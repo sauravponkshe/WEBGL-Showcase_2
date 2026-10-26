@@ -13,9 +13,9 @@ $portsToTry = 8743..8760
 
 # Baked in by the exporter: the app name (= the page title), the launcher / shortcut file names, and whether the
 # debugger (Statistics window + quality switcher) is switched on for this local copy.
-$appTitle  = '3D Configurator'
-$batName   = '3D Configurator.bat'
-$lnkName   = '3D Configurator.lnk'
+$appTitle  = 'Mega Yacht'
+$batName   = 'Mega Yacht.bat'
+$lnkName   = 'Mega Yacht.lnk'
 $debugMode = $false
 $Host.UI.RawUI.WindowTitle = $appTitle
 
@@ -82,7 +82,7 @@ elseif ($defaultId -like 'MSEdge*' -and $edgeExe)   { $appBrowser = $edgeExe }
 elseif ($defaultId -like 'Brave*'  -and $braveExe)  { $appBrowser = $braveExe }
 if (-not $appBrowser) { $appBrowser = @($edgeExe, $chromeExe, $braveExe | Where-Object { $_ })[0] }
 if ($appBrowser) {
-    $profileDir = Join-Path $env:LocalAppData ('PonkConfigurator\' + '3D Configurator')
+    $profileDir = Join-Path $env:LocalAppData ('PonkConfigurator\' + 'Mega Yacht')
     $browserArgs = "--app=$url --user-data-dir=`"$profileDir`" --no-first-run --no-default-browser-check --ignore-gpu-blocklist --enable-gpu-rasterization --enable-zero-copy"
     try { Start-Process $appBrowser -ArgumentList $browserArgs } catch { Start-Process $url }
 } else {

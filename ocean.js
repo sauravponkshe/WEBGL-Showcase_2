@@ -542,6 +542,8 @@ out vec4 outc;
 uniform sampler2D uReflTex;   /* the scene seen in a mirror at the water level (boat, islands) */
 uniform mat4 uReflMat;
 uniform vec4 uReflP;          /* on, water level, strength, ripple distortion */
+uniform float uHullUnder;     /* 1 = solid foam under the whole hull footprint instead of cutting the water away inside the outline */
+uniform float uRingFill;      /* how far the solid, tight foam reaches out from the hull into the ring (0 = only the thin strip at the hull) */
 
 vec3 envSample(vec3 dir, float rough){ return textureCubeUV(uEnv, uEnvRot*(uRot*dir), rough).rgb*uEnvI; }
 vec3 fogColor(vec3 V){
@@ -686,7 +688,9 @@ void main(){
     amt = max(amt, hullRim);
     if (hullRim > 0.002) hullStk = streakTex(hullLocal(vW));      /* the stretched foam texture is only needed inside the ring */
     /* filled: right at the hull, and under any overhang between the waterline and the outline, the foam is solid, so no strip of water shows between the hull and its foam */
-    hullFill = step(0.01, uHullS.w)*(1.0 - smoothstep(0.0, 0.16, max(hs, 0.0)))*smoothstep(-0.9, -0.5, hs)*smoothstep(0.0, 0.35, I);
+    float fillW = max(rimW, 0.05)*(0.35 + 0.5*uRingFill);                         /* the solid part grows and shrinks with the ring itself (its size, the wave pulse) */
+    float fillIn = max(1.0 - smoothstep(0.0, 0.16, max(hs, 0.0)), uRingFill*(1.0 - smoothstep(fillW*0.75, fillW, max(hs, 0.0))));
+    hullFill = step(0.01, uHullS.w)*fillIn*mix(smoothstep(-0.9, -0.5, hs), 1.0, uHullUnder)*smoothstep(0.0, 0.35, I);
   }
 
   float foam = 0.0;
@@ -697,7 +701,8 @@ void main(){
   if (amt > 0.02) {
     tex = foamTex(vQ);
     float m = amt*(0.30 + 1.05*tex)*(0.85 + 0.15*min(I, 2.0)) + hullRim*hullRim*0.50*(0.30 + 1.2*mix(tex, hullStk, 0.75));
-    m = max(m, hullFill*0.95);
+    float fillM = hullFill*(0.84 + 0.14*tex);                                     /* tight, fine-bubble foam, no pinholes */
+    m = max(m, fillM);
     if (uFoamOp.z > 0.01 && ringShare > 0.01) {
       /* tiny see-through pinholes in the ring foam (a few cm across), a few more toward its outer edge */
       vec2 hh = hullLocal(vWorld.xz);
@@ -705,7 +710,7 @@ void main(){
       float thr = uFoamOp.z*(0.62 + 0.18*ringOuter)*smoothstep(0.0, 0.35, hullHs);   /* no pinholes right against the hull */
       float hc = thr + 0.035, hwH = 0.5*uFoamSoft.w;       /* same centre as the classic crisp holes, a wider feather when softer */
       float holeM = mix(1.0, smoothstep(hc - hwH, hc + hwH, hn), 1.0 - smoothstep(25.0, 80.0, dist));
-      m = mix(m, max(m*holeM, hullFill*0.95), ringShare);
+      m = mix(m, max(m*holeM, fillM), ringShare);
     }
     float hwF = mix(uFoamSoft.x, uFoamSoft.y, ringShare);       /* softness: how wide the fade from clear water to solid foam is (0.14 = the classic look) */
     float kF = hwF/0.14, cenF = 0.48 - 0.10*(kF - 1.0);
@@ -719,6 +724,7 @@ void main(){
   vec3 foamCol = mix(fringe, thick, smoothstep(0.1, 0.8, dens));
   foamCol += sunCol*0.05*dayF*PSQ(max(dot(N, uSunDir), 0.0))*dens;
   float foamA = foam*mix(0.45, 0.85, dens)*mix(uFoamOp.x, uFoamOp.y, ringShare);
+  foamCol *= 1.0 - 0.30*uHullUnder*(1.0 - smoothstep(-0.35, 0.0, hullHs));          /* under the hull the foam sits in its shade */
   col = mix(col, foamCol, foamA);
   col += specC*(1.0 - foamA);
 
@@ -732,7 +738,7 @@ void main(){
   alpha = max(alpha, F);                                   /* at grazing angles the surface mirrors the sky and is never clear */
   alpha = max(alpha, foamA);
   alpha *= smoothstep(0.0, 0.10, wd);
-  if (uHullP.y > 0.5) alpha *= smoothstep(-0.14, 0.04, hullSd(vWorld.xz));   /* no water inside the hull */
+  if (uHullP.y > 0.5 && uHullUnder < 0.5) alpha *= smoothstep(-0.14, 0.04, hullSd(vWorld.xz));   /* no water inside the hull (with foam under the hull the foam fills it instead) */
   float dim = 1.0 - exp(-pow(dist/uFogDist, 3.0));
   alpha = max(alpha, dim);
   if (dim > 0.003) col = mix(col, fogColor(V), dim);
@@ -749,11 +755,13 @@ in float aA;
 in vec3 aVel;
 uniform mat4 modelMatrix, viewMatrix, projectionMatrix;
 uniform vec3 uCam;
-uniform float uProj, uAspect;
+uniform float uProj, uAspect, uStyle, uDrop;
+uniform vec3 uSunDir;
 out float vA;
 out float vSoft;
 out vec2 vDir;
 out float vStretch;
+out float vBack;
 void main(){
   float dist = length(uCam - position);
   vSoft = smoothstep(0.14, 0.40, aSize);      /* tiny droplets stay crisp, big puffs are soft mist */
@@ -763,9 +771,12 @@ void main(){
   vec2 dn = (c1.xy/max(c1.w, 1e-3) - c0.xy/max(c0.w, 1e-3))*vec2(uAspect, 1.0);
   float dl = length(dn);
   vDir = dl > 1e-6 ? dn/dl : vec2(0.0, 1.0);
-  /* fast small drops are drawn as streaks along their screen-space motion */
-  vStretch = 1.0 + 5.0*(1.0 - vSoft)*clamp(length(aVel)/8.0, 0.0, 1.0);
-  gl_PointSize = clamp(aSize*uProj/max(dist, 0.5)*vStretch, 1.5, 90.0);
+  /* Spray style: 0 = fast small drops drawn as streaks along their screen-space motion, 1 = round droplets (only a hint of motion blur) */
+  float spd = clamp(length(aVel)/8.0, 0.0, 1.0);
+  vStretch = 1.0 + mix(5.0, 0.45, uStyle)*(1.0 - vSoft)*spd;
+  float dsz = mix(uDrop, 1.0, vSoft);          /* the droplet size slider leaves the big soft mist alone */
+  gl_PointSize = clamp(aSize*dsz*uProj/max(dist, 0.5)*mix(vStretch, 1.0 + (vStretch - 1.0)*0.5, uStyle), 1.5, 90.0);
+  vBack = pow(clamp(dot(normalize(position - uCam), uSunDir), 0.0, 1.0), 3.0);      /* looking toward the sun: spray glows */
   vA = aA;
   gl_Position = projectionMatrix*viewMatrix*modelMatrix*vec4(position, 1.0);
 }
@@ -775,16 +786,18 @@ in float vA;
 in float vSoft;
 in vec2 vDir;
 in float vStretch;
-uniform float uOut, uAmbL;
+in float vBack;
+uniform float uOut, uAmbL, uStyle;
 out vec4 outc;
 void main(){
   vec2 q = vec2(gl_PointCoord.x, 1.0 - gl_PointCoord.y)*2.0 - 1.0;
   float qa = dot(q, vDir), qb = dot(q, vec2(-vDir.y, vDir.x));
   float r2 = qa*qa + qb*qb*vStretch*vStretch;
   if (r2 > 1.0) discard;
-  float a = mix(pow(1.0 - r2, 0.55), pow(1.0 - r2, 1.6), vSoft)*vA;
+  float a = mix(mix(pow(1.0 - r2, 0.55), pow(1.0 - r2, 0.9), uStyle), pow(1.0 - r2, 1.6), vSoft)*vA;
   float dayF = dayFac();
   vec3 col = vec3(0.95, 0.98, 1.0)*(0.15 + 0.85*clamp(uAmbL/0.45, 0.0, 2.0))*(0.85 + 0.15*hash21(gl_FragCoord.xy));
+  col *= 1.0 + 0.9*vBack*dayF*uStyle*(1.0 - 0.5*vSoft);                         /* backlit droplets catch the sun */
   if (uOut > 0.5) col = post(col);
   outc = vec4(ponkSafe(col), ponkF(a, 1.0));
 }
@@ -867,6 +880,28 @@ export const DEFAULT_LOOK = {
   hullRebound: 1,      /* water bouncing off the hull (run-up, ripples, splash), also when the boat is idle: 0 off .. 2 strong */
   reflectBoat: true,   /* mirror the boat and islands in the water (a second, mirrored picture of the scene) */
   reflectAmt: 1,       /* strength of that mirror image (2 and 3 exaggerate it) */
+  reflectDistort: 1,   /* how much the ripples bend and smear the mirror image: 0 = a flat mirror, 1 = as before, higher = more wobble */
+  birds: false,        /* flapping gulls over the water (and in its reflection) */
+  birdCount: 8,        /* how many */
+  birdSize: 1.2,       /* wingspan, metres */
+  birdAlt: 6,          /* height above the water, metres */
+  birdRadius: 18,      /* how far they roam around the boat, metres */
+  birdSpeed: 4,        /* m/s */
+  birdRandom: 0.5,     /* how different each bird is: speed, size, height, wing beat, path (0 = identical) */
+  birdFlock: 0.5,      /* 0 = every bird on its own path .. 1 = tight flocks sharing a path */
+  birdPasses: 0.2,     /* share of the birds that fly across in a pass instead of circling */
+  birdFlap: 1,         /* wing-beat speed (x) */
+  birdColor: '#f2f2ee',
+  birdReflect: 1,      /* how strongly they show in the water */
+  birdSeed: 7,         /* pick another arrangement */
+  hullFoamUnder: true, /* solid foam under the whole hull footprint (so a high bob or low water never shows a blue patch); off for open hulls */
+  hullFill: 0.8,       /* how far solid, tight foam reaches from the hull out into the foam ring: 0 = a thin strip, 1 = almost to the outer edge */
+  sprayStyle: 1,       /* spray look: 0 = streaks .. 1 = round droplets */
+  sprayDrop: 1,        /* size of the individual spray droplets (the soft mist is not scaled) */
+  sprayMist: 1,        /* amount of fine, soft mist around the spray */
+  transTime: 4,        /* seconds the sea takes to change INTO this state (Static or Running); the cruise speed builds up over the same time */
+  glassFix: true,      /* see-through (transmission) glass is drawn as blended glass while the sea is on, so it shows correctly over the water */
+  glassAlpha: 0.3,     /* how solid that blended glass is when the model's glass is fully see-through (0.05 = nearly clear .. 1 = opaque) */
   reflectGlass: false, /* draw see-through glass in the mirror image too (costly: it makes the viewer draw the scene an extra time) */
   wetOn: true,         /* the wet-hull material effect at all (off = the materials are left exactly as the model has them) */
   boatShadow: 0.55,    /* the hull's soft shadow on the water */
@@ -1297,7 +1332,13 @@ export function createOcean(THREE, opts = {}) {
         const Tsea = Math.max(-60, -(0.05 * u + 36 * sstep(40, 290, u)));
         T[i] = T[i] > -1e8 ? Math.max(T[i], Tsea) : Tsea;
       }
+      /* smooth the seabed only: the blur used to spread the land's height out over the water, so the sea showed a flat, foamless
+         halo (up to ~4 m wide) between the real shoreline and where the foam began. Land keeps its exact height, and is held at
+         the waterline while the sea side is blurred, so the shelf meets the coast at sea level and the foam starts right there. */
+      const T0 = Float32Array.from(T);
+      for (let i = 0; i < res * res; i++) if (land[i]) T[i] = 0;
       blur(T, res, Math.max(1, Math.round(2.0 / cell)), 2);
+      for (let i = 0; i < res * res; i++) if (land[i]) T[i] = T0[i]; else if (T[i] > 0.02) T[i] = 0.02;
     } else {
       const cell = Math.max(cx, cz);
       const dist = anyLand ? edt(land, res) : null;
@@ -1423,7 +1464,7 @@ export function createOcean(THREE, opts = {}) {
     uInvL: uv(V3()), uOff: uv(V3()), uTexPerM: uv(V3()), uGrid: uv(V3(600, SEA_A, 384)),
     uLambda: uv(1), uMulInv: uv(1), uAmpRef: uv(2),
     uWaterCol: uv(V3()), uFoamCol: uv(V3()), uFW: uv(V3()),
-    uTransp: uv(0.55), uFoamOp: uv(V3(1, 1, 0)), uFoamSoft: uv(new THREE.Vector4(0.14, 0.14, 0.5, 0.07)), uReflTex: uv(null), uReflMat: uv(new THREE.Matrix4()), uReflP: uv(new THREE.Vector4()), uFoamAmt: uv(1), uWindN: uv(0.5), uOut: uv(0), uFogDist: uv(440), uGlint: uv(0.6), uEnvI: uv(1), uFogMode: uv(0),
+    uTransp: uv(0.55), uFoamOp: uv(V3(1, 1, 0)), uFoamSoft: uv(new THREE.Vector4(0.14, 0.14, 0.5, 0.07)), uReflTex: uv(null), uReflMat: uv(new THREE.Matrix4()), uReflP: uv(new THREE.Vector4()), uFoamAmt: uv(1), uRingFill: uv(0.8), uHullUnder: uv(1), uWindN: uv(0.5), uOut: uv(0), uFogDist: uv(440), uGlint: uv(0.6), uEnvI: uv(1), uFogMode: uv(0),
     uFogCol: uv(V3(0.5, 0.6, 0.7)), uEnvRot: uv(new THREE.Matrix3()), uRot: uv(new THREE.Matrix3()), uEnv: uv(null),
   };
   const seaMat = new THREE.RawShaderMaterial({
@@ -1456,7 +1497,7 @@ export function createOcean(THREE, opts = {}) {
 
   /* ---------- spray ---------- */
   const SPR = { n: 0, max: 0, ps: null, al: null, sz: null, vel: null, age: null, life: null, s0: null, kind: null, geo: null, pts: null, rnd: rng(99), mat: null };
-  const sprayU = { uCam: U.uCam, uSunDir: U.uSunDir, uTime: U.uTime, uDeepCol: U.uDeepCol, uProj: uv(800), uAspect: uv(1.6), uOut: SU.uOut, uAmbL: uv(0.45) };
+  const sprayU = { uCam: U.uCam, uSunDir: U.uSunDir, uTime: U.uTime, uDeepCol: U.uDeepCol, uProj: uv(800), uAspect: uv(1.6), uOut: SU.uOut, uAmbL: uv(0.45), uStyle: uv(1), uDrop: uv(1) };
   function sprayInit(max) {
     if (SPR.pts) { root.remove(SPR.pts); SPR.geo.dispose(); }
     SPR.max = max; SPR.n = 0;
@@ -1510,10 +1551,11 @@ export function createOcean(THREE, opts = {}) {
     const slap = clamp(-f.heaveVel * 0.9, 0, 3) + clamp(Math.abs(f.pitchVel) * 6, 0, 2);
     const energy = (0.10 + 1.3 * sp * sp + 0.6 * slap) * f.sprayK * L.boatSpray;
     f.sprayAcc = (f.sprayAcc || 0) + dt * 320 * energy;          /* droplets: many, tiny */
-    f.mistAcc = (f.mistAcc || 0) + dt * 7 * energy;             /* mist: few, faint, soft */
+    const mistK = clamp(L.sprayMist == null ? 1 : L.sprayMist, 0, 3);
+    f.mistAcc = (f.mistAcc || 0) + dt * 7 * energy * mistK;             /* mist: few, faint, soft */
     const rx = -f.fz, rz = f.fx, sgn = L.boatCruise ? -1 : 1;
     let n = 0;
-    while (f.mistAcc >= 1 && n++ < 8) {
+    while (f.mistAcc >= 1 && n++ < 24) {
       f.mistAcc -= 1;
       const k = pickOutline(h, r() < 0.35 + 0.6 * sp, r());
       const u = h.pts.u[k], v = h.pts.v[k], nu = h.pts.nu[k], nv = h.pts.nv[k];
@@ -1521,7 +1563,7 @@ export function createOcean(THREE, opts = {}) {
       const out = 0.6 + r() * 0.8;
       sprayAdd(x, cpuHeight(x, z) + 0.2, z, (f.fx * nu + rx * nv) * out + sgn * f.fx * f.spd * 0.3, 0.8 + r() * (1.0 + 1.6 * sp), (f.fz * nu + rz * nv) * out + sgn * f.fz * f.spd * 0.3, 0.20 + r() * 0.2, 0.9 + r() * 0.9, 2);
     }
-    if (f.mistAcc > 4) f.mistAcc = 0;
+    if (f.mistAcc > 12) f.mistAcc = 0;
     /* bow sheets: short bright streaks thrown up and out where the outline faces forward, only when the boat has some speed */
     f.sheetAcc = (f.sheetAcc || 0) + dt * 70 * sp * sp * (0.4 + 0.6 * clamp(slap, 0, 1)) * f.sprayK * L.boatSpray;
     n = 0;
@@ -1617,6 +1659,8 @@ export function createOcean(THREE, opts = {}) {
       }
       if (windAcc > 10) windAcc = 0;
     }
+    const mistA = clamp(L.sprayMist == null ? 1 : L.sprayMist, 0, 2);
+    sprayU.uStyle.value = clamp(L.sprayStyle == null ? 1 : L.sprayStyle, 0, 1); sprayU.uDrop.value = clamp(L.sprayDrop == null ? 1 : L.sprayDrop, 0.3, 4);
     let i = 0;
     while (i < SPR.n) {
       SPR.age[i] += dt;
@@ -1637,7 +1681,7 @@ export function createOcean(THREE, opts = {}) {
       const t = a / SPR.life[i];
       const kd = SPR.kind[i];
       SPR.sz[i] = SPR.s0[i] * (kd === 1 ? 1 - 0.35 * t : kd === 2 ? 1 + 1.2 * t : kd === 3 ? 1 - 0.25 * t : 1 + 1.4 * t);
-      SPR.al[i] = sstep(0, 0.05, a) * Math.pow(1 - t, kd === 1 || kd === 3 ? 0.5 : 0.8) * (kd === 1 ? 0.95 : kd === 2 ? 0.10 : kd === 3 ? 0.60 : 0.8);
+      SPR.al[i] = sstep(0, 0.05, a) * Math.pow(1 - t, kd === 1 || kd === 3 ? 0.5 : 0.8) * (kd === 1 ? 0.95 : kd === 2 ? 0.10 * mistA : kd === 3 ? 0.60 : 0.8 * (0.4 + 0.6 * mistA));
       i++;
     }
     const at = SPR.geo.attributes;
@@ -2173,6 +2217,10 @@ export function createOcean(THREE, opts = {}) {
     rebuildHulls();
   }
   let heroFlow = 0, heroScroll = 0, heroBowA = 0;
+  /* RT = the real time since the previous frame (capped at 0.5 s, so a frozen tab cannot throw the boat across the sea).
+     update(dt) still clamps dt to 0.05 for the simulation itself; what the clock must decide (water flowing past the boat, how fast
+     the boat's speed and its bob settle) uses RT, so they come out the same at 60 fps as at 10 fps. */
+  let RT = 0.016;
   const _mD = new THREE.Matrix4(), _mE = new THREE.Matrix4(), _pc = new THREE.Vector3(), _bd = new THREE.Vector3();
   /* outline preview: the detected waterline drawn on the water, so what the viewer sees can be checked by eye */
   const OUT = { on: false, obj: null, built: -1 };
@@ -2199,7 +2247,7 @@ export function createOcean(THREE, opts = {}) {
   }
   function floaterUpdate(dt) {
     const sc = area.scale;
-    const k = Math.min(1, dt * 6);
+    const k = 1 - Math.exp(-RT * 6);
     for (const f of floaters) {
       if (f.hero && L.trackParts && f.trk) {
         /* where the model's own animation has taken the part since the setup, in world space (without the sea motion) */
@@ -2212,9 +2260,9 @@ export function createOcean(THREE, opts = {}) {
       } else { f.pc.copy(f.pivot); f.bc[0] = f.bow[0]; f.bc[1] = f.bow[1]; }
       const lx = (f.pc.x - area.center[0]) / sc, lz = (f.pc.z - area.center[2]) / sc;
       f.x = lx; f.z = lz; f.fx = f.bc[0]; f.fz = f.bc[1];
-      if (f.lastX != null && dt > 0) {
-        const v = Math.hypot(lx - f.lastX, lz - f.lastZ) / dt;
-        f.spd += (clamp(v, 0, 30) - f.spd) * Math.min(1, dt * 2);
+      if (f.lastX != null && RT > 0) {
+        const v = Math.hypot(lx - f.lastX, lz - f.lastZ) / RT;
+        f.spd += (clamp(v, 0, 30) - f.spd) * (1 - Math.exp(-RT * 2));
       }
       f.lastX = lx; f.lastZ = lz;
       if (f.hero && L.boatCruise) f.spd = L.boatSpeed / sc;       /* held in place, but under way: the water does the moving */
@@ -2277,8 +2325,8 @@ export function createOcean(THREE, opts = {}) {
     /* water flowing past the held boat: the wave pattern slides toward the stern (the foam trail follows in the wake pass) */
     const hero = floaters[0];
     heroFlow = (hero && hero.hero && L.boatCruise) ? L.boatSpeed / sc : 0;
-    if (hero && heroFlow > 0) { DR[0] += hero.fx * heroFlow * dt; DR[1] += hero.fz * heroFlow * dt; }
-    heroScroll += (hero ? (L.boatCruise ? heroFlow : hero.spd) : 0) * dt;
+    if (hero && heroFlow > 0) { DR[0] += hero.fx * heroFlow * RT; DR[1] += hero.fz * heroFlow * RT; }
+    heroScroll += (hero ? (L.boatCruise ? heroFlow : hero.spd) : 0) * RT;
     U.uDrift.value.set(DR[0], DR[1]);
     if (hero && hero.hull && L.hullShape) {
       U.uHullTex.value = hero.hull.tex;
@@ -2333,7 +2381,7 @@ export function createOcean(THREE, opts = {}) {
     if (has('waterColor') && changed) dirtySun = true;       /* the baked fallback sky carries the deep colour below the horizon */
     { const sm = (s) => { s = clamp(s, 0, 1); return s < 0.5 ? mix(0.015, 0.14, s * 2) : mix(0.14, 0.46, (s - 0.5) * 2); }; const hs = clamp(L.hullHoleSoft, 0, 1); SU.uFoamSoft.value.set(sm(L.foamSoftness), sm(L.hullFoamSoftness), clamp(L.hullFoamSoftness, 0, 1), hs < 0.5 ? mix(0.012, 0.07, hs * 2) : mix(0.07, 0.32, (hs - 0.5) * 2)); }
     SU.uFoamOp.value.set(Math.pow(clamp(L.foamOpacity, 0, 1), 1.5), Math.pow(clamp(L.hullFoamOpacity, 0, 1), 1.5), clamp(L.hullRingHoles, 0, 1));   /* power curve so the middle of the slider reads as half-transparent */ SU.uTransp.value = L.transp; SU.uFoamAmt.value = L.foam; SU.uWindN.value = L.wind;
-    SU.uFogDist.value = L.fogDist; SU.uGlint.value = L.glint;
+    SU.uFogDist.value = L.fogDist; SU.uGlint.value = L.glint; SU.uRingFill.value = clamp(L.hullFill == null ? 0.8 : L.hullFill, 0, 1); SU.uHullUnder.value = (L.hullFoamUnder == null || L.hullFoamUnder) ? 1 : 0;
     if (/^#/.test(L.horizon || '')) { const c = hexLin(L.horizon); SU.uFogCol.value.set(c[0], c[1], c[2]); SU.uFogMode.value = 1; } else SU.uFogMode.value = 0;
     sprayU.uSunDir = U.uSunDir;
   }
@@ -2353,13 +2401,13 @@ export function createOcean(THREE, opts = {}) {
   /* every see-through (transmissive) mesh outside the ocean: left out of the mirror image unless asked for */
   function glassScan() {
     RFL.glass.length = 0;
-    scene.traverse((o) => { if (o.isMesh && o !== root && glassMat(o.material)) { for (let p = o; p; p = p.parent) if (p === root) return; RFL.glass.push(o); } });
+    scene.traverse((o) => { if (o.isMesh && o !== root && (glassMat(o.material) || (o.userData && o.userData.__ponkGlassOrig))) { for (let p = o; p; p = p.parent) if (p === root) return; RFL.glass.push(o); } });
   }
   const _rN = new THREE.Vector3(0, 1, 0), _rP = new THREE.Vector3(), _rC = new THREE.Vector3(), _rV = new THREE.Vector3(), _rL = new THREE.Vector3(), _rT = new THREE.Vector3(), _rU = new THREE.Vector3();
   const _rM = new THREE.Matrix4(), _rS = new THREE.Vector2(), _rCol = new THREE.Color(), _rPl = new THREE.Plane(), _rQ = new THREE.Vector4(), _rK = new THREE.Vector4();
   function reflectUpdate() {
     const P = SU.uReflP.value;
-    const want = L.reflectBoat && L.reflectAmt > 0.001 && camera && (floaters.length || islandOn);
+    const want = L.reflectBoat && L.reflectAmt > 0.001 && camera && (floaters.length || islandOn || birdsActive());
     if (!want) { P.x = 0; return; }
     camera.updateMatrixWorld();
     camera.getWorldPosition(_rC);
@@ -2370,7 +2418,8 @@ export function createOcean(THREE, opts = {}) {
     if (RFL.off || RFL.fail >= 3) { P.x = 0; return; }
     const qi = Q ? Q.qi : 1;
     RFL.n++;
-    if (RFL.rt && (RFL.n % [3, 2, 1][qi]) !== 0) { P.set(1, RFL.py, L.reflectAmt, 0.05); return; }
+    const rdist = 0.05*clamp(L.reflectDistort == null ? 1 : L.reflectDistort, 0, 8);
+    if (RFL.rt && (RFL.n % [3, 2, 1][qi]) !== 0) { P.set(1, RFL.py, L.reflectAmt, rdist); return; }
     const t0 = performance.now();
     renderer.getDrawingBufferSize(_rS);
     const rs = [0.35, 0.5, 0.6][qi];
@@ -2427,8 +2476,11 @@ export function createOcean(THREE, opts = {}) {
       for (let i = 0; i < RFL.glass.length; i++) { const g = RFL.glass[i]; if (g.visible) { g.visible = false; hid.push(g); } }
     }
     let okR = true;
+    const bm = BR.mesh && BR.mesh.visible ? BR.mesh : null; const bmv = !!bm;
+    if (bm) { if (L.birdReflect <= 0.001) bm.visible = false; else BR.uni.uBMir.value = clamp(L.birdReflect, 0, 1); }
     try { renderer.render(scene, vc); } catch (e) { okR = false; if (++RFL.fail === 1) console.warn('[ocean] mirror image failed:', e); } finally {
       for (let i = 0; i < hid.length; i++) hid[i].visible = true;
+      if (bm) { bm.visible = bmv; BR.uni.uBMir.value = 1; }
       renderer.setRenderTarget(prevRT); renderer.autoClear = prevAuto; scene.background = prevBg; renderer.setClearColor(_rCol, prevA);
       renderer.shadowMap.autoUpdate = prevSh; renderer.shadowMap.needsUpdate = prevNeed; renderer.xr.enabled = prevXR; root.visible = prevRoot; if (OUT.obj) OUT.obj.visible = prevOut;
     }
@@ -2440,8 +2492,135 @@ export function createOcean(THREE, opts = {}) {
     renderer.autoClear = false;
     try { runPass(M.san, RFL.rt); } finally { renderer.autoClear = prevAuto2; renderer.setRenderTarget(prevRT); }
     RFL.py = planeY;
-    P.set(1, planeY, L.reflectAmt, 0.05);
+    P.set(1, planeY, L.reflectAmt, rdist);
     RFL.ms = performance.now() - t0;
+  }
+
+  /* ---------- birds: flapping gulls over the water. They live in the scene (not in the ocean's own group), so the mirror image of the
+     scene picks them up and they are reflected in the sea. Their paths are worked out on the GPU from a few random numbers per
+     bird, so a flock costs next to nothing. ---------- */
+  const BIRD_MAX = 200;
+  const BR = { mesh: null, uni: null, mat: null, seedKey: '', col: '' };
+  function birdGeometry() {
+    const P = [], C = [];
+    const tri = (a, b, c, ca, cb, cc) => { [a, b, c].forEach((v) => P.push(v[0], v[1], v[2])); [ca, cb, cc].forEach((k) => C.push(k, k, k)); };
+    /* normalised: half the wingspan = 1, forward = +z, right = +x */
+    const N = [0, 0, 0.5], Tl = [0, 0, -0.5], Tp = [0, 0.09, -0.05], Bt = [0, -0.08, 0], L = [-0.07, 0, 0], R = [0.07, 0, 0];
+    tri(N, Tp, R, 1, 1, 1); tri(N, L, Tp, 1, 1, 1); tri(N, R, Bt, 0.95, 0.95, 0.95); tri(N, Bt, L, 0.95, 0.95, 0.95);
+    tri(Tl, R, Tp, 1, 1, 1); tri(Tl, Tp, L, 1, 1, 1); tri(Tl, Bt, R, 0.95, 0.95, 0.95); tri(Tl, L, Bt, 0.95, 0.95, 0.95);
+    tri([0, 0, -0.42], [-0.13, 0, -0.82], [0.13, 0, -0.82], 0.9, 0.9, 0.9);
+    [1, -1].forEach((s) => {
+      const R0f = [0.06 * s, 0, 0.18], R0b = [0.06 * s, 0, -0.22], M1f = [0.5 * s, 0, 0.14], M1b = [0.5 * s, 0, -0.28], T = [1.0 * s, 0, -0.1];
+      tri(R0f, M1f, R0b, 1, 0.95, 1); tri(R0b, M1f, M1b, 1, 0.95, 0.92); tri(M1f, T, M1b, 0.92, 0.22, 0.7);
+    });
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(P, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(C, 3));
+    g.computeVertexNormals();
+    return g;
+  }
+  const BIRD_VS_DEF = `
+attribute vec4 aSeed;
+uniform float uBT;
+uniform vec4 uBC, uB1, uB2, uB3;
+varying float vBTone;
+float bh(float n){ return fract(sin(n*91.345 + 1.7)*47453.5453); }
+mat3 birdBasis(vec2 h, float roll, float pitch){
+  vec3 f = normalize(vec3(h.x, pitch, h.y));
+  vec3 r0 = normalize(cross(vec3(0.0, 1.0, 0.0), f));
+  vec3 u0 = cross(f, r0);
+  vec3 r = r0*cos(roll) - u0*sin(roll);
+  vec3 u = u0*cos(roll) + r0*sin(roll);
+  return mat3(r, u, f);
+}
+void birdPose(out vec3 P, out mat3 B, out float ph, out float amp, out float scl){
+  vec4 a = aSeed;
+  float rnd = uB1.w, coh = uB3.x, passK = uB3.y;
+  float fl = (floor(a.x*5.0) + 0.5)/5.0;
+  float e = mix(a.x, fl + (fract(a.x*5.0) - 0.5)*0.04, coh);          /* a whole flock shares (nearly) one path */
+  float t = uBT, R0 = max(uB1.x, 1.0), sp = uB1.y;
+  scl = uB1.z*0.5*(1.0 + (a.z - 0.5)*0.6*rnd);
+  float alt = uB2.x*(1.0 + (a.w - 0.5)*0.8*rnd);
+  float dirS = bh(e*7.1 + 3.0) > 0.5 ? 1.0 : -1.0;
+  vec2 hd; float roll; vec2 xz;
+  if (bh(e*13.7 + 2.0) >= passK) {
+    float r = R0*(0.45 + 0.75*mix(e, a.y, rnd));
+    vec2 off = (vec2(bh(e*31.0 + 1.0), bh(e*57.0 + 5.0)) - 0.5)*R0*(0.6 + 0.8*rnd);
+    float w = sp/max(r, 0.5)*(1.0 + (a.z - 0.5)*0.7*rnd);
+    float th = bh(e*17.3)*6.2831853 + dirS*w*t + (a.z - 0.5)*6.2831853*rnd*(1.0 - coh)*0.5;
+    xz = off + r*vec2(cos(th), sin(th));
+    hd = dirS*vec2(-sin(th), cos(th));
+    roll = -dirS*clamp(0.6*sp/max(r, 0.5), 0.0, 0.5);
+  } else {
+    float Ln = R0*3.0;
+    float ang = bh(e*23.0 + 4.0)*6.2831853;
+    vec2 d = vec2(cos(ang), sin(ang)), pr = vec2(-d.y, d.x);
+    float lane = (bh(e*41.0 + 9.0) - 0.5)*R0*(0.8 + 0.8*rnd) + (a.z - 0.5)*2.0*rnd*(1.0 - coh);
+    float s = fract(e*3.7 + t*sp/(2.0*Ln) + (a.z - 0.5)*0.03*(1.0 - coh));
+    xz = d*(s - 0.5)*2.0*Ln + pr*lane;
+    hd = d;
+    roll = 0.12*sin(t*0.7 + a.z*9.0);
+  }
+  P = vec3(uBC.x + xz.x, uBC.y + alt + sin(t*0.55 + a.z*6.2831853)*0.35*rnd, uBC.z + xz.y);
+  B = birdBasis(hd, roll, 0.05*cos(t*1.1 + a.x*20.0));
+  ph = 6.2831853*3.0*uB2.y*t*(1.0 + (a.y - 0.5)*0.5*rnd) + a.x*40.0;
+  amp = 0.8*mix(1.0, smoothstep(-0.4, 0.4, sin(t*0.37 + a.w*50.0)), rnd*0.8);
+  vBTone = 0.86 + 0.14*a.y;
+}`;
+  function birdsBuild() {
+    const g = birdGeometry();
+    const seeds = new Float32Array(BIRD_MAX * 4);
+    g.setAttribute('aSeed', new THREE.InstancedBufferAttribute(seeds, 4));
+    const uni = { uBT: { value: 0 }, uBC: { value: new THREE.Vector4() }, uB1: { value: new THREE.Vector4(18, 4, 1.2, 0.5) }, uB2: { value: new THREE.Vector4(6, 1, 0, 0) }, uB3: { value: new THREE.Vector4(0.5, 0.2, 0, 0) }, uBMir: { value: 1 } };
+    const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85, metalness: 0, side: THREE.DoubleSide });
+    mat.onBeforeCompile = (sh) => {
+      Object.assign(sh.uniforms, uni);
+      sh.vertexShader = sh.vertexShader
+        .replace('#include <common>', '#include <common>\n' + BIRD_VS_DEF)
+        .replace('#include <beginnormal_vertex>', 'vec3 bP; mat3 bB; float bPh, bAmp, bScl;\nbirdPose(bP, bB, bPh, bAmp, bScl);\nvec3 objectNormal = bB*vec3(normal);\n#ifdef USE_TANGENT\nvec3 objectTangent = vec3(tangent.xyz);\n#endif')
+        .replace('#include <begin_vertex>', 'vec3 bq = position; float bax = abs(bq.x); float bw = smoothstep(0.05, 0.35, bax);\nfloat bfl = sin(bPh - bax*1.2)*bAmp;\nbq.y += bw*bax*bfl*0.9; bq.x *= 1.0 - 0.15*bw*abs(bfl);\nvec3 transformed = bP + bB*(bq*bScl);');
+      sh.fragmentShader = sh.fragmentShader
+        .replace('#include <common>', '#include <common>\nvarying float vBTone;\nuniform float uBMir;')
+        .replace('#include <clipping_planes_fragment>', '#include <clipping_planes_fragment>\nif (uBMir < 0.999 && fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233)))*43758.5453) > uBMir) discard;')
+        .replace('#include <color_fragment>', '#include <color_fragment>\ndiffuseColor.rgb *= vBTone;')
+        .replace('#include <emissivemap_fragment>', '#include <emissivemap_fragment>\ntotalEmissiveRadiance += diffuseColor.rgb*0.32;');   /* white undersides, so the mirror image is light too */
+    };
+    mat.customProgramCacheKey = () => 'ponkbird1';
+    const m = new THREE.InstancedMesh(g, mat, BIRD_MAX);
+    const I = new THREE.Matrix4();
+    for (let i = 0; i < BIRD_MAX; i++) m.setMatrixAt(i, I);
+    m.frustumCulled = false; m.name = 'PONK_OCEAN_BIRDS'; m.count = 0; m.castShadow = false; m.receiveShadow = false;
+    scene.add(m);
+    BR.mesh = m; BR.uni = uni; BR.mat = mat; BR.seedKey = ''; BR.col = '';
+  }
+  const birdsActive = () => !!(L.birds && L.birdCount > 0.5);
+  function birdsUpdate() {
+    if (!birdsActive()) { if (BR.mesh) BR.mesh.visible = false; return; }
+    if (!BR.mesh) birdsBuild();
+    const key = String(L.birdSeed | 0);
+    if (BR.seedKey !== key) {
+      BR.seedKey = key;
+      let s = ((L.birdSeed | 0) * 2654435761 + 12345) >>> 0;
+      const rnd = () => { s = (s + 0x6D2B79F5) >>> 0; let t = s; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+      const a = BR.mesh.geometry.getAttribute('aSeed');
+      for (let i = 0; i < a.array.length; i++) a.array[i] = rnd();
+      a.needsUpdate = true;
+    }
+    if (BR.col !== L.birdColor) { BR.col = L.birdColor; try { BR.mat.color.set(L.birdColor || '#f2f2ee'); } catch (e) { BR.mat.color.set('#f2f2ee'); } }
+    const hero = floaters[0];
+    const u = BR.uni;
+    BR.mesh.visible = true;
+    BR.mesh.count = clamp(Math.round(L.birdCount), 0, BIRD_MAX);
+    u.uBT.value = wallTime;
+    u.uBC.value.set(hero ? hero.pc.x : area.center[0], area.center[1], hero ? hero.pc.z : area.center[2], 0);
+    u.uB1.value.set(L.birdRadius, L.birdSpeed, L.birdSize, clamp(L.birdRandom, 0, 1));
+    u.uB2.value.set(L.birdAlt, L.birdFlap, 0, 0);
+    u.uB3.value.set(clamp(L.birdFlock, 0, 1), clamp(L.birdPasses, 0, 1), 0, 0);
+  }
+  function birdsDispose() {
+    if (!BR.mesh) return;
+    scene.remove(BR.mesh); BR.mesh.geometry.dispose(); BR.mat.dispose(); BR.mesh.dispose && BR.mesh.dispose();
+    BR.mesh = null; BR.uni = null; BR.mat = null;
   }
 
   /* ================================================================ frame === */
@@ -2463,9 +2642,54 @@ export function createOcean(THREE, opts = {}) {
     buildLens();
   }
 
-  function update(dt) {
+  /* ---------- glass: transmission glass cannot see the (transparent) sea, so over water it turns black or vanishes.
+     While the sea is on, each such material is swapped for a blended twin (same colour, roughness, reflections); off or disposed puts the model's own back. ---------- */
+  const GF = { t: 9, a: -1, on: false, twins: new Map(), meshes: new Set() };
+  function glassTwin(m) {
+    let c = GF.twins.get(m);
+    if (!c) {
+      c = m.clone();
+      c.transmission = 0; c.thickness = 0; c.transparent = true; c.depthWrite = false;
+      c.userData = Object.assign({}, m.userData, { __ponkGlassTwin: true, __t: m.transmission, __o: m.opacity, __e: m.envMapIntensity == null ? 1 : m.envMapIntensity });
+      GF.twins.set(m, c);
+    }
+    return c;
+  }
+  function glassTwinApply(c) {
+    const u = c.userData, a = clamp(L.glassAlpha == null ? 0.3 : L.glassAlpha, 0.05, 1);
+    const al = clamp(u.__o * (1 - u.__t * (1 - a)), 0.03, 1);
+    c.opacity = al; c.envMapIntensity = u.__e * Math.min(3, 1 / Math.max(al, 0.33));
+  }
+  function glassFixRestore() {
+    GF.meshes.forEach((o) => { const og = o.userData && o.userData.__ponkGlassOrig; if (og) { o.material = og; delete o.userData.__ponkGlassOrig; } });
+    GF.meshes.clear();
+    GF.twins.forEach((c) => c.dispose()); GF.twins.clear();
+  }
+  function glassFixUpdate(dt) {
+    const want = L.glassFix !== false;
+    GF.t += dt;
+    if (want === GF.on && GF.t < 1 && GF.a === L.glassAlpha) return;
+    GF.t = 0;
+    if (!want) { if (GF.on) glassFixRestore(); GF.on = false; return; }
+    GF.on = true;
+    scene.traverse((o) => {
+      if (!o.isMesh || !o.material || o.userData.__ponkGlassOrig) return;
+      for (let p = o; p; p = p.parent) if (p === root) return;
+      const isG = (m) => m && m.transmission > 0 && m.isMeshPhysicalMaterial;
+      const mat = o.material;
+      if (!(Array.isArray(mat) ? mat.some(isG) : isG(mat))) return;
+      o.userData.__ponkGlassOrig = mat; GF.meshes.add(o);
+      o.material = Array.isArray(mat) ? mat.map((m) => (isG(m) ? glassTwin(m) : m)) : glassTwin(mat);
+    });
+    if (GF.a !== L.glassAlpha || GF.twins.size) { GF.twins.forEach(glassTwinApply); }
+    GF.a = L.glassAlpha;
+  }
+
+  function update(dt, dtReal) {
     if (disposed || !enabled) return;
+    RT = clamp(dtReal > 0 ? dtReal : (dt || 0.016), 0.0005, 0.5);
     dt = clamp(dt || 0.016, 0.0005, 0.05);
+    glassFixUpdate(dt);
     const t0 = (typeof performance !== 'undefined') ? performance.now() : 0;
     stats.passes = 0;
     if (dirtyQuality) { dirtyQuality = false; buildQuality(clamp(L.quality | 0, 0, 2)); dirtyBathy = true; }
@@ -2489,6 +2713,7 @@ export function createOcean(THREE, opts = {}) {
     } finally { endPasses(); }
     if (!paused) if (camera) sprayUpdate(dt, waterFocus(camera)); else sprayUpdate(dt, [0, 0]);
     outlineUpdate();
+    birdsUpdate();
     if (wetLast !== !!L.wetOn) { wetLast = !!L.wetOn; if (wetLast) floaters.forEach(wetApply); else floaters.forEach((f) => wetEach(f, wetRelease)); }
     else if (wetLast && (++wetTick & 15) === 0) floaters.forEach(wetApply);     /* materials swapped by the host get the wet look again, within a second */
     reflectUpdate();
@@ -2520,7 +2745,7 @@ export function createOcean(THREE, opts = {}) {
     root,
     get surface() { return seaMesh; },
     get enabled() { return enabled; },
-    set enabled(v) { enabled = !!v; root.visible = enabled; },
+    set enabled(v) { enabled = !!v; root.visible = enabled; if (!enabled) { glassFixRestore(); GF.on = false; } },
     get paused() { return paused; },
     set paused(v) { paused = !!v; },
     get look() { return L; },
@@ -2561,11 +2786,13 @@ export function createOcean(THREE, opts = {}) {
     /* world-space surface height under a world position */
     heightAt(x, z) { return area.center[1] + area.scale * cpuHeight((x - area.center[0]) / area.scale, (z - area.center[2]) / area.scale); },
     groundAt(x, z) { return area.center[1] + area.scale * terrainT((x - area.center[0]) / area.scale, (z - area.center[2]) / area.scale); },
-    stats() { return { passes: stats.passes, ms: stats.ms, hs: 4 * SIM.sigma * area.scale, quality: QUALITY[Q.qi].name, mesh: Q.meshN, bathy: BATHY ? BATHY.res : 0, floaters: floaters.length, spray: SPR.n, reflMs: RFL.ms, reflSize: [RFL.w, RFL.h] }; },
+    stats() { return { flow: heroFlow, scroll: heroScroll, passes: stats.passes, ms: stats.ms, hs: 4 * SIM.sigma * area.scale, quality: QUALITY[Q.qi].name, mesh: Q.meshN, bathy: BATHY ? BATHY.res : 0, floaters: floaters.length, spray: SPR.n, reflMs: RFL.ms, reflSize: [RFL.w, RFL.h] }; },
     debug: { SIM, WDIR, DR, U, get Q() { return Q; }, get BATHY() { return BATHY; }, get LENS() { return LENS; }, M, U, SU, cpuHeight, terrainT, get floaters() { return floaters; }, stepOcean, stepWake, beginPasses, endPasses, runPass },
     dispose() {
       disposed = true;
+      glassFixRestore(); GF.on = false;
       disposeFloaters();
+      birdsDispose();
       scene.remove(root);
       freeQuality();
       if (seaMesh) seaMesh.geometry.dispose();
@@ -2588,7 +2815,7 @@ export function createOcean(THREE, opts = {}) {
 /* ====================================================================================================================
  * Viewer glue: reads the "ocean" block of config.json (written by the Blender add-on), finds the artist's parts in the
  * loaded model by name, hands the helper proxies to the simulation, and, when the page is served by the add-on's Ocean
- * Tuner, mounts the slider panel whose "Lock Look" button stores the look in the .blend.
+ * Tuner, mounts the slider panel whose "Save and Apply" button stores the look in the .blend.
  * ================================================================================================================== */
 const _num = (v, d) => (typeof v === 'number' && isFinite(v) ? v : d);
 
@@ -2667,6 +2894,9 @@ function _topmost(objs) {
   return objs.filter((o) => { for (let p = o.parent; p; p = p.parent) if (set.has(p)) return false; return true; });
 }
 
+/* an object counts as shown when it and every parent up to the scene are visible */
+function _shown(o) { for (let p = o; p; p = p.parent) { if (p.visible === false) return false; if (p.isScene) return true; } return false; }
+
 export async function attachOcean(THREE, ctx) {
   const { renderer, scene, cam: camera, CFG } = ctx;
   const _find0 = ctx.findNode || ((n) => scene.getObjectByName(n));
@@ -2677,12 +2907,154 @@ export async function attachOcean(THREE, ctx) {
   const findNode = (n) => { const o = _find0(n); if (o) { _held.set(n, o); return o; } const c = _held.get(n); return c && _inScene(c) ? c : null; };
   const tuner = !!ctx.tuner;
   let cfg = (CFG && CFG.ocean) ? CFG.ocean : {};
+  /* the tuner page is served with the saved settings already inside it (window.WCE_OCEAN_BOOT), so it opens exactly at the saved look, not at the export's older copy */
+  if (tuner && typeof window !== 'undefined' && window.WCE_OCEAN_BOOT && typeof window.WCE_OCEAN_BOOT === 'object') {
+    const b = window.WCE_OCEAN_BOOT;
+    cfg = Object.assign({}, cfg, b, { look: b.look && Object.keys(b.look).length ? b.look : cfg.look });
+  }
   const look0 = Object.assign({}, cfg.look || {});
   const coarse = typeof matchMedia === 'function' && matchMedia('(pointer:coarse)').matches;
-  if (coarse && look0.quality == null) look0.quality = _num(cfg.mobile_quality, 0);
+  /* phones and tablets: the same check as the viewer's zoom lock (ctx.isMobile), else a touch screen. The artist's 'Phone / Tablet quality'
+     wins over a locked look, which carries the desktop quality; -1 = same as desktop. The tuner page always shows what the artist picks. */
+  const phone = typeof ctx.isMobile === 'function' ? !!ctx.isMobile() : coarse;
+  if (phone && !ctx.tuner && cfg.phone_quality != null && cfg.phone_quality >= 0) look0.quality = Math.max(0, Math.min(2, Math.round(_num(cfg.phone_quality, 0))));
+  else if (phone && !ctx.tuner && cfg.phone_quality == null && look0.quality == null) look0.quality = _num(cfg.mobile_quality, 0);
   const ocean = createOcean(THREE, { renderer, scene, camera, look: look0, area: _areaOf(cfg) });
   if (cfg.demo) ocean.setDemoIslands(true);
-  const st = { sigCol: '', sigFlo: '', sigArea: _sigOf(_areaOf(cfg)), pending: true, t0: performance.now(), slow: 0, lockedLook: cfg.look ? JSON.parse(JSON.stringify(cfg.look)) : null, viz: null, vizOn: false, panel: null };
+  const st = { sigCol: '', sigFlo: '', sigArea: _sigOf(_areaOf(cfg)), pending: true, t0: performance.now(), slow: 0, viz: null, vizOn: false, panel: null };
+
+  /* ---------- Profiles ----------
+     A profile is a full look: sea, boat, whether the boat cruises, and the transition time. Switching to a profile blends the numbers and
+     colours over THAT profile's transition time; switches (booleans, quality, hull rebuilds) happen at once. Quality is shared. */
+  const NOBLEND = new Set(['quality', 'seaRadius', 'birdCount', 'birdSeed', 'boatCruise', 'boatSpeed', 'transTime']);
+  /* these rebuild the hull's distance map every time they change: they blend, but only ~4 times a second (and exactly at the end) */
+  const HULLKEYS = new Set(['hullLevel', 'hullRes']);
+  const HULL_STEP_MS = 250, PANEL_STEP_MS = 66;
+  const COLORS = new Set(['waterColor', 'foamTint', 'birdColor']);
+  const _hx = (c) => { const m = /^#([0-9a-f]{6})$/i.exec(c || ''); return m ? [parseInt(m[1].slice(0, 2), 16), parseInt(m[1].slice(2, 4), 16), parseInt(m[1].slice(4, 6), 16)] : null; };
+  const _mixHex = (a, b, t) => { const x = _hx(a), y = _hx(b); if (!x || !y) return b; return '#' + [0, 1, 2].map((i) => Math.round(x[i] + (y[i] - x[i]) * t).toString(16).padStart(2, '0')).join(''); };
+  const _clone = (o) => JSON.parse(JSON.stringify(o));
+  st.profiles = [];                                   /* [{ id, name, look }] */
+  st.cur = '';                                        /* id of the profile the sea is in */
+  st.prev = '';                                       /* the profile before it (for the tuner's transition preview) */
+  st.listeners = [];
+  function _emit(n) { st.listeners.forEach((f) => { try { f(n); } catch (e) { /* a listener must not stop the sea */ } }); }
+  function _profList(c) {
+    return (c && Array.isArray(c.profiles) ? c.profiles : []).filter((q) => q && q.look && typeof q.look === 'object')
+      .map((q) => ({ id: String(q.id), name: String(q.name || q.id), look: _clone(q.look) }));
+  }
+  function _findProfile(key) {
+    if (key == null || key === '') return null;
+    const k = String(key).toLowerCase();
+    return st.profiles.find((q) => q.id.toLowerCase() === k) || st.profiles.find((q) => q.name.toLowerCase() === k) || null;
+  }
+  function _initProfiles(c) {
+    st.profiles = _profList(c);
+    if (!st.profiles.length && tuner) st.profiles = [{ id: 'p1', name: 'Profile 1', look: ocean.getLook() }];
+    const start = st.profiles.find((q) => q.id === (c && c.start_profile)) || st.profiles[0] || null;
+    st.cur = start ? start.id : '';
+    st.prev = '';
+    return start;
+  }
+  function setProfile(key, o) {
+    o = o || {};
+    const pr = _findProfile(key);
+    if (!pr) return false;
+    if (pr.id === st.cur && !st.blend) return true;
+    if (tuner && !st.blend) { const c0 = _findProfile(st.cur); if (c0) c0.look = ocean.getLook(); }   /* keep what the artist tuned in the profile being left */
+    const cur = ocean.getLook();
+    const to = Object.assign({}, pr.look); to.quality = cur.quality;
+    if (st.cur !== pr.id) st.prev = st.cur;
+    st.cur = pr.id;
+    st.blend = null;
+    if (o.instant || lab.on) { ocean.setLook(to); if (st.panel) st.panel.sync(to); _emit(pr.id); return true; }
+    const inst = {}, keys = [];
+    Object.keys(to).forEach((k) => {
+      if (NOBLEND.has(k)) return;
+      const a = cur[k], b = to[k];
+      if (a === b) return;
+      if (typeof b === 'number' && typeof a === 'number') keys.push(k);
+      else if (COLORS.has(k) && _hx(a) && _hx(b)) keys.push(k);
+      else inst[k] = b;                                                        /* switches and anything that is not a number: at once */
+    });
+    ['seaRadius', 'birdCount', 'birdSeed'].forEach((k) => { if (to[k] !== cur[k]) inst[k] = to[k]; });
+    const toCruise = !!to.boatCruise, fromCruise = !!cur.boatCruise;
+    const ramp = toCruise || fromCruise;
+    const fromSpeed = fromCruise ? cur.boatSpeed : 0, toSpeed = toCruise ? to.boatSpeed : 0;
+    if (toCruise) { inst.boatCruise = true; inst.boatSpeed = fromSpeed; }       /* the water starts to stream from standstill */
+    ocean.setLook(inst);
+    const now0 = performance.now();
+    st.blend = { from: cur, to, keys, t: 0, t0: now0, lastHull: now0, lastPanel: now0, dur: o.dur > 0 ? o.dur : Math.max(0.3, Math.min(12, _num(to.transTime, 4))), ramp, fromSpeed, toSpeed, toCruise };
+    if (st.panel) st.panel.show();                      /* the switches and rebuild-type settings have changed already: the sliders show it at once */
+    _emit(pr.id);
+    return true;
+  }
+  function stepBlend() {
+    const b = st.blend;
+    if (!b) return;
+    /* progress is read off the clock, not counted in frames: the transition lasts exactly its time on any device */
+    const now = performance.now();
+    b.t = Math.min(1, Math.max(0, (now - b.t0) / 1000 / b.dur));
+    const done = b.t >= 1;
+    const e = b.t * b.t * (3 - 2 * b.t), p = {};
+    const hullDue = done || now - b.lastHull >= HULL_STEP_MS;
+    b.keys.forEach((k) => {
+      if (HULLKEYS.has(k) && !hullDue) return;
+      p[k] = done ? b.to[k] : (COLORS.has(k) ? _mixHex(b.from[k], b.to[k], e) : b.from[k] + (b.to[k] - b.from[k]) * e);
+    });
+    if (hullDue) b.lastHull = now;
+    if (b.ramp) p.boatSpeed = b.fromSpeed + (b.toSpeed - b.fromSpeed) * e;
+    if (done) { p.boatCruise = b.toCruise; p.boatSpeed = b.to.boatSpeed; }
+    ocean.setLook(p);
+    if (st.panel && (done || now - b.lastPanel >= PANEL_STEP_MS)) { b.lastPanel = now; st.panel.show(); }   /* the tuner's sliders follow the sea */
+    if (done) st.blend = null;
+  }
+  /* the tuner's profile list: create (a copy of what is on screen), rename, delete */
+  const profileEdit = {
+    list: () => st.profiles.map((q) => ({ id: q.id, name: q.name })),
+    current: () => st.cur,
+    select(id) { return setProfile(id, { instant: true }); },
+    add() {
+      const c0 = _findProfile(st.cur);
+      if (c0 && !st.blend) c0.look = ocean.getLook();
+      let n = st.profiles.length + 1, id;
+      do { id = 'p' + n++; } while (st.profiles.some((q) => q.id === id));
+      let k = st.profiles.length + 1, name;
+      do { name = 'Profile ' + k++; } while (st.profiles.some((q) => q.name.toLowerCase() === name.toLowerCase()));
+      st.profiles.push({ id, name, look: ocean.getLook() });
+      st.prev = st.cur; st.cur = id;
+      return id;
+    },
+    rename(id, name) {
+      const q = _findProfile(id);
+      name = String(name || '').trim().slice(0, 40);
+      if (!q || !name) return false;
+      if (st.profiles.some((x) => x !== q && x.name.toLowerCase() === name.toLowerCase())) return false;
+      q.name = name; return true;
+    },
+    remove(id) {
+      if (st.profiles.length <= 1) return false;
+      const q = _findProfile(id);
+      if (!q) return false;
+      const i = st.profiles.indexOf(q);
+      st.profiles.splice(i, 1);
+      if (st.prev === q.id) st.prev = '';
+      if (st.cur === q.id) { st.cur = ''; setProfile(st.profiles[Math.max(0, i - 1)].id, { instant: true }); }
+      return true;
+    },
+    /* hear the transition: jump to the previous profile, then blend back to this one over its transition time */
+    preview() {
+      const to = _findProfile(st.cur), from = _findProfile(st.prev) || st.profiles.find((q) => q.id !== st.cur);
+      if (!to || !from) return false;
+      if (!st.blend) to.look = ocean.getLook();
+      st.cur = from.id; ocean.setLook(Object.assign({}, from.look, { quality: ocean.getLook().quality }));
+      st.blend = null;
+      setProfile(to.id, {});
+      st.prev = from.id;
+      return true;
+    },
+  };
+  _initProfiles(cfg);
 
   /* ---------- helper data -> simulation ---------- */
   function proxiesOf(list) {
@@ -2702,13 +3074,29 @@ export async function attachOcean(THREE, ctx) {
       st.sigCol = sc;
       if (!cfg.demo) ocean.setColliders(cols.filter((c) => c.meshes.length || c.proxies.length));
     }
-    const flo = (cfg.floaters || []).map((f) => {
+    const auto = !!cfg.hero_auto;
+    let flo = (cfg.floaters || []).map((f) => {
       const names = f.parts || [];
       const objs = names.map(findNode).filter(Boolean);
       if (objs.length < names.length) complete = false;
-      return { name: f.name, objects: _topmost(objs), center: f.center, length: f.length, width: f.width, bow: f.bow, buoyancy: f.buoyancy, spray: f.spray, hero: !!f.hero, hull: f.hull || null };
+      /* visible = the key part (if one was set) or any part of the group is shown, all the way up to the scene */
+      let here = false;
+      if (f.key) { const k = findNode(f.key); here = !!(k && _shown(k)); } else here = objs.some(_shown);
+      return { name: f.name, objects: _topmost(objs), center: f.center, length: f.length, width: f.width, bow: f.bow, buoyancy: f.buoyancy, spray: f.spray, hero: !!f.hero, hull: f.hull || null, here };
     });
-    const sf = _sigOf([(cfg.floaters || []).map((f) => [f.name, f.parts, f.center, f.length, f.width, f.bow, f.buoyancy, f.spray, !!f.hero, _hullSig(f.hull)]), flo.map((f) => f.objects.length)]);
+    let heroName = '';
+    if (auto) {
+      /* a hidden group drops out completely (hull, ring, buoyancy); the pinned boat always stays; otherwise the first shown boat with a hull is the hero */
+      flo = flo.filter((f) => f.here || f.hero);
+      const pin = flo.find((f) => f.hero && f.objects.length);
+      const pick = pin || flo.find((f) => f.here && f.hull && f.objects.length);
+      flo.forEach((f) => { if (f !== pick) { f.hero = false; f.hull = null; } else f.hero = true; });
+      heroName = pick ? pick.name : '';
+      /* the hero goes first */
+      if (pick) { flo.splice(flo.indexOf(pick), 1); flo.unshift(pick); }
+    } else { const h = flo.find((f) => f.hero && f.objects.length); heroName = h ? h.name : ''; }
+    st.heroName = heroName; st.visSig = _visSig();
+    const sf = _sigOf([(cfg.floaters || []).map((f) => [f.name, f.parts, f.key, f.center, f.length, f.width, f.bow, f.buoyancy, f.spray, !!f.hero, _hullSig(f.hull)]), flo.map((f) => f.objects.length + ':' + (f.hero ? 1 : 0) + ':' + (f.here ? 1 : 0)), auto, heroName]);
     if (force || sf !== st.sigFlo) {
       st.sigFlo = sf;
       ocean.setFloaters(flo.filter((f) => f.objects.length));
@@ -2829,6 +3217,22 @@ export async function attachOcean(THREE, ctx) {
       line([P(L, W), P(L, -W), P(-L, -W), P(-L, W)], 0xffb02e, true);
       line([P(-L, 0), P(L, 0), P(L * 0.8, W * 0.5)], 0xffb02e, false);
     });
+    /* the hull proxy of the boat that is the hero right now (the one the water follows), as yellow triangles */
+    (cfg.floaters || []).forEach((f) => {
+      if (!f.hull || f.name !== st.heroName) return;
+      [].concat(f.hull).forEach((h) => {
+        const P = h.p || [], I = h.i && h.i.length ? h.i : null;
+        const n = I ? I.length : P.length / 3, seg = [];
+        for (let i = 0; i + 2 < n; i += 3) {
+          const t = [0, 1, 2].map((k) => { const v = I ? I[i + k] : i + k; return new THREE.Vector3(P[v * 3], P[v * 3 + 1], P[v * 3 + 2]); });
+          seg.push(t[0], t[1], t[1], t[2], t[2], t[0]);
+        }
+        if (seg.length) {
+          const l = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(seg), new THREE.LineBasicMaterial({ color: 0xffe14d, transparent: true, opacity: 0.7, depthTest: false }));
+          l.renderOrder = 998; l.frustumCulled = false; g.add(l);
+        }
+      });
+    });
     (cfg.colliders || []).forEach((cl) => {
       (cl.proxies || []).forEach((p) => {
         const P = p.p || [], I = p.i && p.i.length ? p.i : null;
@@ -2855,17 +3259,26 @@ export async function attachOcean(THREE, ctx) {
       const j = await r.json();
       const first = !st.polled; st.polled = true;
       cfg = Object.assign({}, cfg, j, { look: first ? (j.look || cfg.look) : cfg.look });
-      if (first && j.look) { ocean.setLook(j.look); if (st.panel) st.panel.sync(j.look); }
-      st.lockedLook = j.locked ? (j.look || null) : null;
+      if (first) {
+        const start = _initProfiles(j);
+        if (start) ocean.setLook(Object.assign({}, start.look, { quality: ocean.getLook().quality }));
+        if (st.panel) { st.panel.sync(ocean.getLook()); st.panel.syncProfiles(); }
+      }
       if (st.panel) st.panel.setLocked(!!j.locked);
       applyHelpers(false);
     } catch (e) { /* the add-on may be busy for a moment */ }
   }
   if (ctx.lab) setLab(typeof ctx.lab === 'object' ? Object.assign({ on: true }, ctx.lab) : { on: true });
-  if (tuner) { poll(); pollTimer = setInterval(poll, 1500); }
+  if (tuner) { poll(); pollTimer = setInterval(poll, 500); }
 
   /* ---------- per frame ---------- */
-  function tick(dt) {
+  function _visSig() {
+    return (cfg.floaters || []).map((f) => {
+      if (f.key) { const k = findNode(f.key); return k && _shown(k) ? 1 : 0; }
+      return (f.parts || []).some((n) => { const o = findNode(n); return o && _shown(o); }) ? 1 : 0;
+    }).join('');
+  }
+  function tick(dt, dtReal) {
     if (st.pending) {
       /* the model may still be loading: look for the named parts twice a second, for up to 90 s */
       const nowMs = performance.now();
@@ -2876,17 +3289,30 @@ export async function attachOcean(THREE, ctx) {
         if (done || nowMs - st.t0 > 90000) st.pending = false;
       }
     }
+    /* which yacht is shown can change at any time (configurations): look 3 times a second, rebuild only when the answer differs */
+    if (cfg.hero_auto && !st.pending && !lab.on) {
+      st.visT = (st.visT || 0) + dt;
+      if (st.visT > 0.3) { st.visT = 0; const vs = _visSig(); if (vs !== st.visSig) { st.visSig = vs; applyHelpers(false); } }
+    }
     const need = ocean.requiredFar();
     if (camera.far < need) { camera.far = need; camera.updateProjectionMatrix(); }
-    ocean.update(dt);
+    stepBlend();
+    ocean.update(dt, dtReal);
     /* if the device cannot keep up, step the quality down once (never up) */
-    if (!tuner && dt > 0.045) st.slow += dt; else st.slow = Math.max(0, st.slow - dt * 0.5);
-    if (st.slow > 4 && ocean.look.quality > 0) { ocean.setLook({ quality: ocean.look.quality - 1 }); st.slow = 0; }
+    /* 'Lower the quality when frames are slow' and its floor ('But never below') are the artist's choice */
+    const floorQ = Math.max(0, Math.min(2, Math.round(_num(cfg.min_quality, 0))));
+    if (!tuner && cfg.auto_step !== false && dt > 0.045) st.slow += dt; else st.slow = Math.max(0, st.slow - dt * 0.5);
+    if (st.slow > 4 && ocean.look.quality > floorQ) { ocean.setLook({ quality: ocean.look.quality - 1 }); st.slow = 0; }
   }
 
   const handle = {
     ocean, tick, get config() { return cfg; }, lab, setLab, labFrame,
     setConfig(c) { cfg = c; applyHelpers(true); },
+    heroName() { return st.heroName || ''; },
+    /* ocean profiles: setProfile('Sunset') (id or name) blends there; the same call from a sequence step, a button or a thumbnail */
+    setProfile, getProfile() { return st.cur; }, hasProfiles() { return st.profiles.length > 0; },
+    profiles() { return st.profiles.map((q) => ({ id: q.id, name: q.name })); },
+    onProfile(fn) { if (typeof fn === 'function') st.listeners.push(fn); },
     dispose() { clearInterval(pollTimer); if (st.viz) scene.remove(st.viz); if (st.panel) st.panel.remove(); ocean.dispose(); },
   };
   if (tuner) {
@@ -2894,19 +3320,34 @@ export async function attachOcean(THREE, ctx) {
       lockUrl: ctx.lockUrl || '/__wce_ocean_lock__',
       onViz(on) { st.vizOn = on; refreshViz(); },
       lab: { get state() { return lab; }, set: setLab, frame: labFrame },
-      getLocked: () => st.lockedLook,
+      getLocked: () => { const q = (cfg.profiles || []).find((x) => x.id === st.cur); return q && q.look ? q.look : null; },
+      lockBody: () => {
+        const c0 = _findProfile(st.cur);
+        if (c0 && !st.blend) c0.look = ocean.getLook();
+        const qual = ocean.getLook().quality;                                  /* quality is one setting for the whole page */
+        const profiles = st.profiles.map((q) => ({ id: q.id, name: q.name, look: Object.assign({}, q.look, { quality: qual }) }));
+        const sp = profiles.some((q) => q.id === cfg.start_profile) ? cfg.start_profile : (profiles[0] ? profiles[0].id : '');
+        return { profiles, start_profile: sp };
+      },
+      profiles: profileEdit,
+      heroInfo: () => ({ name: st.heroName || '', auto: !!cfg.hero_auto }),
     });
+    st.listeners.push(() => { if (st.panel) st.panel.syncProfiles(); });
   }
   return handle;
 }
 
 /* ====================================================================================================================
- * Tuner panel: every look slider, live. "Lock Look" posts the whole look to the add-on, which keeps it in the .blend
+ * Tuner panel: every look slider, live. "Save and Apply" posts the whole look to the add-on, which keeps it in the .blend
  * and bakes it into every export from then on.
  * ================================================================================================================== */
 const _lg = (v) => 0.6 * Math.pow(10 / 0.6, v / 1000);
 const _lgInv = (m) => Math.round(1000 * Math.log(m / 0.6) / Math.log(10 / 0.6));
 const _TUNER_ROWS = [
+  ['This profile', null],
+  ['@check', 'boatCruise', 'Boat cruising (held in place, the water flows past)'],
+  ['transTime', 'Transition time', 0.5, 8, 0.1, (v) => v.toFixed(1) + ' s'],
+  ['@note', 'How long the sea takes to change into this profile when it is switched (a button, a sequence step or a thumbnail). The boat speed builds up and eases off over this time.'],
   ['Sea', null],
   ['wind', 'Wind / sea state', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['waveAmp', 'Wave amplitude', 0, 3, 0.01, (v) => Math.round(v * 100) + '%'],
@@ -2922,6 +3363,7 @@ const _TUNER_ROWS = [
   ['waterColor', 'Water colour', 'color'],
   ['foamTint', 'Foam tint', 'color'],
   ['reflect', 'Reflection', 0, 2, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['glassAlpha', 'Glass opacity (fixed glass)', 0.05, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['glint', 'Sun glitter', 0, 2, 0.01, (v) => Math.round(v * 100) + '%'],
   ['fogDist', 'Horizon haze', 150, 2000, 10, (v) => Math.round(v) + ' m'],
   ['Hero boat', null],
@@ -2929,12 +3371,17 @@ const _TUNER_ROWS = [
   ['boatBob', 'Bob (up/down)', 0, 2, 0.01, (v) => Math.round(v * 100) + '%'],
   ['boatTilt', 'Tilt (pitch/roll)', 0, 2, 0.01, (v) => Math.round(v * 100) + '%'],
   ['boatSpray', 'Spray amount', 0, 3, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['sprayStyle', 'Spray style (streaks to droplets)', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['sprayDrop', 'Droplet size', 0.3, 4, 0.01, (v) => '×' + v.toFixed(2)],
+  ['sprayMist', 'Mist amount', 0, 3, 0.01, (v) => Math.round(v * 100) + '%'],
   ['reflectAmt', 'Boat reflection', 0, 3, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['reflectDistort', 'Reflection distortion', 0, 4, 0.01, (v) => Math.round(v * 100) + '%'],
   ['boatShadow', 'Boat shadow on water', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['waterlineDark', 'Waterline darkening', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['wetHull', 'Wet hull', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['wetHeight', 'Wet band height', 0.02, 1.5, 0.01, (v) => v.toFixed(2) + ' m'],
   ['hullRing', 'Foam ring size', 0, 6, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['hullFill', 'Ring fill (solid tight foam)', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['hullFoamOpacity', 'Foam ring opacity', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['hullFoamSoftness', 'Foam ring softness', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['hullRingHoles', 'Foam ring holes', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
@@ -2944,6 +3391,20 @@ const _TUNER_ROWS = [
   ['hullRes', 'Hull detail', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
   ['bowWaveAmt', 'Bow wave size', 0, 2, 0.01, (v) => Math.round(v * 100) + '%'],
   ['@boatchecks'],
+  ['Birds', null],
+  ['@check', 'birds', 'Birds over the water (flapping gulls, also in the reflection)'],
+  ['birdCount', 'Number of birds', 0, 200, 1, (v) => String(Math.round(v))],
+  ['birdSize', 'Size (wingspan)', 0.2, 6, 0.01, (v) => v.toFixed(2) + ' m'],
+  ['birdAlt', 'Height above water', 0.5, 80, 0.1, (v) => v.toFixed(1) + ' m'],
+  ['birdRadius', 'Roaming distance', 3, 150, 0.5, (v) => v.toFixed(0) + ' m'],
+  ['birdSpeed', 'Flight speed', 0, 25, 0.1, (v) => v.toFixed(1) + ' m/s'],
+  ['birdRandom', 'Randomness', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['birdFlock', 'Flocking (together vs apart)', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['birdPasses', 'Passes (fly across vs circle)', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['birdFlap', 'Wing beat speed', 0, 4, 0.01, (v) => v.toFixed(2) + '×'],
+  ['birdColor', 'Bird colour', 'color'],
+  ['birdReflect', 'Bird reflection', 0, 1, 0.01, (v) => Math.round(v * 100) + '%'],
+  ['birdSeed', 'Arrangement (re-roll)', 1, 99, 1, (v) => String(Math.round(v))],
   ['Sun (only used when the scene has no HDRI / for glitter)', null],
   ['sunAz', 'Sun direction', 0, 360, 1, (v) => Math.round(v) + '°'],
   ['sunEl', 'Sun height', 0, 90, 1, (v) => Math.round(v) + '°'],
@@ -2952,46 +3413,130 @@ const _TUNER_ROWS = [
 export function mountTuner(ocean, opt) {
   const css = document.createElement('style');
   css.textContent = `
-#ponk-ocean-tuner{position:fixed;top:12px;right:12px;width:300px;max-height:calc(100vh - 24px);overflow:auto;z-index:2147483000;background:rgba(14,20,26,.88);color:#e8f1f5;border:1px solid rgba(255,255,255,.14);border-radius:10px;font:12px/1.35 system-ui,Segoe UI,Arial,sans-serif;backdrop-filter:blur(8px);box-shadow:0 8px 30px rgba(0,0,0,.45)}
-#ponk-ocean-tuner h3{margin:0;padding:10px 12px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
-#ponk-ocean-tuner .b{padding:0 12px 12px}
-#ponk-ocean-tuner .sec{margin:10px 0 4px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.55}
-#ponk-ocean-tuner .r{display:grid;grid-template-columns:104px 1fr 54px;gap:8px;align-items:center;margin:5px 0}
-#ponk-ocean-tuner .r span.v{text-align:right;opacity:.75;font-variant-numeric:tabular-nums}
-#ponk-ocean-tuner input[type=range]{width:100%;accent-color:#3fb6ff}
-#ponk-ocean-tuner input[type=color]{width:100%;height:22px;border:0;background:none;padding:0}
-#ponk-ocean-tuner select,#ponk-ocean-tuner button{font:inherit;color:inherit;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:6px;padding:5px 8px;cursor:pointer}
-#ponk-ocean-tuner button:hover{background:rgba(255,255,255,.16)}
-#ponk-ocean-tuner button.lock{background:#1a8fd6;border-color:#4cb6f2;font-weight:600}
-#ponk-ocean-tuner .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
-#ponk-ocean-tuner .st{margin-top:8px;font-size:11px;opacity:.8}
-#ponk-ocean-tuner .st.ok{color:#7be28f;opacity:1}
-#ponk-ocean-tuner .st.err{color:#ff8f8f;opacity:1}
-#ponk-ocean-tuner label.c{display:flex;gap:6px;align-items:center;margin:6px 0}`;
+#ponk-ocean-tuner{position:fixed;top:0;right:0;bottom:0;width:340px;display:flex;flex-direction:column;z-index:2147483000;background:#bcbcbe;color:#000;border-left:1px solid #999;font-family:'Rajdhani',-apple-system,sans-serif;font-size:10px;line-height:1.3;user-select:none;-webkit-user-select:none;box-sizing:border-box}
+#ponk-ocean-tuner *{box-sizing:border-box}
+#ponk-ocean-tuner.min{bottom:auto;border-bottom:1px solid #999}
+#ponk-ocean-tuner.min .b,#ponk-ocean-tuner.min .t2{display:none}
+#ponk-ocean-tuner .top{flex-shrink:0;background:#bcbcbe;display:flex;flex-direction:column;gap:6px;padding:8px 14px;border-bottom:1px solid #999}
+#ponk-ocean-tuner .t1{display:flex;align-items:center;justify-content:space-between;gap:14px}
+#ponk-ocean-tuner h1{font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:#000;margin:0;font-weight:600}
+#ponk-ocean-tuner .fold{padding:7px 12px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#000;background:#fff;border:1px solid #000;border-radius:5px;cursor:pointer;font-family:inherit;flex-shrink:0}
+#ponk-ocean-tuner .fold:hover{background:#000;color:#fff}
+#ponk-ocean-tuner .b{flex:1;min-height:0;overflow-y:auto;padding:16px;scrollbar-width:thin}
+#ponk-ocean-tuner details.card{background:#aeaeb0;border:1px solid #999;border-radius:6px;padding:10px;margin-bottom:10px}
+#ponk-ocean-tuner details.card>summary{list-style:none;cursor:pointer;margin:0 0 6px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:#555;border-bottom:1px solid #999;padding-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-weight:600}
+#ponk-ocean-tuner details.card>summary::-webkit-details-marker{display:none}
+#ponk-ocean-tuner details.card>summary::after{content:'–';font-size:12px;color:#555}
+#ponk-ocean-tuner details.card:not([open])>summary{margin-bottom:0;border-bottom:0;padding-bottom:0}
+#ponk-ocean-tuner details.card:not([open])>summary::after{content:'+'}
+#ponk-ocean-tuner .r{display:grid;grid-template-columns:112px 1fr 58px;align-items:center;gap:6px;margin-bottom:6px}
+#ponk-ocean-tuner .r>span:first-child{font-size:10px;color:#000}
+#ponk-ocean-tuner .r span.v{font-size:9px;color:#555;text-align:right;font-family:'Inconsolata',monospace;min-width:0}
+#ponk-ocean-tuner input[type=range]{width:100%;min-width:0;margin:0}
+#ponk-ocean-tuner input[type=color]{width:26px;height:20px;padding:0;border:1px solid #999;border-radius:4px;background:none;justify-self:end}
+#ponk-ocean-tuner select{background:#fff;border:1px solid #999;color:#000;padding:3px 6px;border-radius:4px;font-size:10px;font-family:inherit;min-width:0;width:100%}
+#ponk-ocean-tuner label.c{display:flex;flex-direction:row-reverse;justify-content:space-between;gap:8px;align-items:center;font-size:10px;color:#000;margin:0 0 6px;cursor:pointer}
+#ponk-ocean-tuner label.c input{flex-shrink:0;margin:0}
+#ponk-ocean-tuner button{font-family:inherit}
+#ponk-ocean-tuner .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+#ponk-ocean-tuner .btns button{flex:1;padding:6px;background:transparent;border:1px solid #888;border-radius:5px;color:#000;letter-spacing:.08em;text-transform:uppercase;font-size:9px;cursor:pointer}
+#ponk-ocean-tuner .btns button:hover{border-color:#000}
+#ponk-ocean-tuner .t1 h1{flex:1;min-width:0;font-size:13px;letter-spacing:.08em;white-space:nowrap}
+#ponk-ocean-tuner .t1 .fold{padding:7px 9px}
+#ponk-ocean-tuner .t1{gap:6px}
+#ponk-ocean-tuner button.save{padding:7px 12px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#fff;background:#000;border:none;border-radius:5px;cursor:pointer;flex-shrink:0;white-space:nowrap}
+#ponk-ocean-tuner button.save:disabled{opacity:.6;cursor:default}
+#pot-toast{position:fixed;bottom:14px;left:calc(50% - 170px);transform:translateX(-50%);background:#222;border:1px solid #4caf7d;color:#fff;padding:8px 16px;border-radius:6px;font-size:11px;font-family:'Rajdhani',-apple-system,sans-serif;z-index:2147483001;opacity:0;transition:opacity .2s;pointer-events:none;max-width:60vw;text-align:center}
+#pot-toast.show{opacity:1}
+#ponk-ocean-tuner .st{margin-top:8px;font-size:10px;color:#333;line-height:1.5}
+#ponk-ocean-tuner .st.ok{color:#1f7a4a}
+#ponk-ocean-tuner .st.err{color:#c0392b}
+#ponk-ocean-profiles{position:fixed;top:0;left:0;bottom:0;width:230px;display:flex;flex-direction:column;z-index:2147483000;background:#bcbcbe;color:#000;border-right:1px solid #999;font-family:'Rajdhani',-apple-system,sans-serif;font-size:10px;line-height:1.3;user-select:none;-webkit-user-select:none;box-sizing:border-box}
+#ponk-ocean-profiles *{box-sizing:border-box}
+#ponk-ocean-profiles.min{bottom:auto;border-bottom:1px solid #999}
+#ponk-ocean-profiles.min .pb{display:none}
+#ponk-ocean-profiles .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;border-bottom:1px solid #999}
+#ponk-ocean-profiles h1{font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin:0;font-weight:600}
+#ponk-ocean-profiles .pf{padding:7px 9px;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#000;background:#fff;border:1px solid #000;border-radius:5px;cursor:pointer;font-family:inherit}
+#ponk-ocean-profiles .pf:hover{background:#000;color:#fff}
+#ponk-ocean-profiles .pb{flex:1;min-height:0;overflow-y:auto;padding:12px;scrollbar-width:thin}
+#ponk-ocean-profiles .pi{display:flex;align-items:center;gap:4px;margin-bottom:6px}
+#ponk-ocean-profiles .pi .nm{flex:1;min-width:0;text-align:left;padding:8px 9px;background:#d6d6d8;border:1px solid #888;border-radius:5px;color:#000;font-size:11px;letter-spacing:.06em;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ponk-ocean-profiles .pi.on .nm{background:#000;color:#fff;border-color:#000}
+#ponk-ocean-profiles .pi .ic{flex-shrink:0;width:26px;height:30px;padding:0;background:transparent;border:1px solid #888;border-radius:5px;color:#000;cursor:pointer;font-size:12px;font-family:inherit}
+#ponk-ocean-profiles .pi .ic:hover{border-color:#000;background:#fff}
+#ponk-ocean-profiles .pi .ic:disabled{opacity:.35;cursor:default}
+#ponk-ocean-profiles input.rn{flex:1;min-width:0;padding:7px 8px;font-size:11px;border:1px solid #000;border-radius:5px;font-family:inherit}
+#ponk-ocean-profiles .pbtn{width:100%;margin-top:4px;padding:8px;background:transparent;border:1px solid #888;border-radius:5px;color:#000;letter-spacing:.08em;text-transform:uppercase;font-size:9px;cursor:pointer;font-family:inherit}
+#ponk-ocean-profiles .pbtn:hover{border-color:#000;background:#fff}
+#ponk-ocean-profiles .sub{margin-top:10px;font-size:9px;color:#444;line-height:1.45}`;
   document.head.appendChild(css);
   const el = document.createElement('div');
   el.id = 'ponk-ocean-tuner';
-  el.innerHTML = '<h3><span>Ocean Tuner</span><span id="pot-fold">–</span></h3><div class="b"></div>';
+  el.innerHTML = '<div class="top"><div class="t1"><h1>Ocean Tuner</h1><button type="button" class="fold" id="pot-fold">Hide</button><button type="button" id="pot-lock" class="save" title="Save and apply (Ctrl+S)">Save and Apply</button></div><label class="c t2" id="pot-uirow" style="margin:0"><input type="checkbox" id="pot-ui"> Show product UI</label></div><div class="b"></div>';
   document.body.appendChild(el);
   const body = el.querySelector('.b');
+  const pel = document.createElement('div');
+  pel.id = 'ponk-ocean-profiles';
+  pel.innerHTML = '<div class="ph"><h1>Profiles</h1><button type="button" class="pf" id="pp-fold">Hide</button></div><div class="pb"><div id="pp-list"></div><button type="button" class="pbtn" id="pp-new">+ New profile (copy of this one)</button><button type="button" class="pbtn" id="pp-prev">Preview the transition</button><div class="sub">A profile is a full ocean: sea, boat, cruising and transition time. Pick one to edit it on the right, then Save and Apply. Profiles appear in Blender\'s sequences and as thumbnails in the UI Designer after Save and Apply.</div></div>';
+  document.body.appendChild(pel);
+  /* the fonts the UI Designer uses (the exported viewer already loads them; a plain page may not) */
+  if (!document.getElementById('pot-fonts')) { const fl = document.createElement('link'); fl.id = 'pot-fonts'; fl.rel = 'stylesheet'; fl.href = 'https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600&family=Inconsolata:wght@400&display=swap'; document.head.appendChild(fl); }
+  /* the tab is called Ocean Tuner whatever the viewer sets as the page title */
+  const oldTitle = document.title;
+  const keepTitle = () => { if (document.title !== 'Ocean Tuner') document.title = 'Ocean Tuner'; };
+  keepTitle();
+  const titleEl = document.querySelector('title');
+  const titleMo = (typeof MutationObserver === 'function' && titleEl) ? new MutationObserver(keepTitle) : null;
+  if (titleMo) titleMo.observe(titleEl, { childList: true, characterData: true, subtree: true });
+  /* the product's own UI (configurator panel, buttons, hotspots) is out of the way while tuning; one tick box brings it back */
+  const uiCss = document.createElement('style'); uiCss.id = 'pot-ui-css';
+  document.head.appendChild(uiCss);
+  const setProductUi = (show) => { uiCss.textContent = show ? '' : '#wce-ui-stage,.hs-sprite{display:none !important}'; };
+  setProductUi(false);
+  const uiRow = el.querySelector('#pot-uirow'), uiBox = el.querySelector('#pot-ui');
+  if (!document.getElementById('wce-ui-stage')) uiRow.style.display = 'none';
+  uiBox.addEventListener('change', () => setProductUi(uiBox.checked));
+  /* every group of settings is a card with a heading, like the UI Designer's side panel */
+  let cur = null;
+  const newCard = (title) => { const d = document.createElement('details'); d.className = 'card'; d.open = true; const sm = document.createElement('summary'); sm.textContent = title; d.appendChild(sm); body.appendChild(d); cur = d; return d; };
+  const host = () => cur || newCard('Look');
   const look = ocean.look;
   const outs = {};
+  const wraps = {};                       /* the row of each setting, so the cruising-only ones can be hidden on the Static tab */
   _TUNER_ROWS.forEach((row) => {
-    if (row[1] === null) { const s = document.createElement('div'); s.className = 'sec'; s.textContent = row[0]; body.appendChild(s); return; }
+    if (row[1] === null) { newCard(row[0]); return; }
+    if (row[0] === '@check') {
+      const [, k, txt] = row;
+      const lb = document.createElement('label'); lb.className = 'c';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!look[k];
+      cb.addEventListener('change', () => ocean.setLook({ [k]: cb.checked }));
+      lb.appendChild(cb); lb.appendChild(document.createTextNode(' ' + txt)); host().appendChild(lb); wraps[k] = lb;
+      outs[k] = { set: (val) => { cb.checked = !!val; } };
+      return;
+    }
+    if (row[0] === '@note') {
+      const nt = document.createElement('div'); nt.className = 'st'; nt.style.marginTop = '0'; nt.style.marginBottom = '4px'; nt.textContent = row[1]; host().appendChild(nt);
+      return;
+    }
     if (row[0] === '@boatchecks') {
-      [['boatCruise', 'Animate cruising (held in place, water flows past)'], ['hullShape', 'Use the real hull shape'], ['hullCut', 'Cut the water inside the hull'], ['bowWave', 'Real bow wave and wake (moves the water)'], ['reflectBoat', 'Mirror the boat and islands in the water'], ['reflectGlass', 'Show glass in that mirror image (slower)'], ['wetOn', 'Wet-hull material effect (off = materials untouched)'], ['trackParts', 'Follow animated parts']].forEach(([k, txt]) => {
+      [['hullShape', 'Use the real hull shape'], ['hullCut', 'Cut the water inside the hull'], ['hullFoamUnder', 'Foam under the whole hull (instead of bare cut)'], ['bowWave', 'Real bow wave and wake (moves the water)'], ['reflectBoat', 'Mirror the boat and islands in the water'], ['glassFix', 'Fix see-through glass over the sea (blended twin)'], ['reflectGlass', 'Show glass in that mirror image (slower)'], ['wetOn', 'Wet-hull material effect (off = materials untouched)'], ['trackParts', 'Follow animated parts']].forEach(([k, txt]) => {
         const lb = document.createElement('label'); lb.className = 'c';
         const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = !!look[k];
         cb.addEventListener('change', () => ocean.setLook({ [k]: cb.checked }));
-        lb.appendChild(cb); lb.appendChild(document.createTextNode(' ' + txt)); body.appendChild(lb);
+        lb.appendChild(cb); lb.appendChild(document.createTextNode(' ' + txt)); host().appendChild(lb); wraps[k] = lb;
         outs[k] = { set: (val) => { cb.checked = !!val; } };
       });
       const lo = document.createElement('label'); lo.className = 'c';
       const co = document.createElement('input'); co.type = 'checkbox'; co.id = 'pot-outline';
       co.addEventListener('change', () => ocean.setOutline && ocean.setOutline(co.checked));
-      lo.appendChild(co); lo.appendChild(document.createTextNode(' Show the detected hull outline')); body.appendChild(lo);
-      const info = document.createElement('div'); info.className = 'st'; info.id = 'pot-hullinfo'; info.textContent = 'hull: none'; body.appendChild(info);
+      lo.appendChild(co); lo.appendChild(document.createTextNode(' Show the detected hull outline')); host().appendChild(lo);
+      const info = document.createElement('div'); info.className = 'st'; info.id = 'pot-hullinfo'; info.textContent = 'hull: none';
+      const hero = document.createElement('div'); hero.className = 'st'; hero.id = 'pot-heronow'; hero.style.fontWeight = '600'; hero.textContent = 'Hero now: none';
+      host().appendChild(hero); host().appendChild(info);
       const tick = () => {
+        const hi = (opt.heroInfo && opt.heroInfo()) || { name: '', auto: false };
+        hero.textContent = 'Hero now: ' + (hi.name || 'none' + (hi.auto ? ' (no shown boat with a hull proxy)' : ' (nothing pinned)'));
         const h = ocean.hullInfo && ocean.hullInfo();
         if (!h) { info.textContent = 'hull: no hull shape in use (soft foam)'; return; }
         info.textContent = 'hull map ' + h.tex[0] + ' x ' + h.tex[1] + ', ' + h.texelCm.toFixed(1) + ' cm per pixel, ' + h.points + ' outline pieces' + (h.meshes > 1 ? ', ' + h.meshes + ' meshes' : '') + ', rebuild ' + h.buildMs.toFixed(1) + ' ms';
@@ -3017,20 +3562,21 @@ export function mountTuner(ocean, opt) {
       show(); r.appendChild(inp); r.appendChild(v);
       outs[key] = { set: (val) => { inp.value = toUi(val); show(); } };
     }
-    body.appendChild(r);
+    host().appendChild(r); wraps[key] = r;
   });
-  const mkRow = (html) => { const d = document.createElement('div'); d.innerHTML = html; body.appendChild(d); return d; };
+  const mkRow = (html) => { const d = document.createElement('div'); d.innerHTML = html; host().appendChild(d); return d; };
+  newCard('General');
   const q = mkRow('<div class="r"><span>Quality</span><select id="pot-q"><option value="0">Low</option><option value="1">Medium</option><option value="2">High</option></select><span></span></div>');
   const qs = q.querySelector('select'); qs.value = String(look.quality);
   qs.addEventListener('change', () => ocean.setLook({ quality: +qs.value }));
-  const sp = mkRow('<label class="c"><input type="checkbox" id="pot-spray"> Spray</label><label class="c"><input type="checkbox" id="pot-viz"> Show helpers (area, hulls, proxies)</label><label class="c"><input type="checkbox" id="pot-pause"> Pause waves</label>');
+  const sp = mkRow('<label class="c"><input type="checkbox" id="pot-spray"> Spray</label><label class="c"><input type="checkbox" id="pot-viz"> Show helpers (area, hull proxy, island proxies)</label><label class="c"><input type="checkbox" id="pot-pause"> Pause waves</label>');
   const cbS = sp.querySelector('#pot-spray'), cbV = sp.querySelector('#pot-viz'), cbP = sp.querySelector('#pot-pause');
   cbS.checked = !!look.spray;
   cbS.addEventListener('change', () => ocean.setLook({ spray: cbS.checked }));
   cbV.addEventListener('change', () => opt.onViz && opt.onViz(cbV.checked));
   cbP.addEventListener('change', () => { ocean.paused = cbP.checked; });
   if (opt.lab) {
-    const sec = document.createElement('div'); sec.className = 'sec'; sec.textContent = 'Test lab (boxes, no model needed)'; body.appendChild(sec);
+    newCard('Test lab (boxes, no model needed)');
     const lr = mkRow('<label class="c"><input type="checkbox" id="pot-lab"> Use test boxes instead of my scene</label><div class="r"><span>Hull</span><select id="pot-lab-hull"><option value="boat">Boat hull</option><option value="box">Plain box</option><option value="cat">Twin hulls (catamaran)</option><option value="fin">Hull + overlapping keel fin</option><option value="open">Open-top boat (shows the water kept out)</option></select><span></span></div><div class="r"><span>Island</span><select id="pot-lab-isl"><option value="box">Box island</option><option value="rock">Rock island</option></select><span></span></div><label class="c"><input type="checkbox" id="pot-lab-ph" checked> Placeholder floaters (buoy, dinghy)</label><div class="btns"><button id="pot-lab-frame">Frame the boat</button></div>');
     const g1 = lr.querySelector('#pot-lab'), g2 = lr.querySelector('#pot-lab-hull'), g3 = lr.querySelector('#pot-lab-isl'), g4 = lr.querySelector('#pot-lab-ph');
     const s0 = opt.lab.state; g1.checked = !!s0.on; g2.value = s0.hull; g3.value = s0.island; g4.checked = !!s0.placeholders;
@@ -3038,27 +3584,86 @@ export function mountTuner(ocean, opt) {
     [g1, g2, g3, g4].forEach((n) => n.addEventListener('change', push));
     lr.querySelector('#pot-lab-frame').addEventListener('click', () => opt.lab.frame());
   }
-  const btns = mkRow('<div class="btns"><button class="lock" id="pot-lock">Lock Look</button><button id="pot-reset">Reset to locked</button><button id="pot-copy">Copy JSON</button></div><div class="st" id="pot-st"></div>');
+  newCard('Look tools');
+  const toastEl = document.createElement('div'); toastEl.id = 'pot-toast'; document.body.appendChild(toastEl);
+  let toastT = 0;
+  const showToast = (msg, isErr) => { toastEl.textContent = msg; toastEl.style.borderColor = isErr ? '#ff6b35' : '#4caf7d'; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 2200); };
+  const btns = mkRow('<div class="btns"><button id="pot-reset">Reset to saved</button><button id="pot-copy">Copy JSON</button></div><div class="st" id="pot-st"></div>');
   const st = btns.querySelector('#pot-st');
   const say = (txt, cls) => { st.textContent = txt; st.className = 'st' + (cls ? ' ' + cls : ''); };
-  const applyAll = (lk) => { ocean.setLook(lk); Object.keys(outs).forEach((k) => { if (k in ocean.look) outs[k].set(ocean.look[k]); }); qs.value = String(ocean.look.quality); cbS.checked = !!ocean.look.spray; };
-  btns.querySelector('#pot-lock').addEventListener('click', async () => {
-    say('Saving…');
+  const showAll = () => { Object.keys(outs).forEach((k) => { if (k in ocean.look) outs[k].set(ocean.look[k]); }); qs.value = String(ocean.look.quality); cbS.checked = !!ocean.look.spray; if (typeof applyCruiseVis === 'function') applyCruiseVis(); };
+  const applyAll = (lk) => { ocean.setLook(lk); showAll(); };
+  const saveBtn = el.querySelector('#pot-lock');
+  let saving = false;
+  const doSave = async () => {
+    if (saving) return;
+    saving = true; saveBtn.disabled = true;
     try {
-      const r = await fetch(opt.lockUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ look: ocean.getLook() }) });
+      const r = await fetch(opt.lockUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(opt.lockBody ? opt.lockBody() : { look: ocean.getLook() }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok && j.ok !== false) say('Locked. This look is stored in the .blend and goes into every export.', 'ok');
-      else say('The add-on did not accept the look: ' + (j.error || r.status), 'err');
-    } catch (e) { say('Could not reach the add-on (is the Ocean Tuner still running in Blender?)', 'err'); }
-  });
-  btns.querySelector('#pot-reset').addEventListener('click', () => { const l = opt.getLocked && opt.getLocked(); if (l) { applyAll(l); say('Back to the locked look.'); } else say('Nothing locked yet.'); });
+      if (r.ok && j.ok !== false) showToast('Saved — ' + (PR ? PR.list().length + ' profile(s) ' : '') + 'applied to your export');
+      else showToast('Blender did not save it' + (j.error ? ': ' + j.error : ''), true);
+    } catch (e) { showToast('Could not reach Blender', true); }
+    saving = false; saveBtn.disabled = false;
+  };
+  saveBtn.addEventListener('click', doSave);
+  window.addEventListener('keydown', (e) => { if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey && (e.key === 's' || e.key === 'S')) { e.preventDefault(); doSave(); } });
+  btns.querySelector('#pot-reset').addEventListener('click', () => { const l = opt.getLocked && opt.getLocked(); if (l) { applyAll(l); say('Back to the saved look.'); } else say('Nothing saved yet.'); });
   btns.querySelector('#pot-copy').addEventListener('click', () => { const t = JSON.stringify(ocean.getLook(), null, 1); if (navigator.clipboard) navigator.clipboard.writeText(t).then(() => say('Copied.'), () => say(t)); else say(t); });
-  const fold = el.querySelector('h3'); let open = true;
-  fold.addEventListener('click', () => { open = !open; body.style.display = open ? '' : 'none'; el.querySelector('#pot-fold').textContent = open ? '–' : '+'; });
+  const foldBtn = el.querySelector('#pot-fold'); let open = true;
+  foldBtn.addEventListener('click', () => { open = !open; el.classList.toggle('min', !open); foldBtn.textContent = open ? 'Hide' : 'Show'; });
+  /* cruising-only settings show only while the profile has Boat cruising ticked */
+  const CRUISE_ONLY = ['boatSpeed', 'bowWave', 'bowWaveAmt'];
+  const applyCruiseVis = () => {
+    const on = !!ocean.look.boatCruise;
+    CRUISE_ONLY.forEach((k) => { if (wraps[k]) wraps[k].style.display = on ? '' : 'none'; });
+  };
+  if (wraps.boatCruise) wraps.boatCruise.querySelector('input').addEventListener('change', applyCruiseVis);
+  applyCruiseVis();
+  /* ---------- left: the Profiles tab ---------- */
+  const PR = opt.profiles;
+  const pList = pel.querySelector('#pp-list');
+  let renaming = '';
+  const profileTitle = () => { const c0 = body.querySelector('details.card>summary'); if (c0 && PR) { const q = PR.list().find((x) => x.id === PR.current()); c0.textContent = 'This profile' + (q ? ': ' + q.name : ''); } };
+  const drawProfiles = () => {
+    if (!PR) { pel.style.display = 'none'; return; }
+    const cur = PR.current(), list = PR.list();
+    pList.innerHTML = '';
+    list.forEach((q) => {
+      const row = document.createElement('div'); row.className = 'pi' + (q.id === cur ? ' on' : '');
+      if (renaming === q.id) {
+        const inp = document.createElement('input'); inp.className = 'rn'; inp.type = 'text'; inp.maxLength = 40; inp.value = q.name;
+        const done = (ok) => { const v = inp.value; renaming = ''; if (ok && v.trim() !== q.name) { if (!PR.rename(q.id, v)) showToast('That name is empty or already used', true); } drawProfiles(); };
+        inp.addEventListener('keydown', (e) => { e.stopPropagation(); if (e.key === 'Enter') done(true); else if (e.key === 'Escape') done(false); });
+        inp.addEventListener('blur', () => { if (renaming === q.id) done(true); });
+        row.appendChild(inp); pList.appendChild(row);
+        setTimeout(() => { inp.focus(); inp.select(); }, 0);
+        return;
+      }
+      const nm = document.createElement('button'); nm.type = 'button'; nm.className = 'nm'; nm.textContent = q.name; nm.title = 'Edit this profile (double-click to rename)';
+      nm.addEventListener('click', () => { if (q.id !== PR.current()) { PR.select(q.id); } drawProfiles(); });
+      nm.addEventListener('dblclick', () => { renaming = q.id; drawProfiles(); });
+      const rn = document.createElement('button'); rn.type = 'button'; rn.className = 'ic'; rn.textContent = '✎'; rn.title = 'Rename';
+      rn.addEventListener('click', () => { renaming = q.id; drawProfiles(); });
+      const dl = document.createElement('button'); dl.type = 'button'; dl.className = 'ic'; dl.textContent = '✕'; dl.title = list.length > 1 ? 'Delete this profile' : 'The last profile cannot be deleted'; dl.disabled = list.length <= 1;
+      dl.addEventListener('click', () => { if (PR.remove(q.id)) { say('Deleted "' + q.name + '". Save and Apply to keep it.'); drawProfiles(); } });
+      row.appendChild(nm); row.appendChild(rn); row.appendChild(dl); pList.appendChild(row);
+    });
+    profileTitle();
+  };
+  if (PR) {
+    pel.querySelector('#pp-new').addEventListener('click', () => { PR.add(); drawProfiles(); applyAll(ocean.getLook()); say('New profile: a copy of the one you were on. Change it, then Save and Apply.', 'ok'); });
+    pel.querySelector('#pp-prev').addEventListener('click', () => { if (!PR.preview()) say('Make a second profile to preview a transition.'); });
+    const pf = pel.querySelector('#pp-fold'); let popen = true;
+    pf.addEventListener('click', () => { popen = !popen; pel.classList.toggle('min', !popen); pf.textContent = popen ? 'Hide' : 'Show'; });
+  }
+  drawProfiles();
   const api = {
     sync(lk) { applyAll(lk); },
-    setLocked(on) { if (on && !st.textContent) say('A look is locked in the .blend.', 'ok'); },
-    remove() { el.remove(); css.remove(); },
+    show() { showAll(); },
+    syncProfiles() { drawProfiles(); applyCruiseVis(); },
+    setLocked(on) { if (on && !st.textContent) say('A saved look is stored in the scene.', 'ok'); },
+    remove() { if (titleMo) titleMo.disconnect(); document.title = oldTitle; uiCss.remove(); el.remove(); pel.remove(); css.remove(); },
   };
   return api;
 }

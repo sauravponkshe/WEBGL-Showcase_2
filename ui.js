@@ -451,15 +451,20 @@ const WCEG = (function(){
   // the exported page, so what you crop and shape in the Designer is exactly what visitors get.
   // A drop shadow from ONE strength value (0 = none): the offset grows with the blur, the tint stays black. Strength 12 is the
   // shadow every thumbnail already had, so existing projects look exactly the same.
-  function shadowCss(on, strength){
+  // Darkness (0-100, default 45) is the opacity of the black shadow tint: 45 is the shadow every element already had.
+  function shadowAlpha(dark){
+    const d = (dark == null || isNaN(Number(dark))) ? 45 : Number(dark);
+    return Math.max(0, Math.min(100, d)) / 100;
+  }
+  function shadowCss(on, strength, dark){
     const s = strength == null ? 12 : strength;
     if(!on || !(s > 0)) return 'none';
-    return '0 ' + Math.round(s / 6) + 'px ' + s + 'px rgba(0,0,0,.45)';
+    return '0 ' + Math.round(s / 6) + 'px ' + s + 'px rgba(0,0,0,' + shadowAlpha(dark) + ')';
   }
-  function shadowFilter(on, strength){
+  function shadowFilter(on, strength, dark){
     const s = strength == null ? 12 : strength;
     if(!on || !(s > 0)) return '';
-    return 'drop-shadow(0 ' + Math.round(s / 6) + 'px ' + Math.round(s / 2) + 'px rgba(0,0,0,.45))';
+    return 'drop-shadow(0 ' + Math.round(s / 6) + 'px ' + Math.round(s / 2) + 'px rgba(0,0,0,' + shadowAlpha(dark) + '))';
   }
   function borderRgba(color, opacity){
     const c = color || '#ffffff';
@@ -481,7 +486,7 @@ const WCEG = (function(){
     // Routing both through custom properties lets the .active rule (see
     // its own comment) layer the ring glow ON TOP of this drop shadow
     // instead of one unconditionally overwriting the other.
-    el.style.setProperty('--wce-thumb-shadow', shadowCss(o.shadow !== false, o.shadowStrength));
+    el.style.setProperty('--wce-thumb-shadow', shadowCss(o.shadow !== false, o.shadowStrength, o.shadowDarkness));
     const shape = o.shape || 'circle';
     const d = thumbDims(o), w = d.w, h = d.h;
     const bw = o.borderWidth != null ? o.borderWidth : 2;
@@ -504,7 +509,7 @@ const WCEG = (function(){
       // the element itself is NOT clipped (a clip would cut off its own glow / ring / shadow): the outline lives on an inner layer
       el.setAttribute('data-wce-poly', '1');
       el.style.clipPath = 'none'; el.style.borderRadius = '0px'; el.style.border = 'none'; el.style.background = 'transparent';
-      el.style.setProperty('--wce-shadow-filter', shadowFilter(o.shadow !== false, o.shadowStrength));
+      el.style.setProperty('--wce-shadow-filter', shadowFilter(o.shadow !== false, o.shadowStrength, o.shadowDarkness));
       const outer = doc.createElement('div');
       outer.className = 'wce-poly-outer';
       outer.style.cssText = 'position:absolute;left:0;top:0;width:' + w + 'px;height:' + h + 'px;';
@@ -543,7 +548,7 @@ const WCEG = (function(){
     el.style.opacity = clamp(num(s.opacity, 100), 0, 100) / 100;
     el.style.transform = s.rotation ? 'rotate('+s.rotation+'deg)' : '';
     el.setAttribute('data-wce-sil', '1');
-    el.style.setProperty('--wce-shadow-filter', shadowFilter(s.shadow === true, s.shadowStrength));
+    el.style.setProperty('--wce-shadow-filter', shadowFilter(s.shadow === true, s.shadowStrength, s.shadowDarkness));
     while(el.firstChild) el.removeChild(el.firstChild);
     const fill = doc.createElement('div'); fill.className = 'wce-shape-fill';
     const content = doc.createElement('div'); content.className = 'wce-shape-content';
@@ -603,7 +608,7 @@ const WCEG = (function(){
   // states), so editing those later never gets silently overridden by an old snapshot.
   const SNAP_KEYS = [
     'x','y','groupId','width','height','size','collapsed','direction','opacity',
-    'shape','radius','borderWidth','borderColor','color','fillOpacity','borderOpacity','shadow','shadowStrength','tracking','orient',
+    'shape','radius','borderWidth','borderColor','color','fillOpacity','borderOpacity','shadow','shadowStrength','shadowDarkness','tracking','orient',
     'fontFamily','fontSize',
     'tabBg','tabBgOpacity','tabBorderColor','tabBorderWidth','tabRadius',
     'shelfBg','shelfBgOpacity','shelfBorderColor','shelfBorderWidth','shelfRadius',
@@ -891,7 +896,11 @@ const WCEUIS = (function(){
           el.style.writingMode = (ori === 'v' || ori === 'rv') ? 'vertical-rl' : '';
           el.style.rotate = (ori === 'rh' || ori === 'rv') ? '180deg' : '';       // the CSS rotate PROPERTY: it composes with the hover lift instead of being replaced by it
           el.style.letterSpacing = o.tracking ? o.tracking + 'px' : '';
-          el.style.textShadow = (o.shadow === true && (o.shadowStrength == null ? 12 : o.shadowStrength) > 0) ? '0 ' + Math.round((o.shadowStrength == null ? 12 : o.shadowStrength) / 6) + 'px ' + Math.round((o.shadowStrength == null ? 12 : o.shadowStrength) / 2) + 'px rgba(0,0,0,.6)' : '';
+          {
+            // darkness 45 (the default) is the .6 tint text always had; 100 is solid black
+            const _ss = o.shadowStrength == null ? 12 : o.shadowStrength, _dk = (o.shadowDarkness == null || isNaN(Number(o.shadowDarkness))) ? 45 : Math.max(0, Math.min(100, Number(o.shadowDarkness)));
+            el.style.textShadow = (o.shadow === true && _ss > 0) ? '0 ' + Math.round(_ss / 6) + 'px ' + Math.round(_ss / 2) + 'px rgba(0,0,0,' + Math.min(1, _dk / 100 * 0.6 / 0.45) + ')' : '';
+          }
           if(o.opacity != null) el.style.opacity = String(o.opacity / 100);
         }
         // text and shapes are click-through on the page; an element that HAS a hover effect must be able to receive the pointer
@@ -1034,7 +1043,7 @@ function _wceBuildLive(p){
   return live;
 }
 function _wceEffectiveOverlays(){
-  const base = window.WCE_OVERLAYS||[];
+  const base = (window.WCE_OVERLAYS||[]).filter(o=>o.type!=='ocean_state' || _wceOceanStatesOn());
   const live = window._wceLive;
   if(!live) return base;
   return base.map(o=>live[o.id]||o);
@@ -1364,7 +1373,7 @@ function buildUI(){
   _wceApplyDeviceOverrides();
   _wceAttachOrientationListener();
   _wceAttachDeclutterResizeListener();
-  buildVariants();buildGlobalSets();buildGeoPkgs();buildMatSubs();buildHDRISwitcher();buildFilterSwitcher();
+  buildVariants();buildGlobalSets();buildGeoPkgs();buildMatSubs();buildHDRISwitcher();buildFilterSwitcher();buildOceanSwitcher();buildSoundButtons();
   buildAdvGeo();buildAdvMat();buildAnimUI();buildSequenceUI();buildCameraUI();buildSectionViewUI();_wceApplyStartupProfile();if(typeof buildMatGeoAnimUI==='function') buildMatGeoAnimUI();
   _wceInitProfiles();
   document.getElementById('atb').addEventListener('click',()=>{
@@ -1563,6 +1572,10 @@ function _fireStep(step) {
     }
   } else if (action_type === 'variant') {
     if (target_name && typeof applyVariant === 'function') applyVariant(target_name);
+  } else if (action_type === 'ocean') {
+    _wceSetOceanState(target_name);
+  } else if (action_type === 'sound') {
+    _wceSoundStep(target_name, step.sound_action);
   } else if (action_type === 'container') {
     if (container_name && container_material) {
       applyMat(container_name, container_material); matSt[container_name]=container_material; refreshAdvMat(matSt);
@@ -1811,6 +1824,10 @@ function applyOverlay(o){
     } else if(o.type==='hdri'){
       const item=(o.uid && (CFG.hdris||[]).find(h=>h.uid===o.uid)) || (CFG.hdris||[]).find(h=>h.name===o.name) || o.item;
       if(item) _loadHDRIItem(item);
+    } else if(o.type==='ocean_state'){
+      _wceSetOceanState(o.name);
+    } else if(o.type==='sound'){
+      _wceSoundFireByName(o.name);
     } else if(o.type==='filter'){
       const fItem=((CFG.post_process&&CFG.post_process.filters)||[]).find(x=>x.name===o.name);
       if(fItem && typeof _wceApplyPPFilter==='function'){
@@ -2339,6 +2356,8 @@ function _wceThumbCovered(o){
   if(t==='cinematic') return !!(_camSeq['Cinematic'] && _camSeq['Cinematic'].playing);
   if(t==='camera_sequence') return !!(o.name && _camSeq[o.name] && _camSeq[o.name].playing);
   if(t==='turntable') return !!window._turntableActive;
+  if(t==='ocean_state') return _wceOceanStateIs(o.name);
+  if(t==='sound') return _wceSoundIsOnByName(o.name);
   if(t==='filter'){
     const f=((CFG.post_process&&CFG.post_process.filters)||[]).find(x=>x.name===o.name);
     return !!f && (window._wceActivePPFilterName!==undefined ? window._wceActivePPFilterName===f.name : window._wceActivePPFilter===f.filter_type);
@@ -4054,6 +4073,11 @@ function _wceSyncPanelHighlights(){
     if(item) set(b, cov({type: 'hdri', uid: item.uid, name: item.name, item: item}));
   });
 
+  // Ocean states
+  q('.pb2[data-oc]').forEach(function(b){ set(b, !!_wceOceanStateIs(b.dataset.oc)); });
+  // Sounds that keep playing
+  q('.pb2[data-snd]').forEach(function(b){ set(b, _wceSoundIsOnByName(b.dataset.snd)); });
+
   // Filters -- by the exact filter that is applied (falls back to the type until one has been applied)
   q('.pb2[data-pf]').forEach(function(b){
     var on = (window._wceActivePPFilterName !== undefined)
@@ -4092,3 +4116,112 @@ function _wceSyncPanelHighlights(){
   q('.camseq-btn[data-seq]').forEach(function(b){ set(b, cov({type: 'camera_sequence', name: b.dataset.seq}), 'playing'); });
   q('.anim-btn[data-seq-name]').forEach(function(b){ set(b, cov({type: 'sequence', name: b.dataset.seqName}), 'playing'); });
 }
+
+/* ---------- Ocean profiles ----------
+   The artist's Ocean Profiles (made in the Ocean Tuner). The side-panel buttons, the Designer thumbnails and the Sequence steps all go through here.
+   A profile is found by name or id; steps and thumbnails saved when the ocean still had Static / Running find the first profile / the one called Running. */
+function _wceOceanProfiles(){ return (CFG && CFG.ocean && CFG.ocean.enabled && CFG.ocean.profiles) ? CFG.ocean.profiles : []; }
+function _wceOceanStatesOn(){ return _wceOceanProfiles().length>0; }
+function _wceOceanFind(n){
+  var ps=_wceOceanProfiles(), k=String(n==null?'':n).toLowerCase(), i;
+  if(!ps.length) return null;
+  for(i=0;i<ps.length;i++){ if(String(ps[i].id).toLowerCase()===k || String(ps[i].name).toLowerCase()===k) return ps[i]; }
+  if(k==='static') return ps[0];
+  if(k==='running') return ps[1] || null;
+  return null;
+}
+function _wceSetOceanState(n){
+  try{
+    var pf=_wceOceanFind(n);
+    if(!pf) return;
+    var o=window._wceOcean;
+    if(o && typeof o.setProfile==='function') o.setProfile(pf.id);
+    else window._wcePendingOcean=pf.id;
+    try{ _wceSyncPanelHighlights(); }catch(e){}
+    try{ _wceSyncThumbHighlights(); }catch(e){}
+  }catch(e){ console.warn('[WCE] ocean profile failed', e); }
+}
+function _wceOceanStateIs(n){
+  var o=window._wceOcean, pf=_wceOceanFind(n);
+  if(!_wceOceanStatesOn() || !pf) return null;
+  var cur=(o && typeof o.getProfile==='function') ? o.getProfile() : (window._wcePendingOcean || CFG.ocean.start_profile);
+  return cur===pf.id;
+}
+function buildOceanSwitcher(){
+  var sec=document.getElementById('socean');
+  if(!sec) return;
+  var ps=_wceOceanProfiles();
+  if(ps.length<2){ sec.innerHTML=''; return; }
+  sec.innerHTML='<div class="st">Ocean</div>';
+  var g=mk('div','pg');
+  ps.forEach(function(pf){
+    var b=mk('button','pb2'); b.textContent=pf.name; b.dataset.oc=pf.name;
+    if(_wceOceanStateIs(pf.name)) b.classList.add('active');
+    b.onclick=function(){ _wceSetOceanState(pf.name); qsa('.pb2[data-oc]').forEach(function(x){ x.classList.toggle('active', x.dataset.oc===pf.name); }); };
+    g.appendChild(b);
+  });
+  sec.appendChild(g);
+}
+
+/* ---------- Sound section: panel buttons and Designer thumbnails ----------
+   A sound plays once, or keeps playing until its trigger is used again. The trigger itself (mesh / hotspot / image / button) is wired in the page;
+   everything here goes through window._wceSoundFire, which also drives the Sound section's looping state. */
+function _wceSoundDefs(){ return (CFG && CFG.sounds) ? CFG.sounds : []; }
+function _wceSoundDefByName(n){
+  var k=String(n==null?'':n).toLowerCase(), l=_wceSoundDefs(), i;
+  for(i=0;i<l.length;i++){ if(String(l[i].name).toLowerCase()===k || String(l[i].key).toLowerCase()===k) return l[i]; }
+  return null;
+}
+function _wceSoundFireByName(n){
+  var d=_wceSoundDefByName(n);
+  if(d && typeof window._wceSoundFire==='function') window._wceSoundFire(d);
+}
+function _wceSoundIsOnByName(n){
+  var d=_wceSoundDefByName(n);
+  return !!(d && typeof window._wceSoundIsOn==='function' && window._wceSoundIsOn(d));
+}
+/* a Sound step in a Sequence / Camera Sequence: Start plays it (a Keep playing sound starts looping), Stop ends a loop */
+function _wceSoundStep(name, act){
+  var d=_wceSoundDefByName(name);
+  if(!d || typeof window._wceSoundFire!=='function') return;
+  var on=_wceSoundIsOnByName(name);
+  if(act==='stop'){ if(d.loop && on) window._wceSoundFire(d); return; }
+  if(d.loop){ if(!on) window._wceSoundFire(d); } else window._wceSoundFire(d);
+}
+function buildSoundButtons(){
+  var sec=document.getElementById('ssound');
+  if(!sec) return;
+  var list=_wceSoundDefs().filter(function(d){ return d.trigger_type==='button'; });
+  if(!list.length){ sec.innerHTML=''; return; }
+  sec.innerHTML='<div class="st">Sound</div>';
+  var g=mk('div','pg');
+  list.forEach(function(d){
+    var b=mk('button','pb2'); b.textContent=d.name; b.dataset.snd=d.name;
+    if(_wceSoundIsOnByName(d.name)) b.classList.add('active');
+    b.onclick=function(){ _wceSoundFireByName(d.name); b.classList.toggle('active', _wceSoundIsOnByName(d.name)); };
+    g.appendChild(b);
+  });
+  sec.appendChild(g);
+}
+
+/* ---------- Default on Load > Presentation: open the page already in Presentation Mode ---------- */
+(function _wcePresentOnLoad(){
+  try{
+    if(!(typeof CFG!=='undefined' && CFG && CFG.default_presentation)) return;
+    var tries=0;
+    function findDef(){
+      var l=(typeof _wceEffectiveOverlays==='function') ? _wceEffectiveOverlays() : (window.WCE_OVERLAYS||[]), i;
+      for(i=0;i<(l||[]).length;i++){ if(l[i] && l[i].type==='presentation' && !l[i].hidden) return l[i]; }
+      return null;
+    }
+    function go(){
+      if(++tries>600) return;   // give up after about 2.5 minutes
+      var ld=document.getElementById('ld');
+      if(ld && ld.style.display!=='none' && !ld.classList.contains('hidden')){ setTimeout(go,250); return; }   // the loading screen is still up
+      var o=findDef(), el=o ? document.querySelector('[data-overlay-id="'+o.id+'"]') : null;
+      if(!o || !el){ setTimeout(go,250); return; }
+      try{ if(!_wcePresentationActive) _wceEnterPresentationMode(o, el); }catch(e){ console.warn('[WCE] could not open in Presentation Mode:', e); }
+    }
+    setTimeout(go,600);
+  }catch(e){}
+})();
