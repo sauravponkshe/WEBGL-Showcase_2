@@ -1779,7 +1779,7 @@ function _wceOverlayKey(o){
   if(o.type==='turntable') return 'turntable::singleton';
   if(o.type==='cinematic') return 'cinematic::singleton';
   if(o.type==='camera_sequence') return 'camera_sequence::'+(o.name||'');
-  if(o.type==='text' || o.type==='group' || o.type==='section_slider' || o.type==='shape') return o.id || (o.type+'::'+Math.random().toString(36).slice(2));
+  if(o.type==='text' || o.type==='group' || o.type==='section_slider' || o.type==='color_selector' || o.type==='shape') return o.id || (o.type+'::'+Math.random().toString(36).slice(2));
   return o.type+'::'+o.name;
 }
 function _wceOverlaySet(){
@@ -2433,7 +2433,7 @@ function _wceBuildThumbnailOverlaysCore(){
   // the UI Designer -- variants, configs, packages, materials, animations,
   // cameras, sequences, environment, plus free-floating text labels and
   // collapsible groups that can nest several of the above together.
-  document.querySelectorAll('.wce-overlay-thumb,.wce-overlay-text,.wce-overlay-group,.wce-overlay-shape,.wce-overlay-section-slider,.wce-overlay-action-btn').forEach(el=>el.remove());
+  document.querySelectorAll('.wce-overlay-thumb,.wce-overlay-text,.wce-overlay-group,.wce-overlay-shape,.wce-overlay-section-slider,.wce-overlay-color-selector,.wce-overlay-action-btn').forEach(el=>el.remove());
   const list=_wceEffectiveOverlays();
 
   // Declared BEFORE the group loop below, which calls _wceEnsureFontLoaded: as a const
@@ -2662,6 +2662,15 @@ function _wceBuildThumbnailOverlaysCore(){
     setTimeout(()=>document.addEventListener('pointerdown', closeHandler, true), 0);
   }
 
+  list.filter(o=>o.type==='color_selector').forEach(o=>{
+    try{
+      const el=mk('div','wce-overlay-color-selector');
+      el.dataset.overlayId=o.id;
+      el.style.left=(o.x??10)+'%'; el.style.top=(o.y??10)+'%';
+      _wceColorSelMount(el,o);
+      hostFor(o).appendChild(el);
+    }catch(e){ console.error('[WCE] failed to render a color selector:', e); }
+  });
   list.filter(o=>o.type==='section_slider').forEach(o=>{
     try{
       const el=mk('div','wce-overlay-section-slider');
@@ -2765,7 +2774,7 @@ list.filter(o=>o.type==='snapshot' && o.display!=='icon').forEach(o=>{
     hostFor(o).appendChild(el);
   });
 
-  list.filter(o=>o.type!=='group' && o.type!=='shape' && o.type!=='text' && o.type!=='section_slider' && (o.type!=='presentation' || o.display==='icon') && (o.type!=='snapshot' || o.display==='icon')).forEach(o=>{
+  list.filter(o=>o.type!=='group' && o.type!=='shape' && o.type!=='text' && o.type!=='section_slider' && o.type!=='color_selector' && (o.type!=='presentation' || o.display==='icon') && (o.type!=='snapshot' || o.display==='icon')).forEach(o=>{
     if(!o.type && o.container && o.material) o.type='material';
     const el=mk('div','wce-overlay-thumb');
     if(o.id) el.dataset.overlayId=o.id;
@@ -3252,7 +3261,7 @@ function _wcePresentationHideSelectors(){
   // all: the hide was being undone 60 times a second, confirmed directly
   // against a real project.
   return ['#panel','#ptab','#ar-btn','.wce-overlay-thumb','.wce-overlay-text',
-          '.wce-overlay-group','.wce-overlay-shape','.wce-overlay-section-slider','.wce-overlay-action-btn'];
+          '.wce-overlay-group','.wce-overlay-shape','.wce-overlay-section-slider','.wce-overlay-color-selector','.wce-overlay-action-btn'];
 }
 // Presentation Mode reveal groups (hotkeys AND Visibility Toggle thumbnails address these):
 //   bulk:hotspots, bulk:annotations, bulk:imagetriggers  -- 3D markers (driven per frame, see _wceHideMarkerCategory)
@@ -4225,3 +4234,601 @@ function buildSoundButtons(){
     setTimeout(go,600);
   }catch(e){}
 })();
+
+/* ================= Color Selector overlay (one panel for the whole scene) =================
+   Added in the UI Designer (+ Add Overlay > Color Selector). Visitors pick a part with its thumbnail (or a subset
+   thumbnail covering several parts) and recolour it: colour, roughness, metalness, clearcoat, specular.
+   WHICH containers can be edited, WHICH properties, and the lowest / highest value of each come from Blender
+   (UI & Annotations > Color Selector, exported as CFG.color_selector). Only containers with exactly one material.
+   Where a material already has a base-colour texture (material.map), the colour is a tint MULTIPLIED over it
+   (three.js does color * map natively); with no texture it is the colour itself.
+   The materials edited are the per-container clones the viewer renders (window._wce.cloneCache), so no other
+   container is ever touched. Choices are remembered in the visitor's browser (not in the Designer). */
+(function(){
+  try{
+    if(document.getElementById('wce-colorsel-css')) return;
+    var s = document.createElement('style'); s.id = 'wce-colorsel-css';
+    s.textContent = [
+      '.wce-overlay-color-selector{position:fixed;z-index:6;box-sizing:border-box;display:flex;flex-direction:column;gap:var(--cs-gap,9px);max-width:calc(100vw - 16px);font-family:inherit;line-height:1.2;pointer-events:auto;user-select:none;-webkit-user-select:none;color:var(--cs-text,#fff);font-size:var(--cs-fs,12px)}',
+      '.wce-group-content>.wce-overlay-color-selector,.wce-shape-content>.wce-overlay-color-selector{position:absolute}',
+      '.wce-shape-content .wce-overlay-color-selector{pointer-events:auto}',
+      '.wce-cs-head{display:flex;align-items:center;justify-content:space-between;gap:8px}',
+      '.wce-cs-head.clickable{cursor:pointer}',
+      '.wce-cs-title{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:calc(var(--cs-fs,12px) * .9);opacity:.92}',
+      '.wce-cs-chev{opacity:.7;font-size:10px}',
+      '.wce-cs-select{width:100%;box-sizing:border-box;background:rgba(0,0,0,.35);color:inherit;border:1px solid rgba(255,255,255,.25);border-radius:5px;padding:4px 6px;font:inherit;outline:none}',
+      '.wce-cs-select option{color:#111}',
+      '.wce-cs-colors{display:flex;flex-wrap:wrap;align-items:center;gap:var(--cs-swgap,6px)}',
+      '.wce-cs-sw,.wce-cs-picker{width:var(--cs-sw,22px);height:var(--cs-sw,22px);box-sizing:border-box;padding:0;margin:0;cursor:pointer;flex:0 0 auto;border:2px solid rgba(255,255,255,.18);background:none}',
+      '.wce-cs-sw.round,.wce-cs-picker.round{border-radius:50%}.wce-cs-sw.rounded,.wce-cs-picker.rounded{border-radius:25%}.wce-cs-sw.sq,.wce-cs-picker.sq{border-radius:2px}',
+      '.wce-cs-picker{overflow:hidden;-webkit-appearance:none;appearance:none}',
+      '.wce-cs-picker::-webkit-color-swatch-wrapper{padding:0}.wce-cs-picker::-webkit-color-swatch{border:0;border-radius:inherit}.wce-cs-picker::-moz-color-swatch{border:0;border-radius:inherit}',
+      '.wce-cs-picker.mixed{opacity:.45}',
+      '.wce-cs-sw.active,.wce-cs-picker.active{border-color:var(--cs-accent,#c8a96e);box-shadow:0 0 0 1px var(--cs-accent,#c8a96e)}',
+      '.wce-cs-note{font-size:calc(var(--cs-fs,12px) * .85);opacity:.65}',
+      '.wce-cs-rows{display:flex;flex-direction:column;gap:var(--cs-gap,9px)}',
+      '.wce-cs-row{display:grid;grid-template-columns:76px 1fr 38px;align-items:center;gap:8px}',
+      '.wce-cs-row.novals{grid-template-columns:76px 1fr}',
+      '.wce-cs-row.stacked{grid-template-columns:1fr auto}.wce-cs-row.stacked .wce-cs-range{grid-column:1 / -1;grid-row:2}',
+      '.wce-cs-row.stacked.novals{grid-template-columns:1fr}',
+      '.wce-cs-lbl{opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.wce-cs-val{text-align:right;color:var(--cs-val,inherit);opacity:.8;font-variant-numeric:tabular-nums}',
+      '.wce-cs-row.off{opacity:.35}.wce-cs-row.off .wce-cs-range{pointer-events:none}',
+      '.wce-cs-range{-webkit-appearance:none;appearance:none;width:100%;height:var(--cs-thumbsz,14px);background:transparent;margin:0;cursor:pointer;outline:none}',
+      '.wce-cs-range::-webkit-slider-runnable-track{height:var(--cs-th,5px);background:var(--cs-trackbg,var(--cs-track,#3a3a44));border-radius:999px}',
+      '.wce-cs-range::-webkit-slider-thumb{-webkit-appearance:none;width:var(--cs-thumbsz,14px);height:var(--cs-thumbsz,14px);border-radius:var(--cs-thumbr,50%);background:var(--cs-thumb,#c8a96e);border:var(--cs-thumbbw,0px) solid var(--cs-thumbbc,#fff);box-sizing:border-box;margin-top:calc((var(--cs-th,5px) - var(--cs-thumbsz,14px)) / 2)}',
+      '.wce-cs-range::-moz-range-track{height:var(--cs-th,5px);background:var(--cs-trackbg,var(--cs-track,#3a3a44));border-radius:999px}',
+      '.wce-cs-range::-moz-range-thumb{width:var(--cs-thumbsz,14px);height:var(--cs-thumbsz,14px);border-radius:var(--cs-thumbr,50%);background:var(--cs-thumb,#c8a96e);border:var(--cs-thumbbw,0px) solid var(--cs-thumbbc,#fff);box-sizing:border-box}',
+      '.wce-cs-btns{display:flex;gap:8px;flex-wrap:wrap}',
+      '.wce-cs-btn{background:transparent;color:inherit;border:1px solid rgba(255,255,255,.3);border-radius:5px;padding:3px 10px;font:inherit;cursor:pointer;opacity:.85}',
+      '.wce-cs-btn:hover{opacity:1;border-color:var(--cs-accent,#c8a96e)}',
+      '.wce-cs-empty{opacity:.65;font-style:italic}',
+      '.wce-cs-edit *{pointer-events:none !important}',
+      '.wce-overlay-thumb.wce-cs-picked{outline:2px solid var(--wce-cs-ring,#c8a96e);outline-offset:2px}'
+    ].join('\n');
+    (document.head || document.documentElement).appendChild(s);
+  }catch(e){}
+})();
+
+function _wceColorSelDefaults(){
+  // Keep in step with _CS_DEF in the UI Designer. Anything missing from a saved overlay falls back to these.
+  return {
+    // panel
+    width:230, panelBg:'#14141a', panelOpacity:88, blur:0, radius:10, padding:12, gap:9, borderWidth:1, borderColor:'#3a3a44', shadow:0,
+    // text
+    textColor:'#ffffff', fontSize:12, fontWeight:'400', letterSpacing:0, textCase:'none', valueColor:'#ffffff',
+    showTitle:true, titleFormat:'Color · {part}', collapsible:false, startCollapsed:false,
+    // controls shown
+    showColor:true, showSwatches:true, showRoughness:true, showMetalness:true, showClearcoat:true, showSpecular:true,
+    showReset:true, showResetAll:false, showPicker:false, showNote:true, showValues:true, decimals:2, rowLayout:'inline',
+    lblRoughness:'', lblMetalness:'', lblClearcoat:'', lblSpecular:'',
+    // sliders
+    trackColor:'#3a3a44', trackHeight:5, showFill:false, fillColor:'#c8a96e', thumbColor:'#c8a96e', thumbSize:14, thumbRadius:50,
+    thumbBorderWidth:0, thumbBorderColor:'#ffffff', showFullRange:false, disallowedColor:'#5a5a64',
+    // swatches
+    swatchSize:22, swatchShape:'circle', swatchGap:6, accent:'#c8a96e',
+    swatches:['#ffffff','#111111','#c0392b','#e67e22','#f1c40f','#27ae60','#2980b9','#8e44ad'],
+    // behaviour
+    remember:true, pulseOnSelect:true, colorTweenMs:0, emptyState:'first', emptyText:'Select a part to edit its color'
+  };
+}
+
+var _WCE_CS_PROPS = ['roughness', 'metalness', 'clearcoat', 'specular'];
+var _WCE_CS_PROP_LABEL = {roughness: 'Roughness', metalness: 'Metalness', clearcoat: 'Clearcoat', specular: 'Specular'};
+
+function _wceCsNice(c){
+  var n = String(c || '').replace(/^MAT_/i, '').replace(/_+/g, ' ').trim().toLowerCase();
+  return n.replace(/\b[a-z]/g, function(ch){ return ch.toUpperCase(); }) || String(c);
+}
+function _wceCsBare(c){ return String(c || '').toUpperCase().replace(/^MAT_/, ''); }
+function _wceCsClamp(v, lo, hi){ return Math.min(hi, Math.max(lo, v)); }
+function _wceCsRgba(hex, op){
+  var h = String(hex || '#000000').replace('#', '');
+  if(h.length === 3) h = h.split('').map(function(x){ return x + x; }).join('');
+  var n = parseInt(h, 16); if(isNaN(n)) n = 0;
+  return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + (_wceCsClamp(op, 0, 100) / 100) + ')';
+}
+
+// ---------------------------------------------------------------- materials
+// The materials the viewer renders for one container (its per-container clones: with / without baked AO).
+function _wceCsMats(c){
+  var W = window._wce, r = [], cc = W && W.cloneCache && W.cloneCache[c];
+  if(!cc) return r;
+  Object.keys(cc).forEach(function(mn){
+    var e = cc[mn]; if(!e) return;
+    ['plain', 'ao'].forEach(function(k){ if(e[k]) r.push(e[k]); });
+  });
+  return r;
+}
+
+// clearcoat / specular only exist on MeshPhysicalMaterial. The glTF loader hands over a plain MeshStandardMaterial when the
+// source had no such extension, so such a clone is swapped (once) for an identical physical one: same values, same slots on
+// the same meshes, same clipping planes. Only this container's own clone is ever swapped, never a shared material.
+function _wceCsUpgrade(c){
+  var W = window._wce, T = W && W.THREE, root = window.root, cc = W && W.cloneCache && W.cloneCache[c];
+  if(!T || !root || !cc || !T.MeshPhysicalMaterial) return;
+  Object.keys(cc).forEach(function(mn){
+    ['plain', 'ao'].forEach(function(k){
+      var m = cc[mn] && cc[mn][k];
+      if(!m || m.isMeshPhysicalMaterial || !m.isMeshStandardMaterial) return;
+      try{
+        var n = new T.MeshPhysicalMaterial();
+        T.MeshStandardMaterial.prototype.copy.call(n, m);
+        n.defines = {STANDARD: '', PHYSICAL: ''};
+        n.name = m.name; n.userData = m.userData; n.clippingPlanes = m.clippingPlanes;
+        n.needsUpdate = true;
+        cc[mn][k] = n;
+        root.traverse(function(o){
+          if(!o.isMesh) return;
+          if(Array.isArray(o.material)){ for(var i = 0; i < o.material.length; i++){ if(o.material[i] === m) o.material[i] = n; } }
+          else if(o.material === m) o.material = n;
+        });
+        if(typeof m.dispose === 'function') m.dispose();
+      }catch(err){ console.warn('[WCE] Color Selector: could not enable clearcoat / specular for "' + c + '":', err); }
+    });
+  });
+}
+
+function _wceCsRead(c){
+  var mats = _wceCsMats(c), m = mats[0];
+  if(!m) return null;
+  return {
+    color: '#' + m.color.getHexString(),
+    roughness: m.roughness != null ? m.roughness : 1,
+    metalness: m.metalness != null ? m.metalness : 0,
+    clearcoat: m.clearcoat != null ? m.clearcoat : 0,
+    specular: m.specularIntensity != null ? m.specularIntensity : 1,
+    hasMap: mats.some(function(x){ return !!x.map; }),
+    physical: mats.every(function(x){ return !!x.isMeshPhysicalMaterial; })
+  };
+}
+
+function _wceCsRender(ms){ try{ if(window._wce && window._wce.requestRender) window._wce.requestRender(ms || 400); }catch(e){} }
+
+function _wceCsSet(c, prop, v){
+  _wceCsMats(c).forEach(function(m){
+    var t = m.userData && m.userData.wceTarget;   // the viewer's transition target: kept equal so nothing slides back later
+    if(prop === 'color'){ if(m.color){ m.color.set(v); if(t && t.color) t.color.copy(m.color); } }
+    else if(prop === 'roughness'){ m.roughness = v; if(t) t.roughness = v; }
+    else if(prop === 'metalness'){ m.metalness = v; if(t) t.metalness = v; }
+    else if(prop === 'clearcoat'){ if(!('clearcoat' in m)) return; m.clearcoat = v; if(t) t.clearcoat = v; }
+    else if(prop === 'specular'){ if(!('specularIntensity' in m)) return; m.specularIntensity = v; if(t) t.specularIntensity = v; }
+  });
+  _wceCsRender(400);
+}
+
+// optional smooth colour change (Color Selector > Behaviour > Smooth colour change)
+function _wceCsTweenColor(c, hex, ms){
+  if(!(ms > 0)){ _wceCsSet(c, 'color', hex); return; }
+  var mats = _wceCsMats(c); if(!mats.length) return;
+  var id = (_wceCsTweenColor._n = (_wceCsTweenColor._n || 0) + 1), t0 = performance.now();
+  var froms = mats.map(function(m){ return m.color.clone(); });
+  var tos = mats.map(function(m){ return m.color.clone().set(hex); });
+  mats.forEach(function(m){ m.userData.wceCsTw = id; });
+  (function step(now){
+    var t = _wceCsClamp((now - t0) / ms, 0, 1);
+    mats.forEach(function(m, i){
+      if(m.userData.wceCsTw !== id) return;
+      m.color.copy(froms[i]).lerp(tos[i], t);
+      var tg = m.userData && m.userData.wceTarget; if(tg && tg.color) tg.color.copy(m.color);
+    });
+    _wceCsRender(120);
+    if(t < 1) requestAnimationFrame(step);
+  })(t0);
+}
+
+// brief glow on the picked part(s), so it is clear which geometry the panel now edits
+var _wceCsPulseId = 0;
+function _wceCsPulse(keys, hex, ms){
+  ms = ms || 700;
+  var mats = [];
+  keys.forEach(function(k){ _wceCsMats(k).forEach(function(m){ if(m.emissive) mats.push(m); }); });
+  if(!mats.length) return;
+  var id = ++_wceCsPulseId, t0 = performance.now();
+  mats.forEach(function(m){
+    if(!m.userData.wceCsPulse) m.userData.wceCsPulse = {e: m.emissive.clone(), i: m.emissiveIntensity};
+    m.emissive.set(hex); m.userData.wceCsPulseId = id;
+  });
+  (function step(now){
+    var t = _wceCsClamp((now - t0) / ms, 0, 1), k = Math.sin(Math.PI * t);
+    mats.forEach(function(m){ if(m.userData.wceCsPulseId === id) m.emissiveIntensity = k * 0.9; });
+    _wceCsRender(120);
+    if(t < 1){ requestAnimationFrame(step); return; }
+    mats.forEach(function(m){
+      if(m.userData.wceCsPulseId !== id) return;
+      var o = m.userData.wceCsPulse; if(o){ m.emissive.copy(o.e); m.emissiveIntensity = o.i; }
+      delete m.userData.wceCsPulse; delete m.userData.wceCsPulseId;
+    });
+    _wceCsRender(200);
+  })(t0);
+}
+
+// ---------------------------------------------------------------- the exposed containers (from Blender)
+function _wceCsCfg(){
+  var c = window._wce && window._wce.CFG && window._wce.CFG.color_selector;
+  return (c && Array.isArray(c.items)) ? c.items : [];
+}
+function _wceCsResolveKey(name){
+  var W = window._wce; if(!W || !W.cloneCache) return null;
+  if(W.cloneCache[name]) return name;
+  var b = _wceCsBare(name), ks = Object.keys(W.cloneCache);
+  for(var i = 0; i < ks.length; i++){ if(_wceCsBare(ks[i]) === b) return ks[i]; }
+  return null;
+}
+// Items whose material is on screen and which really offer exactly one material.
+function _wceColorSelItems(){
+  var W = window._wce, out = [];
+  if(!W || !W.CFG) return out;
+  var all = W.CFG.containers_all || {};
+  _wceCsCfg().forEach(function(it){
+    var key = _wceCsResolveKey(it.container); if(!key) return;
+    if(!_wceCsMats(key).length) return;
+    var b = _wceCsBare(key), n = null;
+    Object.keys(all).forEach(function(k){ if(_wceCsBare(k) === b && Array.isArray(all[k])) n = all[k].length; });
+    if(n !== null && n !== 1) return;
+    out.push({key: key, bare: b, label: it.label || _wceCsNice(it.container), cfg: it});
+  });
+  return out;
+}
+
+// ---------------------------------------------------------------- state: selection, first look, memory
+var _wceCsSel = [];            // container keys the panel is editing right now
+var _wceCsBase = {};           // each container's starting look (Reset returns here)
+var _wceCsInited = {};
+var _wceCsMem = null;          // remembered choices {containerKey: {color, roughness, ...}}
+var _wceCsRememberOn = false;
+var _wceCsPanels = [];
+var _wceCsSaveTimer = 0;
+function _wceCsStoreKey(){ return 'wce-cs:' + (location.pathname || '/'); }
+function _wceCsLoadMem(){
+  if(_wceCsMem) return _wceCsMem;
+  try{ _wceCsMem = JSON.parse(localStorage.getItem(_wceCsStoreKey()) || '{}') || {}; }catch(e){ _wceCsMem = {}; }
+  return _wceCsMem;
+}
+function _wceCsSaveMem(){
+  if(_wceCsSaveTimer) return;
+  _wceCsSaveTimer = setTimeout(function(){
+    _wceCsSaveTimer = 0;
+    try{ localStorage.setItem(_wceCsStoreKey(), JSON.stringify(_wceCsMem || {})); }catch(e){}
+  }, 300);
+}
+function _wceCsRemember(key){
+  if(!_wceCsRememberOn) return;
+  var l = _wceCsRead(key); if(!l) return;
+  _wceCsLoadMem()[key] = {color: l.color, roughness: l.roughness, metalness: l.metalness, clearcoat: l.clearcoat, specular: l.specular};
+  _wceCsSaveMem();
+}
+
+function _wceCsEnsureInit(items, remember){
+  items.forEach(function(it){
+    if(_wceCsInited[it.key]) return;
+    _wceCsInited[it.key] = true;
+    var c = it.cfg || {};
+    var needPhys = ['clearcoat', 'specular'].some(function(p){ return c[p] && c[p].enabled !== false; });
+    if(needPhys) _wceCsUpgrade(it.key);
+    if(!_wceCsRead(it.key)) return;
+    // the starting look chosen in Blender ("Start at")
+    if(c.color && c.color.enabled !== false && c.color.start) _wceCsSet(it.key, 'color', c.color.start);
+    _WCE_CS_PROPS.forEach(function(p){
+      var pc = c[p];
+      if(pc && pc.enabled !== false && pc.start != null) _wceCsSet(it.key, p, _wceCsClamp(pc.start, pc.min != null ? pc.min : 0, pc.max != null ? pc.max : 1));
+    });
+    _wceCsBase[it.key] = _wceCsRead(it.key);      // Reset returns here
+    // what this visitor chose last time
+    if(remember){
+      var m = _wceCsLoadMem()[it.key];
+      if(m){
+        if(m.color && c.color && c.color.enabled !== false) _wceCsSet(it.key, 'color', m.color);
+        _WCE_CS_PROPS.forEach(function(p){
+          var pc = c[p];
+          if(pc && pc.enabled !== false && typeof m[p] === 'number') _wceCsSet(it.key, p, _wceCsClamp(m[p], pc.min != null ? pc.min : 0, pc.max != null ? pc.max : 1));
+        });
+      }
+    }
+  });
+}
+
+function _wceCsResetKeys(keys){
+  keys.forEach(function(k){
+    var b = _wceCsBase[k]; if(!b) return;
+    _wceCsSet(k, 'color', b.color);
+    _WCE_CS_PROPS.forEach(function(p){ _wceCsSet(k, p, b[p]); });
+    if(_wceCsRememberOn){ delete _wceCsLoadMem()[k]; _wceCsSaveMem(); }
+  });
+}
+
+function _wceCsNotify(){
+  _wceCsPanels = _wceCsPanels.filter(function(p){ return p.el && p.el.isConnected; });
+  _wceCsPanels.forEach(function(p){ try{ p.render(); }catch(e){ console.error('[WCE] Color Selector render failed:', e); } });
+  try{ _wceCsRefreshPicked(); }catch(e){}
+}
+function _wceCsSetSel(keys, opt){
+  opt = opt || {};
+  var cur = _wceCsSel.slice().sort().join('|'), nxt = keys.slice().sort().join('|');
+  _wceCsSel = keys.slice();
+  _wceCsNotify();
+  if(opt.pulse !== false && (cur !== nxt || opt.force)){
+    var p = _wceCsPanels.filter(function(x){ return x.d && x.d.pulseOnSelect; })[0];
+    if(p && window.__wceMode !== 'edit') _wceCsPulse(keys, p.d.accent || '#c8a96e', 700);
+  }
+}
+
+// thumbnail clicks: a container thumbnail selects its container, a subset thumbnail selects every exposed container in it
+function _wceCsKeysForOverlay(o, items){
+  var W = window._wce, names = [];
+  if(!W || !o) return [];
+  if(o.type === 'material' && o.container) names = [o.container];
+  else if(o.type === 'mat_subset' || o.type === 'global_set'){
+    var CFG = W.CFG || {};
+    var gset = (o.uid && (CFG.global_mat_sets || []).find(function(x){ return x.uid === o.uid; })) || (CFG.global_mat_sets || []).find(function(x){ return x.name === o.name; });
+    var s = gset || (o.uid && (CFG.mat_subsets || []).find(function(x){ return x.uid === o.uid; })) || (CFG.mat_subsets || []).find(function(x){ return x.name === o.name; }) || (o.state ? {state: o.state} : null);
+    if(s && s.state) names = Object.keys(s.state);
+  }
+  var out = [];
+  names.forEach(function(n){
+    var b = _wceCsBare(n);
+    items.forEach(function(i){ if(i.bare === b && out.indexOf(i.key) < 0) out.push(i.key); });
+  });
+  return out;
+}
+function _wceCsOnOverlay(o){
+  if(!_wceCsPanels.length) return;
+  var keys = _wceCsKeysForOverlay(o, _wceColorSelItems());
+  if(keys.length) _wceCsSetSel(keys, {force: true});
+}
+// a ring around the thumbnail(s) whose parts the panel is editing
+function _wceCsRefreshPicked(){
+  var items = _wceColorSelItems(), sel = _wceCsSel.slice().sort().join('|');
+  var list = (typeof _wceEffectiveOverlays === 'function') ? (_wceEffectiveOverlays() || []) : (window.WCE_OVERLAYS || []);
+  list.forEach(function(o){
+    if(!o || !o.id || (o.type !== 'material' && o.type !== 'mat_subset' && o.type !== 'global_set')) return;
+    var el = document.querySelector('[data-overlay-id="' + String(o.id).replace(/"/g, '\\"') + '"]'); if(!el) return;
+    var keys = _wceCsKeysForOverlay(o, items);
+    el.classList.toggle('wce-cs-picked', !!sel && keys.length > 0 && keys.slice().sort().join('|') === sel);
+  });
+}
+var _wceCsPollOn = false;
+function _wceCsStartPoll(){
+  if(_wceCsPollOn) return; _wceCsPollOn = true;
+  setInterval(function(){
+    if(document.hidden || !_wceCsPanels.length) return;
+    try{ _wceCsRefreshPicked(); }catch(e){}
+  }, 400);
+}
+if(typeof applyOverlay === 'function'){
+  var _wceCsOrigApplyOverlay = applyOverlay;
+  applyOverlay = function(o){
+    var r = _wceCsOrigApplyOverlay.apply(this, arguments);
+    try{ _wceCsOnOverlay(o); }catch(e){}
+    return r;
+  };
+}
+
+// ---------------------------------------------------------------- the panel
+function _wceCsTrackBg(d, lo, hi, val, mixed){
+  // lo / hi / val are percentages along the track. Disallowed ends greyed (when the full range is shown), allowed part up to the value filled.
+  var track = d.trackColor, fill = d.showFill && !mixed ? d.fillColor : d.trackColor, dis = d.disallowedColor;
+  var v = _wceCsClamp(val, lo, hi);
+  var segs = [];
+  if(lo > 0) segs.push([0, lo, dis]);
+  segs.push([lo, v, fill]);
+  segs.push([v, hi, track]);
+  if(hi < 100) segs.push([hi, 100, dis]);
+  return 'linear-gradient(to right,' + segs.filter(function(s){ return s[1] > s[0]; }).map(function(s){ return s[2] + ' ' + s[0] + '% ' + s[1] + '%'; }).join(',') + ')';
+}
+
+function _wceColorSelMount(el, o, opt){
+  opt = opt || {};
+  var d = Object.assign(_wceColorSelDefaults(), o || {});
+  var inDesigner = !!window.__wceMode;
+  el.classList.add('wce-overlay-color-selector');
+  el.classList.toggle('wce-cs-edit', !!opt.edit);
+  // ---- panel style
+  el.style.width = d.width + 'px';
+  el.style.padding = d.padding + 'px';
+  el.style.background = _wceCsRgba(d.panelBg, d.panelOpacity);
+  el.style.border = d.borderWidth + 'px solid ' + d.borderColor;
+  el.style.borderRadius = d.radius + 'px';
+  el.style.boxShadow = d.shadow > 0 ? '0 4px ' + d.shadow + 'px rgba(0,0,0,.45)' : '';
+  el.style.backdropFilter = el.style.webkitBackdropFilter = d.blur > 0 ? 'blur(' + d.blur + 'px)' : '';
+  el.style.fontWeight = d.fontWeight; el.style.letterSpacing = d.letterSpacing + 'px';
+  el.style.textTransform = d.textCase === 'none' ? '' : d.textCase;
+  var sv = function(k, v){ el.style.setProperty(k, v); };
+  sv('--cs-text', d.textColor); sv('--cs-val', d.valueColor); sv('--cs-fs', d.fontSize + 'px'); sv('--cs-gap', d.gap + 'px');
+  sv('--cs-accent', d.accent); sv('--cs-track', d.trackColor); sv('--cs-th', d.trackHeight + 'px');
+  sv('--cs-thumb', d.thumbColor); sv('--cs-thumbsz', d.thumbSize + 'px'); sv('--cs-thumbr', d.thumbRadius + '%');
+  sv('--cs-thumbbw', d.thumbBorderWidth + 'px'); sv('--cs-thumbbc', d.thumbBorderColor);
+  sv('--cs-sw', d.swatchSize + 'px'); sv('--cs-swgap', d.swatchGap + 'px');
+  try{ document.documentElement.style.setProperty('--wce-cs-ring', d.accent); }catch(e){}
+
+  var panel = null;
+  for(var pi = 0; pi < _wceCsPanels.length; pi++){ if(_wceCsPanels[pi].el === el){ panel = _wceCsPanels[pi]; break; } }
+  if(!panel){ panel = {el: el, collapsed: !!d.startCollapsed}; _wceCsPanels.push(panel); }
+  panel.d = d; panel.o = o; panel.opt = opt;
+  _wceCsRememberOn = !!d.remember && !inDesigner;
+  _wceCsStartPoll();
+
+  var swClass = function(){ return d.swatchShape === 'square' ? 'sq' : (d.swatchShape === 'rounded' ? 'rounded' : 'round'); };
+  var fmt = function(v){ return (+v).toFixed(Math.max(0, Math.min(3, d.decimals | 0))); };
+
+  panel.render = function(){
+    el.innerHTML = '';
+    el.style.display = '';
+    var items = _wceColorSelItems();
+    if(!items.length){
+      var tries = (opt.tries || 0);
+      if(tries < 20){ setTimeout(function(){ if(el.isConnected){ opt.tries = tries + 1; panel.render(); } }, 500); }
+      var none = document.createElement('div'); none.className = 'wce-cs-empty';
+      if(_wceCsCfg().length) none.textContent = tries < 20 ? 'Looking for the parts to edit...' : 'The listed containers were not found in this model.';
+      else none.textContent = inDesigner ? 'No containers yet. Add them in Blender: UI & Annotations > Color Selector.' : '';
+      if(!inDesigner && (tries >= 20 || !_wceCsCfg().length)){ el.style.display = 'none'; return; }
+      el.appendChild(none);
+      return;
+    }
+    _wceCsEnsureInit(items, _wceCsRememberOn);
+    // keep only parts that still exist; first part when nothing is picked and the panel is set to "first"
+    _wceCsSel = _wceCsSel.filter(function(k){ return items.some(function(i){ return i.key === k; }); });
+    if(!_wceCsSel.length && d.emptyState === 'first') _wceCsSel = [items[0].key];
+    var S = _wceCsSel.map(function(k){ return items.filter(function(i){ return i.key === k; })[0]; });
+
+    // ---- title row
+    if(d.showTitle || d.collapsible){
+      var head = document.createElement('div'); head.className = 'wce-cs-head' + (d.collapsible ? ' clickable' : '');
+      var title = document.createElement('div'); title.className = 'wce-cs-title';
+      var part = S.length === 0 ? '' : (S.length === 1 ? S[0].label : S.length + ' parts');
+      title.textContent = S.length ? String(d.titleFormat || 'Color · {part}').replace('{part}', part)
+        : (String(d.titleFormat || 'Color').replace('{part}', '').replace(/^[\s·\-–—:|]+/, '').replace(/[\s·\-–—:|]+$/, '') || 'Color');
+      head.appendChild(title);
+      if(d.collapsible){
+        var chev = document.createElement('span'); chev.className = 'wce-cs-chev'; chev.textContent = panel.collapsed ? '▸' : '▾'; head.appendChild(chev);
+        head.onclick = function(){ panel.collapsed = !panel.collapsed; panel.render(); };
+      }
+      el.appendChild(head);
+    }
+    if(d.collapsible && panel.collapsed) return;
+
+    // ---- optional part picker
+    if(d.showPicker){
+      var sel = document.createElement('select'); sel.className = 'wce-cs-select';
+      var op0 = document.createElement('option'); op0.value = ''; op0.textContent = 'Select a part...'; sel.appendChild(op0);
+      items.forEach(function(i){ var op = document.createElement('option'); op.value = i.key; op.textContent = i.label; sel.appendChild(op); });
+      sel.value = S.length === 1 ? S[0].key : '';
+      sel.onchange = function(){ _wceCsSetSel(sel.value ? [sel.value] : [], {force: true}); };
+      el.appendChild(sel);
+    }
+
+    if(!S.length){
+      if(d.emptyState === 'hide' && !inDesigner){ el.style.display = 'none'; return; }
+      var pr = document.createElement('div'); pr.className = 'wce-cs-empty'; pr.textContent = d.emptyText || 'Select a part to edit its color';
+      el.appendChild(pr);
+      return;
+    }
+
+    var body = document.createElement('div'); body.style.cssText = 'display:flex;flex-direction:column;gap:' + d.gap + 'px';
+    el.appendChild(body);
+    var cfgOf = function(it, p){ return (it.cfg && it.cfg[p]) || {}; };
+    var looks = function(){ return S.map(function(i){ return _wceCsRead(i.key) || {}; }); };
+
+    // ---------------- colour
+    var canColor = (d.showColor || d.showSwatches) && S.every(function(i){ return !(i.cfg.color) || i.cfg.color.enabled !== false; });
+    var colorWrap = document.createElement('div'); colorWrap.style.cssText = 'display:flex;flex-direction:column;gap:' + Math.max(4, d.gap - 3) + 'px';
+    var applyColor = function(hex){
+      S.forEach(function(i){ _wceCsTweenColor(i.key, hex, d.colorTweenMs); });
+      setTimeout(function(){ S.forEach(function(i){ _wceCsRemember(i.key); }); }, (d.colorTweenMs || 0) + 30);
+      buildColors(hex);
+    };
+    var buildColors = function(forceHex){
+      colorWrap.innerHTML = '';
+      var ls = looks(), first = ls[0] || {};
+      var mixed = !forceHex && ls.some(function(l){ return l.color !== first.color; });
+      var curHex = forceHex || (mixed ? '#808080' : first.color);
+      var wrap = document.createElement('div'); wrap.className = 'wce-cs-colors';
+      var pal = null;
+      S.forEach(function(i){ if(!pal && i.cfg.color && i.cfg.color.swatches && i.cfg.color.swatches.length) pal = i.cfg.color.swatches; });
+      pal = pal || d.swatches || [];
+      var picker = null, sws = [];
+      var mark = function(hex){
+        var h = String(hex).toLowerCase();
+        sws.forEach(function(b){ b.classList.toggle('active', !mixed && b.dataset.hex === h); });
+        if(picker) picker.classList.toggle('active', !mixed && !sws.some(function(b){ return b.dataset.hex === h; }));
+      };
+      if(d.showSwatches){
+        pal.forEach(function(hex){
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'wce-cs-sw ' + swClass();
+          b.style.background = hex; b.dataset.hex = String(hex).toLowerCase(); b.title = hex;
+          b.onclick = function(){ applyColor(hex); };
+          wrap.appendChild(b); sws.push(b);
+        });
+      }
+      if(d.showColor){
+        picker = document.createElement('input'); picker.type = 'color'; picker.className = 'wce-cs-picker ' + swClass() + (mixed ? ' mixed' : '');
+        picker.value = /^#[0-9a-f]{6}$/i.test(curHex) ? curHex : '#808080';
+        picker.title = mixed ? 'The selected parts differ - picking a colour sets all of them' : (first.hasMap ? 'Tint (multiplies the base texture)' : 'Colour');
+        picker.oninput = function(){
+          S.forEach(function(i){ _wceCsSet(i.key, 'color', picker.value); });
+          mixed = false; picker.classList.remove('mixed'); mark(picker.value);
+        };
+        picker.onchange = function(){ S.forEach(function(i){ _wceCsRemember(i.key); }); };
+        wrap.appendChild(picker);
+      }
+      colorWrap.appendChild(wrap);
+      mark(curHex);
+      if(mixed){
+        var mn = document.createElement('div'); mn.className = 'wce-cs-note'; mn.textContent = 'Mixed - the selected parts have different colors.'; colorWrap.appendChild(mn);
+      }
+      if(d.showNote && ls.some(function(l){ return l.hasMap; })){
+        var note = document.createElement('div'); note.className = 'wce-cs-note';
+        note.textContent = 'Multiplied on top of the base texture. White keeps the texture as it is.';
+        colorWrap.appendChild(note);
+      }
+    };
+    if(canColor){ body.appendChild(colorWrap); buildColors(); }
+
+    // ---------------- sliders (range per property comes from Blender; a subset uses the range every part allows)
+    var rows = document.createElement('div'); rows.className = 'wce-cs-rows';
+    _WCE_CS_PROPS.forEach(function(p){
+      var cap = p.charAt(0).toUpperCase() + p.slice(1);
+      if(!d['show' + cap]) return;
+      if(!S.every(function(i){ return cfgOf(i, p).enabled !== false && i.cfg[p]; })) return;
+      var lo = Math.max.apply(null, S.map(function(i){ var v = cfgOf(i, p).min; return v != null ? v : 0; }));
+      var hi = Math.min.apply(null, S.map(function(i){ var v = cfgOf(i, p).max; return v != null ? v : 1; }));
+      if(lo > hi) return;
+      var ls = looks(), vals = ls.map(function(l){ return l[p]; }), v0 = vals[0];
+      var mixed = vals.some(function(v){ return Math.abs(v - v0) > 0.0005; });
+      var needsPhys = (p === 'clearcoat' || p === 'specular');
+      var off = needsPhys && !ls.every(function(l){ return l.physical; });
+      var label = d['lbl' + cap] || _WCE_CS_PROP_LABEL[p];
+      var r = document.createElement('div'); r.className = 'wce-cs-row' + (off ? ' off' : '') + (d.rowLayout === 'stacked' ? ' stacked' : '') + (d.showValues ? '' : ' novals');
+      if(off) r.title = 'This material does not support ' + label.toLowerCase() + '.';
+      var l = document.createElement('span'); l.className = 'wce-cs-lbl'; l.textContent = label;
+      var inp = document.createElement('input'); inp.type = 'range'; inp.className = 'wce-cs-range'; inp.step = '0.01';
+      var full = !!d.showFullRange;
+      inp.min = full ? '0' : String(lo); inp.max = full ? '1' : String(hi);
+      inp.value = String(_wceCsClamp(v0, lo, hi));
+      var vEl = document.createElement('span'); vEl.className = 'wce-cs-val';
+      var paint = function(v, isMixed){
+        var a = +inp.min, b = +inp.max, span = (b - a) || 1;
+        var pct = function(x){ return (_wceCsClamp(x, a, b) - a) / span * 100; };
+        inp.style.setProperty('--cs-trackbg', _wceCsTrackBg(d, pct(lo), pct(hi), pct(v), isMixed));
+        vEl.textContent = isMixed ? 'mixed' : fmt(v);
+      };
+      paint(_wceCsClamp(v0, lo, hi), mixed);
+      inp.oninput = function(){
+        var v = _wceCsClamp(parseFloat(inp.value), lo, hi);
+        if(String(v) !== inp.value) inp.value = String(v);       // the greyed part is not reachable
+        paint(v, false);
+        S.forEach(function(i){
+          var pc = cfgOf(i, p); _wceCsSet(i.key, p, _wceCsClamp(v, pc.min != null ? pc.min : 0, pc.max != null ? pc.max : 1));
+        });
+      };
+      inp.onchange = function(){ S.forEach(function(i){ _wceCsRemember(i.key); }); };
+      r.appendChild(l); r.appendChild(inp); if(d.showValues) r.appendChild(vEl);
+      rows.appendChild(r);
+    });
+    if(rows.children.length) body.appendChild(rows);
+    if(!canColor && !rows.children.length){
+      var nothing = document.createElement('div'); nothing.className = 'wce-cs-empty'; nothing.textContent = 'Nothing is editable for this part.'; body.appendChild(nothing);
+    }
+
+    // ---------------- buttons
+    if(d.showReset || d.showResetAll){
+      var btns = document.createElement('div'); btns.className = 'wce-cs-btns';
+      if(d.showReset){
+        var rb = document.createElement('button'); rb.type = 'button'; rb.className = 'wce-cs-btn'; rb.textContent = S.length > 1 ? 'Reset these' : 'Reset';
+        rb.onclick = function(){ _wceCsResetKeys(S.map(function(i){ return i.key; })); panel.render(); };
+        btns.appendChild(rb);
+      }
+      if(d.showResetAll){
+        var ra = document.createElement('button'); ra.type = 'button'; ra.className = 'wce-cs-btn'; ra.textContent = 'Reset all';
+        ra.onclick = function(){ _wceCsResetKeys(items.map(function(i){ return i.key; })); panel.render(); };
+        btns.appendChild(ra);
+      }
+      body.appendChild(btns);
+    }
+  };
+  panel.render();
+}
+window._wceColorSelMount = _wceColorSelMount;
+window._wceColorSelItems = _wceColorSelItems;
+window._wceColorSelScan = _wceColorSelItems;
+window._wceColorSelDefaults = _wceColorSelDefaults;

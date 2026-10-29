@@ -1,0 +1,172 @@
+
+======================================================================
+PONKFIGURATOR PRO — Export Report — Highest
+======================================================================
+File: C:\Users\saura\Desktop\New Folder\Highest\b645b7e8b94e.gltf
+Generated: 2026-10-30 03:29:28
+Total size (this .gltf + its .bin + every texture file): 12.70 MB
+
+======================================================================
+EXPORT CONFIGURATION
+======================================================================
+External Textures:        ON
+WebGL Optimized Textures: ON
+Encrypt Data:             off  (this report reflects the file BEFORE encryption — see _write_variant_reports)
+Obfuscate Viewer JS:      off
+
+======================================================================
+ANTI-ALIASING
+======================================================================
+Anti-aliasing:            ON
+Desktop method:           MSAA
+Mobile method:            FXAA
+Fallback method:          FXAA  (used when MSAA is unsupported or a low-end variant loads)
+MSAA samples:             4  (only above pixel ratio 1.5 it falls back)
+Idle refinement:          ON  (16 frames, 200 ms delay, mobile ON)
+Max-quality snapshots:    ON
+Low-end downgrade:        ON
+
+======================================================================
+ANIMATION FOLLOWERS
+======================================================================
+None: every animated object sits under its own ANIM_ empty.
+
+======================================================================
+SIZE BREAKDOWN (approximate — see notes)
+======================================================================
+Geometry (vertex/index buffers): 0 B
+Textures (loose files, External Textures mode):    1.40 MB
+Unaccounted (other bufferViews): 10.97 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
+Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
+
+======================================================================
+GEOMETRY
+======================================================================
+Meshes: 180   Primitives: 209
+Triangles: 3,562,817   Vertices: 3,012,083
+Draco compression: ACTIVE
+
+======================================================================
+TEXTURES
+======================================================================
+KTX2 (GPU-compressed) active: no
+Texture count: 62
+Name                                     Format       Colorspace    Disk size    Est. VRAM
+Image_18                                 image/webp   unknown          4.3 KB      34.2 KB
+Image_57                                 image/webp   unknown          9.3 KB      74.5 KB
+Image_58                                 image/webp   unknown          2.2 KB      17.9 KB
+Image_19                                 image/webp   unknown         22.0 KB     175.8 KB
+Image_53                                 image/webp   unknown         38.4 KB     307.4 KB
+Image_1                                  image/webp   unknown         70.3 KB     562.5 KB
+Image_2                                  image/webp   unknown         14.7 KB     117.2 KB
+Image_3                                  image/webp   unknown         59.8 KB     478.1 KB
+Image_22                                 image/webp   unknown         12.4 KB      99.2 KB
+Image_23                                 image/webp   unknown          6.0 KB      47.8 KB
+Image_24                                 image/webp   unknown          1.0 KB       8.0 KB
+Image_21                                 image/webp   unknown          2.0 KB      16.4 KB
+Image_55                                 image/webp   unknown          5.2 KB      41.2 KB
+Image_56                                 image/webp   unknown          9.7 KB      77.9 KB
+Image_50                                 image/webp   unknown          9.1 KB      73.1 KB
+Image_39                                 image/webp   unknown         19.6 KB     157.0 KB
+Image_40                                 image/webp   unknown           946 B       7.4 KB
+Image_46                                 image/webp   unknown         14.8 KB     118.5 KB
+Image_51                                 image/webp   unknown         97.4 KB     779.0 KB
+Image_52                                 image/webp   unknown         42.2 KB     337.6 KB
+Image_8                                  image/webp   unknown         77.7 KB     621.9 KB
+Image_13                                 image/webp   unknown         28.2 KB     225.8 KB
+Image_14                                 image/webp   unknown         22.0 KB     176.1 KB
+Image_12                                 image/webp   unknown          3.9 KB      31.2 KB
+Image_9                                  image/webp   unknown          8.0 KB      64.0 KB
+Image_10                                 image/webp   unknown          7.3 KB      58.5 KB
+Image_11                                 image/webp   unknown          3.3 KB      26.0 KB
+Image_17                                 image/webp   unknown          3.1 KB      25.2 KB
+Image_15                                 image/webp   unknown          8.1 KB      65.1 KB
+Image_16                                 image/webp   unknown          8.7 KB      69.5 KB
+Image_28                                 image/webp   unknown         14.3 KB     114.0 KB
+Image_29                                 image/webp   unknown          4.6 KB      37.1 KB
+Image_30                                 image/webp   unknown           976 B       7.6 KB
+Image_42                                 image/webp   unknown           816 B       6.4 KB
+Image_45                                 image/webp   unknown           502 B       3.9 KB
+Image_44                                 image/webp   unknown         16.5 KB     132.2 KB
+Image_43                                 image/webp   unknown          9.7 KB      77.8 KB
+Image_54                                 image/webp   unknown         11.7 KB      93.8 KB
+Image_59                                 image/webp   unknown          3.1 KB      25.0 KB
+Image_61                                 image/webp   unknown          4.4 KB      34.9 KB
+Image_34                                 image/webp   unknown         12.4 KB      98.9 KB
+Image_35                                 image/webp   unknown          4.3 KB      34.4 KB
+Image_36                                 image/webp   unknown           918 B       7.2 KB
+Image_25                                 image/webp   unknown         51.8 KB     414.0 KB
+Image_26                                 image/webp   unknown         20.9 KB     166.8 KB
+Image_27                                 image/webp   unknown          6.4 KB      51.0 KB
+Image_31                                 image/webp   unknown         51.1 KB     409.0 KB
+Image_32                                 image/webp   unknown         18.6 KB     148.5 KB
+Image_33                                 image/webp   unknown          7.3 KB      58.5 KB
+Image_5                                  image/webp   unknown          1.7 KB      13.8 KB
+Image_4                                  image/webp   unknown        123.5 KB     988.0 KB
+Image_41                                 image/webp   unknown          3.4 KB      27.5 KB
+Image_0                                  image/webp   unknown         74.1 KB     593.0 KB
+Image_38                                 image/webp   unknown         59.8 KB     478.5 KB
+Image_6                                  image/webp   unknown        102.3 KB     818.5 KB
+Image_7                                  image/webp   unknown         48.1 KB     385.0 KB
+Image_20                                 image/webp   unknown         64.2 KB     513.3 KB
+Image_47                                 image/webp   unknown         25.9 KB     207.1 KB
+Image_48                                 image/webp   unknown         16.0 KB     127.9 KB
+Image_49                                 image/webp   unknown         38.2 KB     305.8 KB
+Image_37                                 image/webp   unknown         13.3 KB     106.0 KB
+Image_60                                 image/webp   unknown          8.8 KB      70.5 KB
+
+Estimated total VRAM for textures: 11.18 MB
+
+======================================================================
+MATERIALS / DRAW CALLS
+======================================================================
+Materials: 122
+Primitives (mesh x material combinations): 209
+Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
+
+======================================================================
+ANIMATIONS (this file)
+======================================================================
+Clips: 0
+
+======================================================================
+HDRI / ENVIRONMENT
+======================================================================
+Environments: 1
+  - Environment 1  file=hdri/environment_1.hdr  [Flatten Ground]
+
+======================================================================
+CONTAINERS (material swap targets)
+======================================================================
+Containers: 0
+
+======================================================================
+CONFIGS (Full Configurations)
+======================================================================
+Saved presets: 0
+
+======================================================================
+GEOS (Geo Packages)
+======================================================================
+Exposed geo package categories: 0
+Geo subset presets: 1
+  - Geo Set 1
+
+======================================================================
+MAT SUBSETS (per-category color/material options)
+======================================================================
+Categories: 0   Options: 0
+
+======================================================================
+CAMERAS
+======================================================================
+Zoom range: 2.0 - 15.0  [offset centers active]
+Floor Z: 0.0   Roof Z: None
+Static cameras: 0  (Free: 0, Locked: 0)
+Turntable: off
+
+======================================================================
+WARNINGS
+======================================================================
+  ! WebGL Optimized Textures is enabled but this file has no KTX2 textures — check the export console for a conversion failure
+
