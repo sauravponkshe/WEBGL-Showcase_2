@@ -3,8 +3,8 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: C:\Users\saura\Desktop\New Folder\Highest\b645b7e8b94e.gltf
-Generated: 2026-10-30 03:29:28
-Total size (this .gltf + its .bin + every texture file): 12.70 MB
+Generated: 2026-10-30 12:10:47
+Total size (this .gltf + its .bin + every texture file): 17.48 MB
 
 ======================================================================
 EXPORT CONFIGURATION
@@ -35,110 +35,126 @@ None: every animated object sits under its own ANIM_ empty.
 SIZE BREAKDOWN (approximate — see notes)
 ======================================================================
 Geometry (vertex/index buffers): 0 B
-Textures (loose files, External Textures mode):    1.40 MB
-Unaccounted (other bufferViews): 10.97 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
+Textures (loose files, External Textures mode):    3.33 MB
+Unaccounted (other bufferViews): 13.93 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
 Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
 
 ======================================================================
 GEOMETRY
 ======================================================================
-Meshes: 180   Primitives: 209
-Triangles: 3,562,817   Vertices: 3,012,083
+Meshes: 185   Primitives: 215
+Triangles: 4,005,372   Vertices: 3,269,759
 Draco compression: ACTIVE
 
 ======================================================================
 TEXTURES
 ======================================================================
-KTX2 (GPU-compressed) active: no
-Texture count: 62
+KTX2 (GPU-compressed) active: YES
+Texture count: 68
 Name                                     Format       Colorspace    Disk size    Est. VRAM
-Image_18                                 image/webp   unknown          4.3 KB      34.2 KB
-Image_57                                 image/webp   unknown          9.3 KB      74.5 KB
-Image_58                                 image/webp   unknown          2.2 KB      17.9 KB
-Image_19                                 image/webp   unknown         22.0 KB     175.8 KB
-Image_53                                 image/webp   unknown         38.4 KB     307.4 KB
-Image_1                                  image/webp   unknown         70.3 KB     562.5 KB
-Image_2                                  image/webp   unknown         14.7 KB     117.2 KB
-Image_3                                  image/webp   unknown         59.8 KB     478.1 KB
-Image_22                                 image/webp   unknown         12.4 KB      99.2 KB
-Image_23                                 image/webp   unknown          6.0 KB      47.8 KB
-Image_24                                 image/webp   unknown          1.0 KB       8.0 KB
-Image_21                                 image/webp   unknown          2.0 KB      16.4 KB
-Image_55                                 image/webp   unknown          5.2 KB      41.2 KB
-Image_56                                 image/webp   unknown          9.7 KB      77.9 KB
-Image_50                                 image/webp   unknown          9.1 KB      73.1 KB
-Image_39                                 image/webp   unknown         19.6 KB     157.0 KB
-Image_40                                 image/webp   unknown           946 B       7.4 KB
-Image_46                                 image/webp   unknown         14.8 KB     118.5 KB
-Image_51                                 image/webp   unknown         97.4 KB     779.0 KB
-Image_52                                 image/webp   unknown         42.2 KB     337.6 KB
-Image_8                                  image/webp   unknown         77.7 KB     621.9 KB
-Image_13                                 image/webp   unknown         28.2 KB     225.8 KB
-Image_14                                 image/webp   unknown         22.0 KB     176.1 KB
-Image_12                                 image/webp   unknown          3.9 KB      31.2 KB
-Image_9                                  image/webp   unknown          8.0 KB      64.0 KB
-Image_10                                 image/webp   unknown          7.3 KB      58.5 KB
-Image_11                                 image/webp   unknown          3.3 KB      26.0 KB
-Image_17                                 image/webp   unknown          3.1 KB      25.2 KB
-Image_15                                 image/webp   unknown          8.1 KB      65.1 KB
-Image_16                                 image/webp   unknown          8.7 KB      69.5 KB
-Image_28                                 image/webp   unknown         14.3 KB     114.0 KB
-Image_29                                 image/webp   unknown          4.6 KB      37.1 KB
-Image_30                                 image/webp   unknown           976 B       7.6 KB
-Image_42                                 image/webp   unknown           816 B       6.4 KB
-Image_45                                 image/webp   unknown           502 B       3.9 KB
-Image_44                                 image/webp   unknown         16.5 KB     132.2 KB
-Image_43                                 image/webp   unknown          9.7 KB      77.8 KB
-Image_54                                 image/webp   unknown         11.7 KB      93.8 KB
-Image_59                                 image/webp   unknown          3.1 KB      25.0 KB
-Image_61                                 image/webp   unknown          4.4 KB      34.9 KB
-Image_34                                 image/webp   unknown         12.4 KB      98.9 KB
-Image_35                                 image/webp   unknown          4.3 KB      34.4 KB
-Image_36                                 image/webp   unknown           918 B       7.2 KB
-Image_25                                 image/webp   unknown         51.8 KB     414.0 KB
-Image_26                                 image/webp   unknown         20.9 KB     166.8 KB
-Image_27                                 image/webp   unknown          6.4 KB      51.0 KB
-Image_31                                 image/webp   unknown         51.1 KB     409.0 KB
-Image_32                                 image/webp   unknown         18.6 KB     148.5 KB
-Image_33                                 image/webp   unknown          7.3 KB      58.5 KB
-Image_5                                  image/webp   unknown          1.7 KB      13.8 KB
-Image_4                                  image/webp   unknown        123.5 KB     988.0 KB
-Image_41                                 image/webp   unknown          3.4 KB      27.5 KB
-Image_0                                  image/webp   unknown         74.1 KB     593.0 KB
-Image_38                                 image/webp   unknown         59.8 KB     478.5 KB
-Image_6                                  image/webp   unknown        102.3 KB     818.5 KB
-Image_7                                  image/webp   unknown         48.1 KB     385.0 KB
-Image_20                                 image/webp   unknown         64.2 KB     513.3 KB
-Image_47                                 image/webp   unknown         25.9 KB     207.1 KB
-Image_48                                 image/webp   unknown         16.0 KB     127.9 KB
-Image_49                                 image/webp   unknown         38.2 KB     305.8 KB
-Image_37                                 image/webp   unknown         13.3 KB     106.0 KB
-Image_60                                 image/webp   unknown          8.8 KB      70.5 KB
+Image_28                                 image/ktx2   unknown         54.6 KB      54.6 KB
+Image_29                                 image/ktx2   unknown         33.9 KB      33.9 KB
+Image_30                                 image/ktx2   unknown          3.8 KB       3.8 KB
+Image_31                                 image/ktx2   unknown        131.9 KB     131.9 KB
+Image_32                                 image/ktx2   unknown         80.4 KB      80.4 KB
+Image_33                                 image/ktx2   unknown         34.2 KB      34.2 KB
+Normal_PlasticMatte                      image/ktx2   unknown         44.0 KB      44.0 KB
+Image_2                                  image/ktx2   unknown        110.9 KB     110.9 KB
+Image_3                                  image/ktx2   unknown        122.4 KB     122.4 KB
+Image_1                                  image/ktx2   unknown         37.5 KB      37.5 KB
+Image_21                                 image/ktx2   unknown          3.4 KB       3.4 KB
+Image_4                                  image/ktx2   unknown         38.9 KB      38.9 KB
+Image_41                                 image/ktx2   unknown          7.3 KB       7.3 KB
+Image_20                                 image/ktx2   unknown         91.6 KB      91.6 KB
+Image_43                                 image/ktx2   unknown         46.3 KB      46.3 KB
+Image_18                                 image/ktx2   unknown         17.0 KB      17.0 KB
+Image_57                                 image/ktx2   unknown         61.2 KB      61.2 KB
+Image_58                                 image/ktx2   unknown         28.5 KB      28.5 KB
+Image_19                                 image/ktx2   unknown         42.6 KB      42.6 KB
+Image_53                                 image/ktx2   unknown         88.3 KB      88.3 KB
+Image_22                                 image/ktx2   unknown         64.7 KB      64.7 KB
+Image_23                                 image/ktx2   unknown         32.2 KB      32.2 KB
+Image_24                                 image/ktx2   unknown          4.4 KB       4.4 KB
+Image_55                                 image/ktx2   unknown          6.7 KB       6.7 KB
+Image_56                                 image/ktx2   unknown         44.7 KB      44.7 KB
+Image_50                                 image/webp   unknown         29.4 KB     235.5 KB
+Image_39                                 image/ktx2   unknown         74.7 KB      74.7 KB
+Image_40                                 image/ktx2   unknown          9.8 KB       9.8 KB
+Image_46                                 image/ktx2   unknown         54.6 KB      54.6 KB
+Image_51                                 image/ktx2   unknown         37.7 KB      37.7 KB
+Image_52                                 image/ktx2   unknown         34.8 KB      34.8 KB
+Image_8                                  image/ktx2   unknown        124.5 KB     124.5 KB
+Image_13                                 image/ktx2   unknown         32.5 KB      32.5 KB
+Image_14                                 image/ktx2   unknown         30.0 KB      30.0 KB
+Image_12                                 image/jpeg   unknown         41.0 KB     327.6 KB
+Image_9                                  image/ktx2   unknown         63.0 KB      63.0 KB
+Image_10                                 image/ktx2   unknown         52.1 KB      52.1 KB
+Image_11                                 image/ktx2   unknown         23.3 KB      23.3 KB
+Image_17                                 image/ktx2   unknown         24.6 KB      24.6 KB
+Image_15                                 image/ktx2   unknown         62.2 KB      62.2 KB
+Image_16                                 image/ktx2   unknown         56.1 KB      56.1 KB
+Image_42                                 image/ktx2   unknown           853 B        853 B
+Image_45                                 image/jpeg   unknown          2.1 KB      17.0 KB
+Image_44                                 image/ktx2   unknown         60.4 KB      60.4 KB
+Image_54                                 image/ktx2   unknown         32.6 KB      32.6 KB
+Image_59                                 image/ktx2   unknown          4.0 KB       4.0 KB
+Image_61                                 image/ktx2   unknown          5.7 KB       5.7 KB
+Image_34                                 image/ktx2   unknown         52.0 KB      52.0 KB
+Image_35                                 image/ktx2   unknown         34.0 KB      34.0 KB
+Image_36                                 image/ktx2   unknown          2.9 KB       2.9 KB
+Image_25                                 image/ktx2   unknown        132.2 KB     132.2 KB
+Image_26                                 image/ktx2   unknown         80.6 KB      80.6 KB
+Image_27                                 image/ktx2   unknown         33.8 KB      33.8 KB
+Image_5                                  image/ktx2   unknown          5.3 KB       5.3 KB
+Image_0                                  image/ktx2   unknown         36.3 KB      36.3 KB
+Image_38                                 image/ktx2   unknown         37.7 KB      37.7 KB
+Image_6                                  image/ktx2   unknown         39.4 KB      39.4 KB
+Image_7                                  image/ktx2   unknown         33.4 KB      33.4 KB
+Image_47                                 image/ktx2   unknown         22.2 KB      22.2 KB
+Image_48                                 image/ktx2   unknown         15.6 KB      15.6 KB
+Image_49                                 image/ktx2   unknown         27.2 KB      27.2 KB
+Image_37                                 image/ktx2   unknown         25.7 KB      25.7 KB
+Wood_Normal(LIght Oak)                   image/ktx2   unknown         87.4 KB      87.4 KB
+Wood_Diffuse(Light Oak)                  image/ktx2   unknown        128.0 KB     128.0 KB
+Tex_GROUNDSHADOW_1_v1                    image/png    sRGB            30.3 KB     242.3 KB
+Tex_GROUNDSHADOW_2                       image/png    sRGB            32.3 KB     258.5 KB
+Carpaint_Clearcoat                       image/jpeg   unknown        234.9 KB      1.83 MB
+Carpaint_Normal                          image/jpeg   linear         227.9 KB      1.78 MB
 
-Estimated total VRAM for textures: 11.18 MB
+Estimated total VRAM for textures: 7.41 MB
 
 ======================================================================
 MATERIALS / DRAW CALLS
 ======================================================================
-Materials: 122
-Primitives (mesh x material combinations): 209
+Materials: 128
+Primitives (mesh x material combinations): 215
 Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
 
 ======================================================================
 ANIMATIONS (this file)
 ======================================================================
-Clips: 0
+Clips: 9
+  - ANIM_PASSENGER_DOOR
+  - ANIM_DRIVER_DOOR
+  - ANIM_FOOTSTEP
+  - ANIM_RH_REARDOOR_JOINTRH
+  - ANIM_LH_REARDOOR_JOINTLH
+  - ANIM_RH_REARDOOR
+  - ANIM_LH_REARDOOR
+  - ANIM_SLIDING_DOOR
+  - ANIM_SLIDING_DOOR_HANDLE
 
 ======================================================================
 HDRI / ENVIRONMENT
 ======================================================================
 Environments: 1
-  - Environment 1  file=hdri/environment_1.hdr  [Flatten Ground]
+  - Environment 1  file=hdri/environment_1.exr
 
 ======================================================================
 CONTAINERS (material swap targets)
 ======================================================================
-Containers: 0
+Containers: 1
+  - CARPAINT
 
 ======================================================================
 CONFIGS (Full Configurations)
@@ -160,13 +176,14 @@ Categories: 0   Options: 0
 ======================================================================
 CAMERAS
 ======================================================================
-Zoom range: 2.0 - 15.0  [offset centers active]
+Zoom range: 4.767 - 15.285
 Floor Z: 0.0   Roof Z: None
-Static cameras: 0  (Free: 0, Locked: 0)
+Static cameras: 1  (Free: 1, Locked: 0)
+  - Camera  [free]
 Turntable: off
 
 ======================================================================
 WARNINGS
 ======================================================================
-  ! WebGL Optimized Textures is enabled but this file has no KTX2 textures — check the export console for a conversion failure
+(none)
 
