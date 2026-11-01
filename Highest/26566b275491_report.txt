@@ -3,8 +3,8 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT\Highest\26566b275491.gltf
-Generated: 2026-11-01 21:35:19
-Total size (this .gltf + its .bin + every texture file): 34.45 MB
+Generated: 2026-11-02 04:47:12
+Total size (this .gltf + its .bin + every texture file): 36.42 MB
 
 ======================================================================
 EXPORT CONFIGURATION
@@ -35,25 +35,26 @@ None: every animated object sits under its own ANIM_ empty.
 SIZE BREAKDOWN (approximate — see notes)
 ======================================================================
 Geometry (vertex/index buffers): 0 B
-Textures (loose files, External Textures mode):    9.56 MB
-Unaccounted (other bufferViews): 24.41 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
+Textures (loose files, External Textures mode):    10.98 MB
+Unaccounted (other bufferViews): 24.95 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
 Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
 
 ======================================================================
 GEOMETRY
 ======================================================================
-Meshes: 382   Primitives: 455
-Triangles: 3,874,621   Vertices: 3,677,485
+Meshes: 380   Primitives: 461
+Triangles: 3,942,911   Vertices: 3,745,936
 Draco compression: ACTIVE
 
 ======================================================================
 TEXTURES
 ======================================================================
 KTX2 (GPU-compressed) active: YES
-Texture count: 74
+Texture count: 77
 Name                                     Format       Colorspace    Disk size    Est. VRAM
 Carpaint_Clearcoat                       image/jpeg   unknown        219.1 KB      1.71 MB
 Carpaint_Normal                          image/jpeg   linear         213.3 KB      1.67 MB
+Group_004_ao                             image/ktx2   unknown        586.9 KB     586.9 KB
 Tex_GROUNDSHADOW_1                       image/ktx2   unknown          7.4 KB       7.4 KB
 Tex_GROUNDSHADOW_2                       image/ktx2   unknown          7.1 KB       7.1 KB
 Image_18                                 image/ktx2   unknown         16.2 KB      16.2 KB
@@ -62,9 +63,10 @@ Image_53                                 image/ktx2   unknown         88.9 KB   
 Image_55                                 image/ktx2   unknown          6.8 KB       6.8 KB
 Image                                    image/ktx2   unknown           361 B        361 B
 Group_001_ao                             image/ktx2   unknown        208.8 KB     208.8 KB
+Front_Alloy_004_ao                       image/ktx2   unknown        122.5 KB     122.5 KB
 Image_38                                 image/ktx2   unknown         37.8 KB      37.8 KB
 Image_39                                 image/ktx2   unknown         75.7 KB      75.7 KB
-Group_ao                                 image/ktx2   unknown        325.5 KB     325.5 KB
+Front_Tyre005_006_ao                     image/ktx2   unknown        174.6 KB     174.6 KB
 Image_40                                 image/ktx2   unknown          9.9 KB       9.9 KB
 Image                                    image/ktx2   unknown           361 B        361 B
 Image_4                                  image/jpeg   sRGB           111.8 KB     894.2 KB
@@ -73,15 +75,17 @@ Interior_Body_001_ao                     image/ktx2   unknown        252.5 KB   
 leather_red_02_rough_1k                  image/ktx2   unknown        120.3 KB     120.3 KB
 Image_51                                 image/ktx2   unknown         37.7 KB      37.7 KB
 LWB_ROOF_01_00_ao                        image/ktx2   unknown        154.7 KB     154.7 KB
-Image_52                                 image/ktx2   unknown         35.3 KB      35.3 KB
 Object127817_ao                          image/ktx2   unknown        160.6 KB     160.6 KB
 Roughness_MetalGrid                      image/ktx2   unknown         76.0 KB      76.0 KB
 Image_43                                 image/ktx2   unknown         46.5 KB      46.5 KB
+Object127853_ao                          image/ktx2   unknown         98.0 KB      98.0 KB
+Image_52                                 image/ktx2   unknown         35.3 KB      35.3 KB
 Rack_Black_ao                            image/ktx2   unknown         80.0 KB      80.0 KB
 Rack_White_ao                            image/ktx2   unknown        128.9 KB     128.9 KB
-Image_47                                 image/ktx2   unknown         22.5 KB      22.5 KB
-Image_48                                 image/ktx2   unknown         15.7 KB      15.7 KB
-Image_49                                 image/ktx2   unknown         27.4 KB      27.4 KB
+Image_47                                 image/jpeg   linear          28.8 KB     230.5 KB
+Image_48                                 image/jpeg   sRGB            24.6 KB     196.8 KB
+Image_49                                 image/jpeg   linear          39.7 KB     317.5 KB
+Group_ao                                 image/ktx2   unknown        325.5 KB     325.5 KB
 Image_37                                 image/ktx2   unknown         24.0 KB      24.0 KB
 Image_60                                 image/ktx2   unknown        120.5 KB     120.5 KB
 Wood_Carpet_ao                           image/ktx2   unknown        149.6 KB     149.6 KB
@@ -119,21 +123,20 @@ Image_23                                 image/ktx2   unknown         76.9 KB   
 Image_25                                 image/ktx2   unknown        519.3 KB     519.3 KB
 Object125_ao                             image/ktx2   unknown        224.7 KB     224.7 KB
 Image_26                                 image/ktx2   unknown        230.1 KB     230.1 KB
-Image_34                                 image/ktx2   unknown        151.1 KB     151.1 KB
-Image_35                                 image/ktx2   unknown         88.9 KB      88.9 KB
-Image_36                                 image/ktx2   unknown          7.7 KB       7.7 KB
-Image_32                                 image/ktx2   unknown           879 B        879 B
-Image_33                                 image/ktx2   unknown        104.1 KB     104.1 KB
+Open_body_144_ao                         image/ktx2   unknown        197.7 KB     197.7 KB
 SEATSYSTEMAO_ao                          image/ktx2   unknown        202.0 KB     202.0 KB
 SEAT_SYSTEM_TWIN_PASSENGER_RECLINE_SEAT_ image/ktx2   unknown        258.0 KB     258.0 KB
+Seat_Accesories_2_001_ao                 image/ktx2   unknown        312.2 KB     312.2 KB
+Pasanger_Seat_012_ao                     image/ktx2   unknown        200.9 KB     200.9 KB
+Image_35                                 image/ktx2   unknown         88.9 KB      88.9 KB
 
-Estimated total VRAM for textures: 14.17 MB
+Estimated total VRAM for textures: 16.23 MB
 
 ======================================================================
 MATERIALS / DRAW CALLS
 ======================================================================
-Materials: 167
-Primitives (mesh x material combinations): 455
+Materials: 181
+Primitives (mesh x material combinations): 461
 Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
 
 ======================================================================
@@ -156,8 +159,9 @@ Environments: 1
 ======================================================================
 CONTAINERS (material swap targets)
 ======================================================================
-Containers: 1
+Containers: 2
   - BODYPAINT
+  - BODYPAINTWITHAO
 
 ======================================================================
 CONFIGS (Full Configurations)
@@ -167,23 +171,27 @@ Saved presets: 0
 ======================================================================
 GEOS (Geo Packages)
 ======================================================================
-Exposed geo package categories: 0
+Exposed geo package categories: 1
+  - GEOMETRIES_INTERIOR_LIGHTS: 3 option(s)
 Geo subset presets: 1
   - Geo Set 1
 
 ======================================================================
 MAT SUBSETS (per-category color/material options)
 ======================================================================
-Categories: 0   Options: 0
+Categories: 1   Options: 3
+  - PAINT: 3 option(s) — BLUE, WHITE, GREY
 
 ======================================================================
 CAMERAS
 ======================================================================
 Zoom range: 1.46 - 11.469
 Floor Z: 0.0   Roof Z: None
-Static cameras: 2  (Free: 1, Locked: 1)
+Static cameras: 4  (Free: 1, Locked: 3)
   - Camera  [zoom_pan]
   - Camera.001  [free]
+  - Camera.002  [zoom_pan]
+  - Camera.003  [zoom_pan]
 Turntable: off
 
 ======================================================================

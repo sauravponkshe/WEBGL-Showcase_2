@@ -2,20 +2,144 @@
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_1_GLTF"
+      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_1_GLTF",
+      "CARPAINT_METALLIC_2_GLTF"
+    ],
+    "BODYPAINTWITHAO": [
+      "CARPAINT_METALLIC_3_GLTF.001",
+      "CARPAINT_METALLIC_2_GLTF.001",
+      "CARPAINT_METALLIC_1_GLTF.001"
     ]
   },
   "render_priority": {},
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_1_GLTF"
+      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_1_GLTF",
+      "CARPAINT_METALLIC_2_GLTF"
+    ],
+    "BODYPAINTWITHAO": [
+      "CARPAINT_METALLIC_3_GLTF.001",
+      "CARPAINT_METALLIC_2_GLTF.001",
+      "CARPAINT_METALLIC_1_GLTF.001"
     ]
   },
   "color_selector": {
     "items": []
   },
   "mat_colors": {
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.026241226121783257,
+        0.04970657825469971,
+        0.09989875555038452
+      ],
+      "metallic": 0.5,
+      "roughness": 0.1,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.2024,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_1_GLTF.001": {
+      "color": [
+        0.06812375783920288,
+        0.06812379509210587,
+        0.07157954573631287
+      ],
+      "metallic": 0.5,
+      "roughness": 0.1,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.2024,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_2_GLTF": {
+      "color": [
+        0.7071032524108887,
+        0.7071032524108887,
+        0.7071032524108887
+      ],
+      "metallic": 0.5,
+      "roughness": 0.25,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.2024,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_2_GLTF.001": {
+      "color": [
+        0.7071032524108887,
+        0.7071032524108887,
+        0.7071032524108887
+      ],
+      "metallic": 0.5,
+      "roughness": 0.25,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.2024,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_3_GLTF.001": {
+      "color": [
+        0.026241226121783257,
+        0.04970657825469971,
+        0.09989875555038452
+      ],
+      "metallic": 0.5,
+      "roughness": 0.1,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.2024,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
+    },
     "CARPAINT_METALLIC_1_GLTF": {
       "color": [
         0.06812375783920288,
@@ -23,14 +147,14 @@
         0.07157954573631287
       ],
       "metallic": 0.5,
-      "roughness": 0.0915,
+      "roughness": 0.1,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 0.45,
+      "clearcoat": 0.5,
       "clearcoatRoughness": 0.2024,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
@@ -40,7 +164,24 @@
     }
   },
   "light_mat_links": [],
-  "geometry_exposed": {},
+  "geometry_exposed": {
+    "GEOMETRIES_INTERIOR_LIGHTS": {
+      "name": "GEOMETRIES_INTERIOR_LIGHTS",
+      "enabled": true,
+      "children": [
+        {
+          "name": "GEOMETRIES_INTERIOR_LIGHTS_ON",
+          "enabled": true,
+          "children": []
+        },
+        {
+          "name": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+          "enabled": true,
+          "children": []
+        }
+      ]
+    }
+  },
   "geometry_subsets": [
     {
       "name": "Geo Set 1",
@@ -51,8 +192,38 @@
       }
     }
   ],
-  "mat_subset_categories": [],
-  "mat_subsets": [],
+  "mat_subset_categories": [
+    "PAINT"
+  ],
+  "mat_subsets": [
+    {
+      "name": "BLUE",
+      "uid": "dd82b36b51f94b529fae4e1e3db925af",
+      "category": "PAINT",
+      "state": {
+        "BODYPAINT": "CARPAINT_METALLIC_3_GLTF",
+        "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"
+      }
+    },
+    {
+      "name": "WHITE",
+      "uid": "b3172618f78842df811803876ba27878",
+      "category": "PAINT",
+      "state": {
+        "BODYPAINT": "CARPAINT_METALLIC_2_GLTF",
+        "BODYPAINTWITHAO": "CARPAINT_METALLIC_2_GLTF.001"
+      }
+    },
+    {
+      "name": "GREY",
+      "uid": "11bbb0f2676d4addac4f6e0677e5f069",
+      "category": "PAINT",
+      "state": {
+        "BODYPAINT": "CARPAINT_METALLIC_1_GLTF",
+        "BODYPAINTWITHAO": "CARPAINT_METALLIC_1_GLTF.001"
+      }
+    }
+  ],
   "global_mat_sets": [],
   "mat_animations": [],
   "sounds": [],
@@ -132,7 +303,12 @@
   },
   "default_variant": null,
   "default_global_set": null,
-  "default_mat_subsets": [],
+  "default_mat_subsets": [
+    {
+      "name": "BLUE",
+      "category": "PAINT"
+    }
+  ],
   "default_sound_on": true,
   "startup_sound_yield": false,
   "startup_sound_resume": true,
@@ -195,7 +371,7 @@
         }
       ]
     },
-    "focal_length_mm": 15.0,
+    "focal_length_mm": 50.0,
     "sensor_width_mm": 36.0,
     "roof_z": null
   },
@@ -238,11 +414,11 @@
       "ground_contrast": 0.0,
       "ground_skybox_file": null,
       "grade_exposure": 0.0,
-      "grade_brightness": 1.4,
+      "grade_brightness": 1.3,
       "grade_contrast": 1.1,
       "grade_saturation": 1.1,
       "grade_bloom": 0.1,
-      "grade_bloom_threshold": 0.99,
+      "grade_bloom_threshold": 0.95,
       "default": true,
       "environment": null,
       "light": null,
@@ -463,7 +639,7 @@
   },
   "media_items": [],
   "anim_textures": [],
-  "page_title": "3D Configurator",
+  "page_title": "CONFIGURATOR",
   "page_icon": "",
   "global_pointer": null,
   "model_file": "Highest/26566b275491.gltf",
@@ -525,9 +701,9 @@
       {
         "name": "Camera.001",
         "position": [
-          -9.3332,
-          0.6938,
-          6.6646
+          -9.5598,
+          0.6711,
+          6.3356
         ],
         "target": [
           0.0,
@@ -544,6 +720,50 @@
         "focal_length_mm": 50.0,
         "sensor_width_mm": 36.0,
         "allow_pan": true
+      },
+      {
+        "name": "Camera.002",
+        "position": [
+          0.2961,
+          1.1354,
+          0.2081
+        ],
+        "target": [
+          -0.3042,
+          0.9507,
+          0.1661
+        ],
+        "lock": "zoom_pan",
+        "transition": "fly",
+        "fly_duration": 1.2,
+        "ease_in": false,
+        "ease_out": true,
+        "dip_duration": 0.4,
+        "default": false,
+        "focal_length_mm": 20.0,
+        "sensor_width_mm": 36.0
+      },
+      {
+        "name": "Camera.003",
+        "position": [
+          2.6414,
+          1.1638,
+          0.2841
+        ],
+        "target": [
+          -0.1274,
+          0.6553,
+          0.1679
+        ],
+        "lock": "zoom_pan",
+        "transition": "fly",
+        "fly_duration": 1.2,
+        "ease_in": false,
+        "ease_out": true,
+        "dip_duration": 0.4,
+        "default": false,
+        "focal_length_mm": 20.0,
+        "sensor_width_mm": 36.0
       }
     ],
     "cinematic": {
