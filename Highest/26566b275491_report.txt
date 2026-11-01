@@ -1,0 +1,193 @@
+
+======================================================================
+PONKFIGURATOR PRO — Export Report — Highest
+======================================================================
+File: E:\URBANIA\EXPORT\Highest\26566b275491.gltf
+Generated: 2026-11-01 21:20:03
+Total size (this .gltf + its .bin + every texture file): 40.09 MB
+
+======================================================================
+EXPORT CONFIGURATION
+======================================================================
+External Textures:        ON
+WebGL Optimized Textures: off
+Encrypt Data:             off  (this report reflects the file BEFORE encryption — see _write_variant_reports)
+Obfuscate Viewer JS:      off
+
+======================================================================
+ANTI-ALIASING
+======================================================================
+Anti-aliasing:            ON
+Desktop method:           FXAA
+Mobile method:            FXAA
+Fallback method:          FXAA  (used when MSAA is unsupported or a low-end variant loads)
+MSAA samples:             4  (only above pixel ratio 1.5 it falls back)
+Idle refinement:          ON  (16 frames, 200 ms delay, mobile ON)
+Max-quality snapshots:    ON
+Low-end downgrade:        ON
+
+======================================================================
+ANIMATION FOLLOWERS
+======================================================================
+None: every animated object sits under its own ANIM_ empty.
+
+======================================================================
+SIZE BREAKDOWN (approximate — see notes)
+======================================================================
+Geometry (vertex/index buffers): 0 B
+Textures (loose files, External Textures mode):    15.06 MB
+Unaccounted (other bufferViews): 24.41 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
+Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
+
+======================================================================
+GEOMETRY
+======================================================================
+Meshes: 382   Primitives: 455
+Triangles: 3,874,621   Vertices: 3,677,485
+Draco compression: ACTIVE
+
+======================================================================
+TEXTURES
+======================================================================
+KTX2 (GPU-compressed) active: no
+Texture count: 74
+Name                                     Format       Colorspace    Disk size    Est. VRAM
+Carpaint_Clearcoat                       image/jpeg   unknown        219.1 KB      1.71 MB
+Carpaint_Normal                          image/jpeg   linear         213.3 KB      1.67 MB
+Tex_GROUNDSHADOW_1                       image/png    sRGB            37.2 KB     297.7 KB
+Tex_GROUNDSHADOW_2                       image/png    sRGB            41.9 KB     335.4 KB
+Image_18                                 image/jpeg   sRGB            29.3 KB     234.7 KB
+Image_19                                 image/jpeg   sRGB            93.7 KB     749.9 KB
+Image_53                                 image/jpeg   sRGB           143.8 KB      1.12 MB
+Image_55                                 image/jpeg   sRGB            10.9 KB      86.8 KB
+Image                                    image/png    sRGB              250 B       2.0 KB
+Group_001_ao                             image/jpeg   linear         319.5 KB      2.50 MB
+Image_38                                 image/jpeg   sRGB            59.2 KB     473.4 KB
+Image_39                                 image/jpeg   linear          88.9 KB     711.2 KB
+Group_ao                                 image/jpeg   linear         393.8 KB      3.08 MB
+Image_40                                 image/jpeg   sRGB            18.0 KB     143.8 KB
+Image                                    image/jpeg   linear            645 B       5.0 KB
+Image_4                                  image/jpeg   sRGB           111.8 KB     894.2 KB
+leather_red_02_nor_gl_1k                 image/jpeg   linear         184.6 KB      1.44 MB
+Interior_Body_001_ao                     image/jpeg   linear         412.1 KB      3.22 MB
+leather_red_02_rough_1k                  image/jpeg   linear         175.2 KB      1.37 MB
+Image_51                                 image/jpeg   linear          72.9 KB     583.2 KB
+LWB_ROOF_01_00_ao                        image/jpeg   linear         279.7 KB      2.19 MB
+Image_52                                 image/jpeg   sRGB            40.3 KB     322.2 KB
+Object127817_ao                          image/jpeg   linear         255.1 KB      1.99 MB
+Roughness_MetalGrid                      image/jpeg   linear         473.0 KB      3.70 MB
+Image_43                                 image/jpeg   sRGB            50.0 KB     399.9 KB
+Rack_Black_ao                            image/jpeg   linear         154.6 KB      1.21 MB
+Rack_White_ao                            image/jpeg   linear         223.3 KB      1.74 MB
+Image_47                                 image/jpeg   linear          28.8 KB     230.5 KB
+Image_48                                 image/jpeg   sRGB            24.6 KB     196.8 KB
+Image_49                                 image/jpeg   linear          39.7 KB     317.5 KB
+Image_37                                 image/jpeg   sRGB            59.2 KB     473.6 KB
+Image_60                                 image/jpeg   linear         187.7 KB      1.47 MB
+Wood_Carpet_ao                           image/jpeg   linear         269.1 KB      2.10 MB
+Image_60                                 image/jpeg   sRGB           141.0 KB      1.10 MB
+Image_21                                 image/jpeg   sRGB             8.1 KB      64.5 KB
+Image_20                                 image/jpeg   sRGB           148.3 KB      1.16 MB
+Image_57                                 image/jpeg   linear         212.1 KB      1.66 MB
+Image_58                                 image/jpeg   sRGB            95.4 KB     762.9 KB
+Image_2                                  image/jpeg   linear         701.2 KB      5.48 MB
+Image_42                                 image/jpeg   sRGB             5.0 KB      40.3 KB
+Image_54                                 image/jpeg   sRGB           116.1 KB     928.7 KB
+Object127862_ao                          image/jpeg   linear         356.8 KB      2.79 MB
+Open_body_132_ao                         image/jpeg   linear         142.9 KB      1.12 MB
+GSMBiDim_001_ao                          image/jpeg   linear         157.1 KB      1.23 MB
+Image_46                                 image/jpeg   sRGB           120.1 KB     961.1 KB
+polySurface4_001_ao                      image/jpeg   linear         346.2 KB      2.70 MB
+Normal_GrainedPlastic                    image/jpeg   linear          98.2 KB     785.5 KB
+Steering_001_ao                          image/jpeg   linear         299.4 KB      2.34 MB
+Steering_002_ao                          image/jpeg   linear         370.4 KB      2.89 MB
+Steering_003_ao                          image/jpeg   linear         247.0 KB      1.93 MB
+Object127784_002_ao                      image/jpeg   linear         399.5 KB      3.12 MB
+Image_29                                 image/jpeg   sRGB           149.8 KB      1.17 MB
+Image_31                                 image/jpeg   linear         942.9 KB      7.37 MB
+Image_32                                 image/jpeg   sRGB           332.2 KB      2.59 MB
+Image_17                                 image/jpeg   linear          97.2 KB     778.0 KB
+Image_15                                 image/jpeg   linear         248.0 KB      1.94 MB
+Image_16                                 image/jpeg   sRGB           285.5 KB      2.23 MB
+Image_12                                 image/jpeg   unknown        129.7 KB      1.01 MB
+Image_9                                  image/jpeg   linear         269.9 KB      2.11 MB
+Image_10                                 image/jpeg   sRGB           280.9 KB      2.19 MB
+Image_11                                 image/jpeg   linear         104.7 KB     837.9 KB
+Image_22                                 image/jpeg   linear         455.4 KB      3.56 MB
+Object125_ao-Image_24                    image/jpeg   linear         208.5 KB      1.63 MB
+Image_23                                 image/jpeg   sRGB           142.6 KB      1.11 MB
+Image_25                                 image/jpeg   linear         984.6 KB      7.69 MB
+Object125_ao                             image/jpeg   linear         350.5 KB      2.74 MB
+Image_26                                 image/jpeg   sRGB           361.1 KB      2.82 MB
+Image_34                                 image/jpeg   linear         286.2 KB      2.24 MB
+Image_35                                 image/jpeg   sRGB           153.8 KB      1.20 MB
+Image_36                                 image/jpeg   linear          69.5 KB     555.9 KB
+Image_32                                 image/jpeg   sRGB            64.8 KB     518.3 KB
+Image_33                                 image/jpeg   linear         137.9 KB      1.08 MB
+SEATSYSTEMAO_ao                          image/jpeg   linear         314.2 KB      2.46 MB
+SEAT_SYSTEM_TWIN_PASSENGER_RECLINE_SEAT_ image/jpeg   linear         373.4 KB      2.92 MB
+
+Estimated total VRAM for textures: 120.46 MB
+
+======================================================================
+MATERIALS / DRAW CALLS
+======================================================================
+Materials: 167
+Primitives (mesh x material combinations): 455
+Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
+
+======================================================================
+ANIMATIONS (this file)
+======================================================================
+Clips: 6
+  - ANIM_PASS_DOOR_NLA
+  - ANIM_DRIVER_DOOR_NLA
+  - ANIM_FOOTSTEP_NLA
+  - ANIM_RR_RH_DOOR_NLA
+  - ANIM_RR_LH_DOOR_NLA
+  - ANIM_SLIDING_NLA
+
+======================================================================
+HDRI / ENVIRONMENT
+======================================================================
+Environments: 1
+  - Environment 1  file=hdri/environment_1.hdr
+
+======================================================================
+CONTAINERS (material swap targets)
+======================================================================
+Containers: 1
+  - BODYPAINT
+
+======================================================================
+CONFIGS (Full Configurations)
+======================================================================
+Saved presets: 0
+
+======================================================================
+GEOS (Geo Packages)
+======================================================================
+Exposed geo package categories: 0
+Geo subset presets: 1
+  - Geo Set 1
+
+======================================================================
+MAT SUBSETS (per-category color/material options)
+======================================================================
+Categories: 0   Options: 0
+
+======================================================================
+CAMERAS
+======================================================================
+Zoom range: 1.46 - 11.469
+Floor Z: 0.0   Roof Z: None
+Static cameras: 2  (Free: 1, Locked: 1)
+  - Camera  [zoom_pan]
+  - Camera.001  [free]
+Turntable: off
+
+======================================================================
+WARNINGS
+======================================================================
+(none)
+

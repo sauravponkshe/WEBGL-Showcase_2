@@ -1,61 +1,37 @@
 {
   "config_warnings": [],
   "containers": {
-    "CARPAINT": [
-      "KiaClearWhite_CARPAINT_METALLIC_1_GLTF",
-      "DarkSkyBlue_CARPAINT_METALLIC_1_GLTF"
+    "BODYPAINT": [
+      "CARPAINT_METALLIC_1_GLTF"
     ]
   },
   "render_priority": {},
   "render_priority_dynamic_groups": [],
   "containers_all": {
-    "CARPAINT": [
-      "KiaClearWhite_CARPAINT_METALLIC_1_GLTF",
-      "DarkSkyBlue_CARPAINT_METALLIC_1_GLTF"
+    "BODYPAINT": [
+      "CARPAINT_METALLIC_1_GLTF"
     ]
   },
   "color_selector": {
     "items": []
   },
   "mat_colors": {
-    "DarkSkyBlue_CARPAINT_METALLIC_1_GLTF": {
+    "CARPAINT_METALLIC_1_GLTF": {
       "color": [
-        6.399235280696303e-05,
-        0.023045789450407028,
-        0.08600771427154541
+        0.06812375783920288,
+        0.06812379509210587,
+        0.07157954573631287
       ],
       "metallic": 0.5,
-      "roughness": 0.3,
+      "roughness": 0.0915,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.0,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
-    },
-    "KiaClearWhite_CARPAINT_METALLIC_1_GLTF": {
-      "color": [
-        0.5772969126701355,
-        0.5772969126701355,
-        0.5772969126701355
-      ],
-      "metallic": 0.5,
-      "roughness": 0.3,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.0,
+      "clearcoat": 0.45,
+      "clearcoatRoughness": 0.2024,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
@@ -68,7 +44,7 @@
   "geometry_subsets": [
     {
       "name": "Geo Set 1",
-      "uid": "7ad7a6a893044574a225913fe41f7e02",
+      "uid": "bce0a0cbc8534f13b8a62911b6d8746e",
       "state": {
         "LIGHTS": "NONE",
         "ENVIRONMENTS": "NONE"
@@ -133,7 +109,7 @@
     },
     "aa": {
       "enabled": true,
-      "desktop_method": "MSAA",
+      "desktop_method": "FXAA",
       "mobile_method": "FXAA",
       "fallback_method": "FXAA",
       "msaa_samples": 4,
@@ -146,53 +122,7 @@
       "lowend_downgrade": true,
       "phone_downgrade": false
     },
-    "filters": [
-      {
-        "name": "Normal",
-        "filter_type": "NORMAL",
-        "intensity": 1.0,
-        "hue": 0.0,
-        "saturation": 0.0,
-        "contrast": 0.0,
-        "brightness": 0.0
-      },
-      {
-        "name": "Black & White",
-        "filter_type": "BW",
-        "intensity": 1.0,
-        "hue": 0.0,
-        "saturation": 0.0,
-        "contrast": 0.0,
-        "brightness": 0.0
-      },
-      {
-        "name": "Dramatic",
-        "filter_type": "DRAMATIC",
-        "intensity": 0.5,
-        "hue": 0.0,
-        "saturation": 0.0,
-        "contrast": 0.0,
-        "brightness": 0.0
-      },
-      {
-        "name": "Cross Process",
-        "filter_type": "CROSS_PROCESS",
-        "intensity": 1.0,
-        "hue": 0.0,
-        "saturation": 0.0,
-        "contrast": 0.0,
-        "brightness": 0.0
-      },
-      {
-        "name": "Pastel",
-        "filter_type": "PASTEL",
-        "intensity": 1.0,
-        "hue": 0.0,
-        "saturation": 0.0,
-        "contrast": 0.0,
-        "brightness": 0.0
-      }
-    ],
+    "filters": [],
     "active_filter_index": -1
   },
   "mat_name_map": {},
@@ -211,8 +141,8 @@
   "startup_sound_loop": false,
   "startup_sound": "",
   "camera": {
-    "zoom_min": 4.767,
-    "zoom_max": 15.285,
+    "zoom_min": 1.46,
+    "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
       -0.0
@@ -224,14 +154,55 @@
     "floor_z": 0.0,
     "lock_zoom": "off",
     "lock_zoom_phone": false,
-    "focal_length_mm": 40.0,
+    "pan": {
+      "speed": 0.3,
+      "bindings": [
+        {
+          "action": "left",
+          "code": "ArrowLeft",
+          "shift": false,
+          "ctrl": true,
+          "alt": false,
+          "speed": 0.3,
+          "plane": "screen"
+        },
+        {
+          "action": "right",
+          "code": "ArrowRight",
+          "shift": false,
+          "ctrl": true,
+          "alt": false,
+          "speed": 0.3,
+          "plane": "screen"
+        },
+        {
+          "action": "up",
+          "code": "ArrowUp",
+          "shift": false,
+          "ctrl": true,
+          "alt": false,
+          "speed": 0.3,
+          "plane": "screen"
+        },
+        {
+          "action": "down",
+          "code": "ArrowDown",
+          "shift": false,
+          "ctrl": true,
+          "alt": false,
+          "speed": 0.3,
+          "plane": "screen"
+        }
+      ]
+    },
+    "focal_length_mm": 15.0,
     "sensor_width_mm": 36.0,
     "roof_z": null
   },
   "hdri": {
-    "file": "hdri/environment_1.exr",
+    "file": "hdri/environment_1.hdr",
     "strength": 1.0,
-    "background": true,
+    "background": false,
     "flatten_ground": false,
     "ground_height": -1.0,
     "ground_radius": 25.0,
@@ -246,10 +217,10 @@
   "hdris": [
     {
       "name": "Environment 1",
-      "uid": "37fe4923e2e6458c8bafe0bab4d6705b",
-      "file": "hdri/environment_1.exr",
+      "uid": "e3f6ce7daa104b17af660eca9b887393",
+      "file": "hdri/environment_1.hdr",
       "strength": 1.0,
-      "background": true,
+      "background": false,
       "rotation_z": 0.0,
       "flatten_ground": false,
       "ground_height": -1.0,
@@ -267,9 +238,9 @@
       "ground_contrast": 0.0,
       "ground_skybox_file": null,
       "grade_exposure": 0.0,
-      "grade_brightness": 1.2,
-      "grade_contrast": 1.5,
-      "grade_saturation": 1.2,
+      "grade_brightness": 1.4,
+      "grade_contrast": 1.1,
+      "grade_saturation": 1.1,
       "grade_bloom": 0.1,
       "grade_bloom_threshold": 0.99,
       "default": true,
@@ -332,7 +303,7 @@
   "animations": {
     "controls": [
       {
-        "name": "PASSENGER_DOOR",
+        "name": "PASS_DOOR_NLA",
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
@@ -352,10 +323,10 @@
         "extra_hotspots": [],
         "extra_images": [],
         "kind": "control",
-        "id": "control:PASSENGER_DOOR"
+        "id": "control:PASS_DOOR_NLA"
       },
       {
-        "name": "DRIVER_DOOR",
+        "name": "DRIVER_DOOR_NLA",
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
@@ -375,10 +346,10 @@
         "extra_hotspots": [],
         "extra_images": [],
         "kind": "control",
-        "id": "control:DRIVER_DOOR"
+        "id": "control:DRIVER_DOOR_NLA"
       },
       {
-        "name": "FOOTSTEP",
+        "name": "FOOTSTEP_NLA",
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
@@ -398,14 +369,13 @@
         "extra_hotspots": [],
         "extra_images": [],
         "kind": "control",
-        "id": "control:FOOTSTEP"
+        "id": "control:FOOTSTEP_NLA"
       },
       {
-        "name": "RH_REARDOOR",
+        "name": "RR_RH_DOOR_NLA",
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
-        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -422,14 +392,13 @@
         "extra_hotspots": [],
         "extra_images": [],
         "kind": "control",
-        "id": "control:RH_REARDOOR"
+        "id": "control:RR_RH_DOOR_NLA"
       },
       {
-        "name": "LH_REARDOOR",
+        "name": "RR_LH_DOOR_NLA",
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
-        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -446,14 +415,13 @@
         "extra_hotspots": [],
         "extra_images": [],
         "kind": "control",
-        "id": "control:LH_REARDOOR"
+        "id": "control:RR_LH_DOOR_NLA"
       },
       {
-        "name": "SLIDING_DOOR_HANDLE",
+        "name": "SLIDING_NLA",
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
-        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -470,269 +438,10 @@
         "extra_hotspots": [],
         "extra_images": [],
         "kind": "control",
-        "id": "control:SLIDING_DOOR_HANDLE"
-      },
-      {
-        "name": "RH_REARDOOR_JOINTRH",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:RH_REARDOOR_JOINTRH"
-      },
-      {
-        "name": "LH_REARDOOR_JOINTLH",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:LH_REARDOOR_JOINTLH"
-      },
-      {
-        "name": "SLIDING_DOOR",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:SLIDING_DOOR"
+        "id": "control:SLIDING_NLA"
       }
     ],
-    "combos": [
-      {
-        "name": "SLIDING",
-        "members": [
-          "SLIDING_DOOR_HANDLE",
-          "SLIDING_DOOR"
-        ],
-        "trigger": "button",
-        "states": 2,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "member_fracs": {
-          "SLIDING_DOOR_HANDLE": [
-            0.0,
-            1.0
-          ],
-          "SLIDING_DOOR": [
-            0.0,
-            1.0
-          ]
-        },
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "combo",
-        "id": "combo:SLIDING",
-        "member_ids": [
-          "control:SLIDING_DOOR_HANDLE",
-          "control:SLIDING_DOOR"
-        ]
-      },
-      {
-        "name": "REARDOOR_RIGHT",
-        "members": [
-          "RH_REARDOOR_JOINTRH",
-          "RH_REARDOOR"
-        ],
-        "trigger": "button",
-        "states": 2,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "member_fracs": {
-          "RH_REARDOOR_JOINTRH": [
-            0.0,
-            1.0
-          ],
-          "RH_REARDOOR": [
-            0.0,
-            1.0
-          ]
-        },
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "combo",
-        "id": "combo:REARDOOR_RIGHT",
-        "member_ids": [
-          "control:RH_REARDOOR_JOINTRH",
-          "control:RH_REARDOOR"
-        ]
-      },
-      {
-        "name": "REARDOOR_LEFT",
-        "members": [
-          "LH_REARDOOR",
-          "LH_REARDOOR_JOINTLH"
-        ],
-        "trigger": "button",
-        "states": 2,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "member_fracs": {
-          "LH_REARDOOR": [
-            0.0,
-            1.0
-          ],
-          "LH_REARDOOR_JOINTLH": [
-            0.0,
-            1.0
-          ]
-        },
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "combo",
-        "id": "combo:REARDOOR_LEFT",
-        "member_ids": [
-          "control:LH_REARDOOR",
-          "control:LH_REARDOOR_JOINTLH"
-        ]
-      },
-      {
-        "name": "ALL_DOORS",
-        "members": [
-          "LH_REARDOOR_JOINTLH",
-          "LH_REARDOOR",
-          "RH_REARDOOR",
-          "RH_REARDOOR_JOINTRH",
-          "SLIDING_DOOR",
-          "SLIDING_DOOR_HANDLE",
-          "PASSENGER_DOOR",
-          "DRIVER_DOOR",
-          "FOOTSTEP"
-        ],
-        "trigger": "button",
-        "states": 2,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "member_fracs": {
-          "LH_REARDOOR_JOINTLH": [
-            0.0,
-            1.0
-          ],
-          "LH_REARDOOR": [
-            0.0,
-            1.0
-          ],
-          "RH_REARDOOR": [
-            0.0,
-            1.0
-          ],
-          "RH_REARDOOR_JOINTRH": [
-            0.0,
-            1.0
-          ],
-          "SLIDING_DOOR": [
-            0.0,
-            1.0
-          ],
-          "SLIDING_DOOR_HANDLE": [
-            0.0,
-            1.0
-          ],
-          "PASSENGER_DOOR": [
-            0.0,
-            1.0
-          ],
-          "DRIVER_DOOR": [
-            0.0,
-            1.0
-          ],
-          "FOOTSTEP": [
-            0.0,
-            1.0
-          ]
-        },
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "combo",
-        "id": "combo:ALL_DOORS",
-        "member_ids": [
-          "control:LH_REARDOOR_JOINTLH",
-          "control:LH_REARDOOR",
-          "control:RH_REARDOOR",
-          "control:RH_REARDOOR_JOINTRH",
-          "control:SLIDING_DOOR",
-          "control:SLIDING_DOOR_HANDLE",
-          "control:PASSENGER_DOOR",
-          "control:DRIVER_DOOR",
-          "control:FOOTSTEP"
-        ]
-      }
-    ],
+    "combos": [],
     "sequences": []
   },
   "annotations": [],
@@ -757,16 +466,16 @@
   "page_title": "3D Configurator",
   "page_icon": "",
   "global_pointer": null,
-  "model_file": "Highest/b645b7e8b94e.gltf",
-  "model_token": "b645b7e8b94e",
+  "model_file": "Highest/26566b275491.gltf",
+  "model_token": "26566b275491",
   "model_ext": "gltf",
   "available_variants": [
     "current"
   ],
   "cameras": {
     "fly_duration": 1.2,
-    "zoom_min": 4.767,
-    "zoom_max": 15.285,
+    "zoom_min": 1.46,
+    "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
       -0.0
@@ -794,14 +503,36 @@
       {
         "name": "Camera",
         "position": [
-          -7.0835,
-          0.6811,
-          5.6819
+          -1.0952,
+          1.169,
+          0.0049
         ],
         "target": [
-          -0.3705,
-          0.5546,
-          -0.4192
+          -1.5501,
+          0.9614,
+          0.0092
+        ],
+        "lock": "zoom_pan",
+        "transition": "fly",
+        "fly_duration": 1.2,
+        "ease_in": false,
+        "ease_out": true,
+        "dip_duration": 0.4,
+        "default": false,
+        "focal_length_mm": 15.0,
+        "sensor_width_mm": 36.0
+      },
+      {
+        "name": "Camera.001",
+        "position": [
+          -9.3332,
+          0.6938,
+          6.6646
+        ],
+        "target": [
+          0.0,
+          0.5812,
+          -0.0
         ],
         "lock": "free",
         "transition": "fly",
@@ -809,9 +540,10 @@
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
-        "default": false,
-        "focal_length_mm": 40.0,
-        "sensor_width_mm": 36.0
+        "default": true,
+        "focal_length_mm": 50.0,
+        "sensor_width_mm": 36.0,
+        "allow_pan": true
       }
     ],
     "cinematic": {
@@ -819,7 +551,11 @@
       "trigger": "button"
     },
     "camera_sequences": [],
-    "pivot": null
+    "pivot": [
+      0.0,
+      0.5812,
+      -0.0
+    ]
   },
   "section_view": {}
 }
