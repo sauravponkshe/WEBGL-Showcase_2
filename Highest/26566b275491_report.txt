@@ -3,7 +3,7 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT\Highest\26566b275491.gltf
-Generated: 2026-11-03 01:35:19
+Generated: 2026-11-03 02:22:15
 Total size (this .gltf + its .bin + every texture file): 40.19 MB
 
 ======================================================================
@@ -198,7 +198,7 @@ Categories: 1   Options: 3
 ======================================================================
 CAMERAS
 ======================================================================
-Zoom range: 4.366 - 11.469
+Zoom range: 5.067 - 11.469
 Floor Z: 0.0   Roof Z: None
 Static cameras: 4  (Free: 1, Locked: 3)
   - DASHCAM  [zoom_pan]

@@ -3970,6 +3970,7 @@ window._wceColorSelDefaults = _wceColorSelDefaults;
     // The three Force variants. Only the loaded one (selected: true) is shown as active; none of them is clickable (one model is loaded).
     variants: [ { label: 'Short Wheelbase' }, { label: 'Medium Wheelbase' }, { label: 'Long Wheelbase', selected: true } ],
     paintCategory: 'PAINTS',                                                      // which material-subset category fills COLOURS
+    exitCams: ['FIRSTROW', 'REARSEAT'],                                           // cameras (2nd / 3rd seat) that show the round "back outside" button
     exteriorCams: ['FREECAM']                                                     // any other camera counts as "Interior" for the tab
   };
   const $ = (id) => document.getElementById(id);
@@ -4042,6 +4043,7 @@ window._wceColorSelDefaults = _wceColorSelDefaults;
     // ---- EXTERIOR / INTERIOR tab: camera fly-to (click, so re-clicking the active tab flies back too) ----
     $('fx-exterior').onclick = () => flyToCamera(FX.cameras.exterior);
     $('fx-interior').onclick = () => flyToCamera(FX.cameras.interior);
+    $('fx-exit').onclick     = () => flyToCamera(FX.cameras.exterior);
 
     // ---- keep the tab in step with the camera, however it was moved (tab, or an in-scene hotspot) -------
     // flyToCamera() records the chosen camera in window._wceCamSel; watching that value is enough.
@@ -4049,6 +4051,7 @@ window._wceColorSelDefaults = _wceColorSelDefaults;
       if (!name) return;
       const ext = FX.exteriorCams.indexOf(name) !== -1;
       $('fx-exterior').checked = ext; $('fx-interior').checked = !ext;
+      $('fx-exit').hidden = FX.exitCams.indexOf(name) === -1;
     };
     let _camSel = window._wceCamSel;
     try {
@@ -4063,6 +4066,7 @@ window._wceColorSelDefaults = _wceColorSelDefaults;
       open = o;
       panel.classList.toggle('slideOut', !o); panel.classList.toggle('slideIn', o);
       toggle.classList.toggle('flip', !o);
+      $('fx-exit').classList.toggle('beside', o);
       toggle.setAttribute('aria-expanded', String(o)); toggle.setAttribute('aria-label', o ? 'Hide controls' : 'Show controls');
     };
     toggle.onclick = () => setPanel(!open);
