@@ -210,6 +210,8 @@ html,body{font-family:'Rajdhani',sans-serif;font-size:13px}
 /* sliding control panel */
 #fx-stage{position:fixed;inset:0;pointer-events:none}
 #fx .controlPanel{position:relative;z-index:99;width:270px;border:1px solid #ccc;padding:30px 20px 0 20px;background:#fff;transition:all 1s ease;pointer-events:auto;max-height:100vh;overflow:visible}
+/* short screens (e.g. phone landscape): the content scrolls inside the panel; the slide arrow stays put. When everything fits, nothing changes. */
+#fx .fx-scroll{max-height:calc(100vh - 31px);max-height:calc(100dvh - 31px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 #fx .controlPanel.slideIn{left:270px;margin-left:-270px}
 #fx .controlPanel.slideOut{left:-270px;margin-left:0}
 #fx .togglebtn{position:absolute;top:50%;right:-31px;width:40px;height:40px;transform:translateY(-50%);display:flex;justify-content:center;align-items:center;border:0;border-radius:5px;padding:0;background-color:#fff;color:#212529;cursor:pointer}
@@ -263,6 +265,7 @@ html,body{font-family:'Rajdhani',sans-serif;font-size:13px}
   <div id="fx-stage">
     <div class="controlPanel slideIn" id="fx-panel" aria-label="Configuration controls">
       <button type="button" class="togglebtn" id="fx-toggle" aria-expanded="true" aria-label="Hide controls"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></button>
+      <div class="fx-scroll">
       <div class="panel-sec"><h4>colours</h4><div class="color-btn" id="fx-colours"></div></div>
       <div class="panel-sec"><h4>VARIANTS</h4><div class="switch-field" id="fx-variants"></div></div>
       <div class="panel-sec mb-0"><h4>Lights</h4>
@@ -275,6 +278,7 @@ html,body{font-family:'Rajdhani',sans-serif;font-size:13px}
           <input type="radio" id="fx-door-open" name="fx-door" value="true"><label for="fx-door-open">Open</label>
           <input type="radio" id="fx-door-close" name="fx-door" value="false" checked><label for="fx-door-close">Close</label>
         </div></div>
+      </div>
     </div>
   </div>
 </div>

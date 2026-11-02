@@ -4061,7 +4061,7 @@ window._wceColorSelDefaults = _wceColorSelDefaults;
 
     // ---- panel slide ------------------------------------------------------------------------------
     const panel = $('fx-panel'), toggle = $('fx-toggle');
-    let open = !(window.innerWidth < 768);
+    let open = !(window.innerWidth < 768 || window.innerHeight < 500);   // closed to start on phones, incl. landscape
     const setPanel = (o) => {
       open = o;
       panel.classList.toggle('slideOut', !o); panel.classList.toggle('slideIn', o);
@@ -4070,6 +4070,7 @@ window._wceColorSelDefaults = _wceColorSelDefaults;
       toggle.setAttribute('aria-expanded', String(o)); toggle.setAttribute('aria-label', o ? 'Hide controls' : 'Show controls');
     };
     toggle.onclick = () => setPanel(!open);
+    panel.addEventListener('wheel', (e) => e.stopPropagation(), { passive: true });   // scrolling the panel must not zoom the 3D view
     setPanel(open);
   }
 
