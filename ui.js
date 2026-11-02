@@ -1247,6 +1247,8 @@ function _fireStep(step) {
     _wceSetOceanState(target_name);
   } else if (action_type === 'sound') {
     _wceSoundStep(target_name, step.sound_action);
+  } else if (action_type === 'mat_anim' || action_type === 'geo_anim') {
+    _wceMatGeoAnimStep(action_type === 'mat_anim' ? 'MAT' : 'GEO', target_name, step.matgeo_action);
   } else if (action_type === 'container') {
     if (container_name && container_material) {
       applyMat(container_name, container_material); matSt[container_name]=container_material; refreshAdvMat(matSt);
@@ -3376,6 +3378,19 @@ function _wceSoundStep(name, act){
   if(act==='stop'){ if(d.loop && on) window._wceSoundFire(d); return; }
   if(d.loop){ if(!on) window._wceSoundFire(d); } else window._wceSoundFire(d);
 }
+function _wceMatGeoAnimStep(kind, key, act){
+  var list=(kind==='MAT') ? (CFG.mat_animations||[]) : (CFG.geo_animations||[]);
+  var def=null, i;
+  for(i=0;i<list.length;i++){ if(list[i].source_key===key){ def=list[i]; break; } }
+  if(!def) return;
+  if(def.play_mode==='step'){ if(typeof window._matGeoStep==='function') window._matGeoStep(kind, def); return; }
+  if(typeof window.triggerMatGeoAnim!=='function') return;
+  var on=!!(window._matGeoActive && window._matGeoActive[def.source_key]);
+  var stopping=!!(window._matGeoStopping && window._matGeoStopping[def.source_key]);
+  if(act==='start'){ if(!on) window.triggerMatGeoAnim(kind, def.source_key); else if(stopping) delete window._matGeoStopping[def.source_key]; }
+  else if(act==='stop'){ if(on && !stopping) window.triggerMatGeoAnim(kind, def.source_key); }
+  else window.triggerMatGeoAnim(kind, def.source_key);
+}
 function buildSoundButtons(){
   var sec=document.getElementById('ssound');
   if(!sec) return;
@@ -3941,3 +3956,124 @@ window._wceColorSelMount = _wceColorSelMount;
 window._wceColorSelItems = _wceColorSelItems;
 window._wceColorSelScan = _wceColorSelItems;
 window._wceColorSelDefaults = _wceColorSelDefaults;
+
+/* ======================================================================================================
+   FORCE UI  --  replaces the built-in panel. The built-in UI is still built (the viewer logic talks to it)
+   but hidden by CSS; this layer drives the same functions the old buttons used.
+   Everything is looked up by NAME from config.json, so a re-export keeps working as long as the names stay.
+   ====================================================================================================== */
+(function(){
+  'use strict';
+  const FX = {
+    cameras: { exterior: 'FREECAM', interior: 'DASHCAM' },                       // EXTERIOR / INTERIOR tab
+    seq:     { lightsOn: 'LAMP_ON', lightsOff: 'LAMP_OFF', doorsOpen: 'DOOR_OPEN', doorsClose: 'DOOR_CLOSED' },
+    // The three Force variants. Only the loaded one (selected: true) is shown as active; none of them is clickable (one model is loaded).
+    variants: [ { label: 'Short Wheelbase' }, { label: 'Medium Wheelbase' }, { label: 'Long Wheelbase', selected: true } ],
+    paintCategory: 'PAINTS',                                                      // which material-subset category fills COLOURS
+    exteriorCams: ['FREECAM']                                                     // any other camera counts as "Interior" for the tab
+  };
+  const $ = (id) => document.getElementById(id);
+
+  function toSrgbHex(lin){
+    const f = (v) => { v = Math.max(0, Math.min(1, v)); v = v <= 0.0031308 ? v * 12.92 : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return Math.round(v * 255); };
+    return '#' + [0, 1, 2].map(i => f(lin[i]).toString(16).padStart(2, '0')).join('');
+  }
+  function swatchFor(sub){
+    const cols = (window.CFG && window.CFG.mat_colors) || {};
+    const st = sub.state || {};
+    const names = Object.keys(st).map(k => st[k]);
+    for (let i = 0; i < names.length; i++){
+      const c = cols[names[i]];
+      if (c && c.color && c.color.length >= 3) return toSrgbHex(c.color);
+    }
+    return '#999999';
+  }
+  const titleCase = (s) => String(s).replace(/_/g, ' ').toLowerCase().replace(/(^|\s)\S/g, (m) => m.toUpperCase());
+
+  // Runs one of two sequences for a toggle; if clicked again mid-animation, the latest wish runs next (nothing is dropped).
+  function makeToggle(onName, offName){
+    let want = null, busy = false;
+    return async function(state){
+      want = state;
+      if (busy) return;
+      busy = true;
+      try { while (want !== null){ const s = want; want = null; try { await executeSequence(s ? onName : offName); } catch(e){ console.error('[FX]', e); } } }
+      finally { busy = false; }
+    };
+  }
+
+  function buildForceUI(){
+    const CFG = window.CFG || {};
+    if (!$('fx')) return;
+
+    // ---- COLOURS: the material subsets of one category --------------------------------------------
+    const all = CFG.mat_subsets || [];
+    const cat = all.some(s => s.category === FX.paintCategory) ? FX.paintCategory : (all[0] && all[0].category);
+    const subs = all.filter(s => s.category === cat);
+    const defName = ((CFG.default_mat_subsets || []).find(d => d.category === cat) || {}).name;
+    const colours = $('fx-colours');
+    colours.innerHTML = '';
+    subs.forEach((s, i) => {
+      const g = document.createElement('div'); g.className = 'color__group';
+      g.innerHTML = '<input type="radio" name="fx-color" id="fx-color-' + i + '" value="' + i + '"' + (s.name === defName ? ' checked' : '') + '>' +
+        '<label class="color__label-radio" for="fx-color-' + i + '"><span class="color__radio-button" style="background-color:' + swatchFor(s) + '"></span>' + titleCase(s.name) + '</label>';
+      colours.appendChild(g);
+    });
+    colours.parentNode.style.display = subs.length ? '' : 'none';
+    colours.onchange = (e) => {
+      const el = e.target; if (!el || el.name !== 'fx-color') return;
+      const sub = subs[+el.value]; if (!sub) return;
+      applyMatSubset(sub.state, sub.category);
+      if (typeof refreshAdvMat === 'function') refreshAdvMat(sub.state);
+    };
+
+    // ---- VARIANTS: listed like Force, but not clickable -----------------------------------------------
+    $('fx-variants').innerHTML = FX.variants.map((v, i) =>
+      '<div class="v-field fixed"><input type="radio" id="fx-variant-' + i + '" name="fx-variant"' + (v.selected ? ' checked' : ' disabled') + '><label for="fx-variant-' + i + '">' + v.label + '</label></div>').join('');
+
+    // ---- LIGHTS / DOORS: the sequences ------------------------------------------------------------
+    const lights = makeToggle(FX.seq.lightsOn, FX.seq.lightsOff);
+    const doors  = makeToggle(FX.seq.doorsOpen, FX.seq.doorsClose);
+    $('fx-light-on').onchange   = () => { if ($('fx-light-on').checked)  lights(true);  };
+    $('fx-light-off').onchange  = () => { if ($('fx-light-off').checked) lights(false); };
+    $('fx-door-open').onchange  = () => { if ($('fx-door-open').checked)  doors(true);  };
+    $('fx-door-close').onchange = () => { if ($('fx-door-close').checked) doors(false); };
+
+    // ---- EXTERIOR / INTERIOR tab: camera fly-to (click, so re-clicking the active tab flies back too) ----
+    $('fx-exterior').onclick = () => flyToCamera(FX.cameras.exterior);
+    $('fx-interior').onclick = () => flyToCamera(FX.cameras.interior);
+
+    // ---- keep the tab in step with the camera, however it was moved (tab, or an in-scene hotspot) -------
+    // flyToCamera() records the chosen camera in window._wceCamSel; watching that value is enough.
+    const syncTab = (name) => {
+      if (!name) return;
+      const ext = FX.exteriorCams.indexOf(name) !== -1;
+      $('fx-exterior').checked = ext; $('fx-interior').checked = !ext;
+    };
+    let _camSel = window._wceCamSel;
+    try {
+      Object.defineProperty(window, '_wceCamSel', { configurable: true, get: () => _camSel, set: (v) => { _camSel = v; syncTab(v); } });
+    } catch(e){ console.warn('[FX] camera sync unavailable', e); }
+    syncTab(_camSel);
+
+    // ---- panel slide ------------------------------------------------------------------------------
+    const panel = $('fx-panel'), toggle = $('fx-toggle');
+    let open = !(window.innerWidth < 768);
+    const setPanel = (o) => {
+      open = o;
+      panel.classList.toggle('slideOut', !o); panel.classList.toggle('slideIn', o);
+      toggle.classList.toggle('flip', !o);
+      toggle.setAttribute('aria-expanded', String(o)); toggle.setAttribute('aria-label', o ? 'Hide controls' : 'Show controls');
+    };
+    toggle.onclick = () => setPanel(!open);
+    setPanel(open);
+  }
+
+  const _origBuildUI = buildUI;
+  buildUI = function(){
+    let r;
+    try { r = _origBuildUI.apply(this, arguments); } catch(e){ console.error('[FX] built-in UI build failed (ignored, it is hidden):', e); }
+    try { buildForceUI(); } catch(e){ console.error('[FX] Force UI failed:', e); }
+    return r;
+  };
+})();

@@ -4,9 +4,9 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <script>if(innerWidth<768)document.documentElement.classList.add('wce-narrow')</script>
-<title>CONFIGURATOR</title>
-<meta name="application-name" content="CONFIGURATOR"/>
-<meta name="apple-mobile-web-app-title" content="CONFIGURATOR"/>
+<title>3D Configurator</title>
+<meta name="application-name" content="3D Configurator"/>
+<meta name="apple-mobile-web-app-title" content="3D Configurator"/>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600&family=Inconsolata:wght@300;400&display=swap" rel="stylesheet">
@@ -71,10 +71,20 @@ body.wce-panel-combined .tabpane:not(:first-child){border-top:1px solid var(--bo
 #lt{font-size:10px;letter-spacing:.3em;color:var(--muted);margin-top:10px;font-family:'Inconsolata',monospace}
 #st{position:fixed;bottom:14px;left:18px;font-size:9px;letter-spacing:.2em;color:var(--muted);font-family:'Inconsolata',monospace;z-index:10}
 </style>
+<link rel="preload" as="image" href="ui-assets/urbania-logo-loader.png">
+<link rel="preload" as="image" href="ui-assets/urbania-loader.png">
 <style id="wce-startup-overrides">
-#ld{background-color:#000000}
-
-#lt{font-size:10px !important;font-weight:400 !important}
+/* Force-style "Road" loader: white screen, logo above, van driving along a road line. */
+#ld{background-color:#ffffff !important;transition:opacity .4s ease !important}
+#ldcircle{display:none !important}
+#lgo{align-self:stretch;display:flex;justify-content:center;margin:0 auto 15px;padding:0 15px;max-width:300px}
+#lgo img{max-width:100%;height:auto;display:block;pointer-events:none;user-select:none}
+#lbw{align-self:stretch;position:relative;width:100% !important;height:60px !important;overflow:hidden;margin:0 !important}
+#lbw::before{display:none !important}
+#lb{position:absolute !important;left:0;bottom:0;width:0%;height:3px !important;background:#000 !important;opacity:1 !important;transition:all .5s !important}
+#lic{position:absolute;left:0;bottom:0;max-height:60px;transition:all .5s;pointer-events:none;user-select:none}
+#lt{margin:0 !important;font-size:10px !important;font-weight:400 !important;color:#000 !important}
+#lt:not(:empty){margin-top:12px !important}
 </style>
 <style>
 .nested-grp{margin-left:10px;padding-left:8px;border-left:1px solid var(--border);margin-top:6px;display:none}
@@ -181,19 +191,88 @@ html,body{font-family:'Rajdhani',sans-serif;font-size:13px}
   "three-mesh-bvh":"https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js"
 }}
 </script>
+<style id="fx-css">
+/* ===== Force UI (replaces the built-in panel). Scoped to #fx. Values taken from the Force reference styles. ===== */
+@font-face{font-family:"AcherusGrotesque-Medium";src:url("ui-assets/fonts/AcherusGrotesque-Medium.woff") format("woff");font-display:swap}
+@font-face{font-family:"AcherusGrotesque-Bold";src:url("ui-assets/fonts/AcherusGrotesque-Bold.woff") format("woff");font-display:swap}
+@font-face{font-family:"AcherusGrotesque-ExtraBold";src:url("ui-assets/fonts/AcherusGrotesque-ExtraBold.woff") format("woff");font-display:swap}
+@font-face{font-family:"OpenSansRegular";src:url("ui-assets/fonts/OpenSansRegular.woff") format("woff");font-display:swap}
+/* the built-in UI stays in the DOM (the viewer logic still talks to it) but is never shown; the dip-to-black overlay and the in-scene hotspots are kept */
+#wce-ui-stage>*:not(#dip):not(#wce-ui-canvas){display:none !important}
+#wce-ui-canvas>*:not(#hotspot-layer){display:none !important}
+#fx{position:fixed;inset:0;z-index:5;pointer-events:none;font-family:"OpenSansRegular",sans-serif;font-size:16px;line-height:24px;color:#212529;-webkit-font-smoothing:antialiased}
+#fx input[type=radio]{position:absolute !important;clip:rect(0,0,0,0);height:1px;width:1px;border:0;overflow:hidden;opacity:0;pointer-events:none}
+/* EXTERIOR / INTERIOR tab (floats over the top of the view) */
+#fx .TabBtn{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:5;width:300px;max-width:calc(100vw - 30px);pointer-events:auto}
+#fx .TabBtn-field{display:flex;justify-content:space-between;margin:0;overflow:hidden;background:#fff;border-radius:3px}
+#fx .TabBtn-field label{width:48%;margin:0 2px;padding:8px 16px;border:none;border-radius:3px;background-color:rgba(0,0,0,.0588235294);color:#000;font-family:"AcherusGrotesque-Medium",sans-serif;font-size:16px;letter-spacing:1.6px;line-height:30px;text-align:center;text-transform:uppercase;opacity:.5;cursor:pointer;user-select:none}
+#fx .TabBtn-field input:checked+label{font-family:"AcherusGrotesque-ExtraBold",sans-serif;font-weight:800;border-bottom:3px solid #000;background-color:#fff;opacity:1}
+/* sliding control panel */
+#fx-stage{position:fixed;inset:0;pointer-events:none}
+#fx .controlPanel{position:relative;z-index:99;width:270px;border:1px solid #ccc;padding:30px 20px 0 20px;background:#fff;transition:all 1s ease;pointer-events:auto;max-height:100vh;overflow:visible}
+#fx .controlPanel.slideIn{left:270px;margin-left:-270px}
+#fx .controlPanel.slideOut{left:-270px;margin-left:0}
+#fx .togglebtn{position:absolute;top:50%;right:-31px;width:40px;height:40px;transform:translateY(-50%);display:flex;justify-content:center;align-items:center;border:0;border-radius:5px;padding:0;background-color:#fff;color:#212529;cursor:pointer}
+#fx .togglebtn svg{width:11px;height:16px;transition:all 1s}
+#fx .togglebtn.flip svg{transform:rotate(-180deg)}
+#fx .panel-sec{margin-bottom:30px}
+#fx .panel-sec.mb-0{margin-bottom:0}
+#fx .panel-sec h4{margin:0;font-family:"AcherusGrotesque-Bold",sans-serif;font-weight:700;font-size:18px;line-height:0;color:#000;text-transform:uppercase}
+/* colour swatches */
+#fx .color-btn{display:flex;flex-wrap:wrap;margin-top:20px}
+#fx .color__group{display:inline-block}
+#fx .color__label-radio{display:inline-block;position:relative;margin-top:8px;margin-right:20px;font-size:12px;font-weight:600;line-height:24px;text-align:center;cursor:pointer;user-select:none}
+#fx .color__radio-button{display:block;position:relative;width:40px;height:40px;margin-bottom:8px;border:2px solid #707070;border-radius:50%}
+#fx .color__radio-button::after{content:"";display:block;position:absolute;top:50%;left:50%;width:40px;height:40px;border-radius:50%;transform:translate(-50%,-50%);opacity:0;transition:opacity .2s}
+#fx .color__group input:checked~.color__label-radio .color__radio-button::after,#fx .color__group input:checked+.color__label-radio .color__radio-button::after{opacity:1;border:3px solid #fff;box-shadow:0 3px 12px -4px rgba(0,0,0,.75)}
+/* switch buttons (variants / lights / doors) */
+#fx .switch-field{margin-top:30px;margin-bottom:36px;overflow:hidden}
+#fx .switch-field.pair{display:flex;justify-content:flex-start;column-gap:.26em}
+#fx .switch-field label{display:inline-block;width:48%;padding:8px 16px;border:2px solid #707070;border-radius:4px;background-color:#fff;color:#212529;font-family:"AcherusGrotesque-Bold",sans-serif;font-size:14px;line-height:1;text-align:center;text-transform:uppercase;cursor:pointer;transition:all .1s ease-in-out;user-select:none}
+#fx .v-field{margin-bottom:.5rem}
+#fx .v-field:last-child{margin-bottom:0}
+#fx .v-field label{display:block;width:100%}
+#fx .v-field.fixed label{cursor:default;pointer-events:none}
+#fx .switch-field input:disabled+label{cursor:default;opacity:.55}
+#fx .switch-field input:checked+label{background-color:#000;color:#fff;border:2px solid #000;box-shadow:none;outline:0}
+#fx input:focus-visible+label{outline:2px solid #000;outline-offset:2px}
+</style>
 </head>
 <body class="">
 <canvas id="c"></canvas>
-<div id="wce-ui-stage">
+<!-- Loader lives outside the scaled UI stage so it keeps its true pixel sizes (Force-style loader) -->
 <div id="ld">
 <!--WCE_STARTUP_HTML_START-->
-  
-  <svg id="ldcircle" width="36" height="36" viewBox="0 0 36 36" fill="none" style="opacity:1.0"><circle cx="18.0" cy="18.0" r="16.0" stroke="#1c1c22" stroke-width="1.5"/><path d="M18.0 2.0 A16.0 16.0 0 0 1 34.0 18.0" stroke="#c8a96e" stroke-width="1.5" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 18.0 18.0" to="360 18.0 18.0" dur="0.9s" repeatCount="indefinite"/></path></svg>
-  <div id="lbw"><div id="lb"></div></div>
-  <p id="lt">INITIALISING</p>
+  <div id="lgo"><img src="ui-assets/urbania-logo-loader.png" alt="" draggable="false"></div>
+  <div id="lbw"><div id="lb"></div><img id="lic" data-road="1" src="ui-assets/urbania-loader.png" alt="" draggable="false"></div>
+  <p id="lt"></p>
 <!--WCE_STARTUP_HTML_END-->
 </div>
-
+<!-- Force UI (replaces the built-in panel; built by ui.js) -->
+<div id="fx">
+  <div class="TabBtn"><div class="TabBtn-field">
+    <input type="radio" id="fx-exterior" name="fx-extint" value="exterior" checked><label for="fx-exterior">Exterior</label>
+    <input type="radio" id="fx-interior" name="fx-extint" value="interior"><label for="fx-interior">Interior</label>
+  </div></div>
+  <div id="fx-stage">
+    <div class="controlPanel slideIn" id="fx-panel" aria-label="Configuration controls">
+      <button type="button" class="togglebtn" id="fx-toggle" aria-expanded="true" aria-label="Hide controls"><svg viewBox="0 0 320 512" aria-hidden="true" focusable="false"><path fill="currentColor" d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></button>
+      <div class="panel-sec"><h4>colours</h4><div class="color-btn" id="fx-colours"></div></div>
+      <div class="panel-sec"><h4>VARIANTS</h4><div class="switch-field" id="fx-variants"></div></div>
+      <div class="panel-sec mb-0"><h4>Lights</h4>
+        <div class="switch-field pair">
+          <input type="radio" id="fx-light-on" name="fx-light" value="true"><label for="fx-light-on">On</label>
+          <input type="radio" id="fx-light-off" name="fx-light" value="false" checked><label for="fx-light-off">Off</label>
+        </div></div>
+      <div class="panel-sec"><h4>Doors</h4>
+        <div class="switch-field pair">
+          <input type="radio" id="fx-door-open" name="fx-door" value="true"><label for="fx-door-open">Open</label>
+          <input type="radio" id="fx-door-close" name="fx-door" value="false" checked><label for="fx-door-close">Close</label>
+        </div></div>
+    </div>
+  </div>
+</div>
+<div id="wce-ui-stage">
 <div id="dip" style="position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50;transition:opacity 0.35s ease"></div>
 <div id="wce-ui-canvas">
 <div id="hotspot-layer"></div>
@@ -275,13 +354,13 @@ const CFG = {
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF"
+      "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
-      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
+      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_1_GLTF.001"
     ]
   },
@@ -289,13 +368,13 @@ const CFG = {
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF"
+      "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
-      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
+      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_1_GLTF.001"
     ]
   },
@@ -303,14 +382,36 @@ const CFG = {
     "items": []
   },
   "mat_colors": {
-    "CARPAINT_METALLIC_3_GLTF": {
+    "CARPAINT_METALLIC_3_GLTF.001": {
       "color": [
-        0.026241226121783257,
-        0.04970657825469971,
-        0.09989875555038452
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
       ],
-      "metallic": 0.5,
-      "roughness": 0.1,
+      "metallic": 0.3776,
+      "roughness": 0.0544,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_2_GLTF.001": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.1329,
+      "roughness": 0.25,
       "emissive": [
         1.0,
         1.0,
@@ -318,7 +419,73 @@ const CFG = {
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
+      "clearcoatRoughness": 0.65,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.0,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_1_GLTF": {
+      "color": [
+        0.05690384283661842,
+        0.05287881940603256,
+        0.05287881940603256
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0544,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0544,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_2_GLTF": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.113,
+      "roughness": 0.088,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.65,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
@@ -327,113 +494,71 @@ const CFG = {
     },
     "CARPAINT_METALLIC_1_GLTF.001": {
       "color": [
-        0.06812375783920288,
-        0.06812379509210587,
-        0.07157954573631287
+        0.05690384283661842,
+        0.05287881940603256,
+        0.05287881940603256
       ],
-      "metallic": 0.5,
-      "roughness": 0.1,
+      "metallic": 0.3776,
+      "roughness": 0.0544,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
       "ior": 1.5,
-      "specularIntensity": 0.2734
+      "specularIntensity": 0.0498
+    }
+  },
+  "mat_bc": {
+    "Driver Seat": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_2_GLTF": {
-      "color": [
-        0.7071032524108887,
-        0.7071032524108887,
-        0.7071032524108887
-      ],
-      "metallic": 0.5,
-      "roughness": 0.25,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "DRIVER SEAT": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_2_GLTF.001": {
-      "color": [
-        0.7071032524108887,
-        0.7071032524108887,
-        0.7071032524108887
-      ],
-      "metallic": 0.5,
-      "roughness": 0.25,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "PASS_SEAT.001": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_3_GLTF.001": {
-      "color": [
-        0.026241226121783257,
-        0.04970657825469971,
-        0.09989875555038452
-      ],
-      "metallic": 0.5,
-      "roughness": 0.1,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "Passenger Seat": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_1_GLTF": {
-      "color": [
-        0.06812375783920288,
-        0.06812379509210587,
-        0.07157954573631287
-      ],
-      "metallic": 0.5,
-      "roughness": 0.1,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "PERFORATION 1.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "DRIVER SEAT.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "PERFORATION 1.003": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "PERFORATION.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "REAR SEAT.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "PERFORATION 1.005": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "REAR SEAT.003": {
+      "b": 2.5,
+      "c": 1.0
     }
   },
   "light_mat_links": [],
@@ -453,44 +578,86 @@ const CFG = {
           "children": []
         }
       ]
+    },
+    "GEOMETRIES_LAMPS": {
+      "name": "GEOMETRIES_LAMPS",
+      "enabled": true,
+      "children": [
+        {
+          "name": "GEOMETRIES_LAMPS_ON",
+          "enabled": true,
+          "children": []
+        },
+        {
+          "name": "GEOMETRIES_LAMPS_OFF",
+          "enabled": true,
+          "children": []
+        }
+      ]
+    },
+    "GEOMETRIES_BLINKERS": {
+      "name": "GEOMETRIES_BLINKERS",
+      "enabled": true,
+      "children": [
+        {
+          "name": "GEOMETRIES_BLINKERS_ON",
+          "enabled": true,
+          "children": []
+        },
+        {
+          "name": "GEOMETRIES_BLINKERS_OFF",
+          "enabled": true,
+          "children": []
+        }
+      ]
     }
   },
   "geometry_subsets": [
     {
-      "name": "Geo Set 1",
+      "name": "LIGHTS_ON",
       "uid": "bce0a0cbc8534f13b8a62911b6d8746e",
       "state": {
-        "LIGHTS": "NONE",
-        "ENVIRONMENTS": "NONE"
+        "GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_ON",
+        "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_ON",
+        "GEOMETRIES_BLINKERS": "GEOMETRIES_BLINKERS_ON"
+      }
+    },
+    {
+      "name": "LIGHTS_OFF",
+      "uid": "e900fff89c3b43b7959b549d6a431d59",
+      "state": {
+        "GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+        "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_OFF",
+        "GEOMETRIES_BLINKERS": "GEOMETRIES_BLINKERS_OFF"
       }
     }
   ],
   "mat_subset_categories": [
-    "PAINT"
+    "PAINTS"
   ],
   "mat_subsets": [
     {
-      "name": "BLUE",
-      "uid": "dd82b36b51f94b529fae4e1e3db925af",
-      "category": "PAINT",
-      "state": {
-        "BODYPAINT": "CARPAINT_METALLIC_3_GLTF",
-        "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"
-      }
-    },
-    {
       "name": "WHITE",
-      "uid": "b3172618f78842df811803876ba27878",
-      "category": "PAINT",
+      "uid": "0dbb1c12f0fb4e2dad408420429842b6",
+      "category": "PAINTS",
       "state": {
         "BODYPAINT": "CARPAINT_METALLIC_2_GLTF",
         "BODYPAINTWITHAO": "CARPAINT_METALLIC_2_GLTF.001"
       }
     },
     {
+      "name": "BLUE",
+      "uid": "443ce6c179194717b9cc3fda182db324",
+      "category": "PAINTS",
+      "state": {
+        "BODYPAINT": "CARPAINT_METALLIC_3_GLTF",
+        "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"
+      }
+    },
+    {
       "name": "GREY",
-      "uid": "11bbb0f2676d4addac4f6e0677e5f069",
-      "category": "PAINT",
+      "uid": "2ffb818c7ed342beaa959ecee783f1e7",
+      "category": "PAINTS",
       "state": {
         "BODYPAINT": "CARPAINT_METALLIC_1_GLTF",
         "BODYPAINTWITHAO": "CARPAINT_METALLIC_1_GLTF.001"
@@ -500,7 +667,59 @@ const CFG = {
   "global_mat_sets": [],
   "mat_animations": [],
   "sounds": [],
-  "geo_animations": [],
+  "geo_animations": [
+    {
+      "source_key": "__geov__GEOMETRIES_BLINKERS",
+      "label": "BLINKERS",
+      "play_mode": "cycle",
+      "transition_sec": 0.0,
+      "play_order": [
+        "GEOMETRIES_BLINKERS_OFF",
+        "GEOMETRIES_BLINKERS_ON"
+      ],
+      "cycle": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": [],
+        "start_mode": "trigger",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "pause_sec": 0.5,
+        "stop_mode": "target",
+        "stop_target": "GEOMETRIES_BLINKERS_OFF",
+        "stop_reach": "jump"
+      },
+      "step": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": []
+      },
+      "source_type": "geo_variant",
+      "geo_parent": "GEOMETRIES_BLINKERS",
+      "variant_chains": {
+        "GEOMETRIES_BLINKERS_OFF": [
+          {
+            "parent": "GEOMETRIES_BLINKERS",
+            "child": "GEOMETRIES_BLINKERS_OFF",
+            "siblings": [
+              "GEOMETRIES_BLINKERS_ON",
+              "GEOMETRIES_BLINKERS_OFF"
+            ]
+          }
+        ],
+        "GEOMETRIES_BLINKERS_ON": [
+          {
+            "parent": "GEOMETRIES_BLINKERS",
+            "child": "GEOMETRIES_BLINKERS_ON",
+            "siblings": [
+              "GEOMETRIES_BLINKERS_ON",
+              "GEOMETRIES_BLINKERS_OFF"
+            ]
+          }
+        ]
+      }
+    }
+  ],
   "area_lights": [],
   "light_shadows": {},
   "light_intensity_divisors": {},
@@ -553,14 +772,14 @@ const CFG = {
     },
     "aa": {
       "enabled": true,
-      "desktop_method": "FXAA",
+      "desktop_method": "MSAA_FXAA",
       "mobile_method": "FXAA",
       "fallback_method": "FXAA",
       "msaa_samples": 4,
       "msaa_max_pixel_ratio": 1.5,
       "idle_enabled": true,
       "idle_frames": 16,
-      "idle_delay_ms": 200,
+      "idle_delay_ms": 50,
       "idle_mobile": true,
       "snapshot_max_quality": true,
       "lowend_downgrade": true,
@@ -571,15 +790,16 @@ const CFG = {
   },
   "mat_name_map": {},
   "default_geo_state": {
-    "LIGHTS": "NONE",
-    "ENVIRONMENTS": "NONE"
+    "GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+    "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_OFF",
+    "GEOMETRIES_BLINKERS": "GEOMETRIES_BLINKERS_OFF"
   },
   "default_variant": null,
   "default_global_set": null,
   "default_mat_subsets": [
     {
-      "name": "BLUE",
-      "category": "PAINT"
+      "name": "GREY",
+      "category": "PAINTS"
     }
   ],
   "default_sound_on": true,
@@ -590,7 +810,8 @@ const CFG = {
   "startup_sound_loop": false,
   "startup_sound": "",
   "camera": {
-    "zoom_min": 1.46,
+    "orbit_damping": 0.25,
+    "zoom_min": 4.366,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -603,8 +824,13 @@ const CFG = {
     "floor_z": 0.0,
     "lock_zoom": "off",
     "lock_zoom_phone": false,
+    "fit_on_resize": false,
+    "ref_aspect": 1.77778,
     "pan": {
       "speed": 0.3,
+      "rmb": true,
+      "return": false,
+      "return_s": 5.0,
       "bindings": [
         {
           "action": "left",
@@ -644,7 +870,7 @@ const CFG = {
         }
       ]
     },
-    "focal_length_mm": 50.0,
+    "focal_length_mm": 20.0,
     "sensor_width_mm": 36.0,
     "roof_z": null
   },
@@ -670,7 +896,7 @@ const CFG = {
       "file": "hdri/environment_1.hdr",
       "strength": 1.0,
       "background": false,
-      "rotation_z": 0.0,
+      "rotation_z": -10.89,
       "flatten_ground": false,
       "ground_height": -1.0,
       "ground_radius": 25.0,
@@ -687,7 +913,7 @@ const CFG = {
       "ground_contrast": 0.0,
       "ground_skybox_file": null,
       "grade_exposure": 0.0,
-      "grade_brightness": 1.3,
+      "grade_brightness": 1.2,
       "grade_contrast": 1.1,
       "grade_saturation": 1.1,
       "grade_bloom": 0.1,
@@ -717,7 +943,7 @@ const CFG = {
     "env_rotation": [
       0.0,
       0.0,
-      0.0
+      -10.89
     ],
     "env_scale": [
       1.0,
@@ -756,6 +982,7 @@ const CFG = {
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -779,6 +1006,7 @@ const CFG = {
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -802,6 +1030,7 @@ const CFG = {
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -825,6 +1054,7 @@ const CFG = {
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -848,6 +1078,7 @@ const CFG = {
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -871,6 +1102,7 @@ const CFG = {
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -890,8 +1122,514 @@ const CFG = {
         "id": "control:SLIDING_NLA"
       }
     ],
-    "combos": [],
-    "sequences": []
+    "combos": [
+      {
+        "name": "Anim Set 1",
+        "members": [
+          "PASS_DOOR_NLA",
+          "DRIVER_DOOR_NLA",
+          "FOOTSTEP_NLA",
+          "RR_RH_DOOR_NLA",
+          "RR_LH_DOOR_NLA",
+          "SLIDING_NLA"
+        ],
+        "trigger": "button",
+        "states": 2,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "member_fracs": {
+          "PASS_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "DRIVER_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "FOOTSTEP_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_RH_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_LH_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "SLIDING_NLA": [
+            0.0,
+            1.0
+          ]
+        },
+        "playback_mode": "PINGPONG",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "combo",
+        "id": "combo:Anim Set 1",
+        "member_ids": [
+          "control:PASS_DOOR_NLA",
+          "control:DRIVER_DOOR_NLA",
+          "control:FOOTSTEP_NLA",
+          "control:RR_RH_DOOR_NLA",
+          "control:RR_LH_DOOR_NLA",
+          "control:SLIDING_NLA"
+        ]
+      }
+    ],
+    "sequences": [
+      {
+        "name": "DASHCAM_GOING_IN",
+        "trigger": "image",
+        "label": "DASHCAM_GOING_IN",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "Interior.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          -1.2213,
+          0.5183,
+          1.1614
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.19,
+        "image_height": 0.19,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "DASHCAM",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "DASHCAM",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "FIRST_ROW",
+        "trigger": "image",
+        "label": "FIRST_ROW",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "FrontSeat.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          0.8162,
+          1.2373,
+          0.5923
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "FIRSTROW",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "FIRSTROW",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "LAST_ROW",
+        "trigger": "image",
+        "label": "LAST_ROW",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "RearSeat.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          2.4311,
+          1.2867,
+          0.6467
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "REARSEAT",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "REARSEAT",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "DASHCAM_IN",
+        "trigger": "image",
+        "label": "DASHCAM_IN",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "Interior.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          -1.1257,
+          1.169,
+          0.0049
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "DASHCAM",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "DASHCAM",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "FREECAM",
+        "trigger": "image",
+        "label": "FREECAM",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "Exterior.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          -1.6765,
+          0.6274,
+          0.7004
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "FREECAM",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "FREECAM",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "LAMP_ON",
+        "trigger": "button",
+        "label": "LAMP_ON",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_INTERIOR_LIGHTS",
+                "child": "GEOMETRIES_INTERIOR_LIGHTS_ON",
+                "siblings": [
+                  "GEOMETRIES_INTERIOR_LIGHTS_ON",
+                  "GEOMETRIES_INTERIOR_LIGHTS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_LAMPS",
+                "child": "GEOMETRIES_LAMPS_ON",
+                "siblings": [
+                  "GEOMETRIES_LAMPS_ON",
+                  "GEOMETRIES_LAMPS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_anim",
+            "action_name": "",
+            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "start",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "LAMP_OFF",
+        "trigger": "button",
+        "label": "LAMP_OFF",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_INTERIOR_LIGHTS",
+                "child": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+                "siblings": [
+                  "GEOMETRIES_INTERIOR_LIGHTS_ON",
+                  "GEOMETRIES_INTERIOR_LIGHTS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_LAMPS",
+                "child": "GEOMETRIES_LAMPS_OFF",
+                "siblings": [
+                  "GEOMETRIES_LAMPS_ON",
+                  "GEOMETRIES_LAMPS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_anim",
+            "action_name": "",
+            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "stop",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "DOOR_OPEN",
+        "trigger": "button",
+        "label": "DOOR_OPEN",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": true,
+            "action_type": "combo",
+            "action_name": "Anim Set 1",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "DOOR_CLOSED",
+        "trigger": "button",
+        "label": "DOOR_CLOSED",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": true,
+            "action_type": "combo",
+            "action_name": "Anim Set 1",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 0,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      }
+    ]
   },
   "annotations": [],
   "annotation_popup_style": {
@@ -912,7 +1650,7 @@ const CFG = {
   },
   "media_items": [],
   "anim_textures": [],
-  "page_title": "CONFIGURATOR",
+  "page_title": "3D Configurator",
   "page_icon": "",
   "global_pointer": null,
   "model_file": "Highest/26566b275491.gltf",
@@ -923,7 +1661,7 @@ const CFG = {
   ],
   "cameras": {
     "fly_duration": 1.2,
-    "zoom_min": 1.46,
+    "zoom_min": 4.366,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -950,7 +1688,7 @@ const CFG = {
     },
     "static": [
       {
-        "name": "Camera",
+        "name": "DASHCAM",
         "position": [
           -1.0952,
           1.169,
@@ -962,17 +1700,23 @@ const CFG = {
           0.0092
         ],
         "lock": "zoom_pan",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.5,
+        "hide_image_dist": 0.5,
         "default": false,
         "focal_length_mm": 15.0,
-        "sensor_width_mm": 36.0
+        "sensor_width_mm": 36.0,
+        "look": {
+          "zoom_in": 2.0,
+          "zoom_out": 1.0
+        }
       },
       {
-        "name": "Camera.001",
+        "name": "FREECAM",
         "position": [
           -9.5598,
           0.6711,
@@ -984,18 +1728,20 @@ const CFG = {
           -0.0
         ],
         "lock": "free",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.0,
+        "hide_image_dist": 0.0,
         "default": true,
         "focal_length_mm": 50.0,
         "sensor_width_mm": 36.0,
         "allow_pan": true
       },
       {
-        "name": "Camera.002",
+        "name": "FIRSTROW",
         "position": [
           0.2961,
           1.1354,
@@ -1007,17 +1753,33 @@ const CFG = {
           0.1661
         ],
         "lock": "zoom_pan",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.0,
+        "hide_image_dist": 0.0,
         "default": false,
         "focal_length_mm": 20.0,
-        "sensor_width_mm": 36.0
+        "sensor_width_mm": 36.0,
+        "hide_items": [
+          {
+            "name": "IMG_SEQUENCE_FIRST_ROW",
+            "pos": [
+              0.8162,
+              1.2373,
+              0.5923
+            ]
+          }
+        ],
+        "look": {
+          "zoom_in": 2.0,
+          "zoom_out": 1.0
+        }
       },
       {
-        "name": "Camera.003",
+        "name": "REARSEAT",
         "position": [
           2.6414,
           1.1638,
@@ -1029,14 +1791,20 @@ const CFG = {
           0.1679
         ],
         "lock": "zoom_pan",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.5,
+        "hide_image_dist": 0.5,
         "default": false,
         "focal_length_mm": 20.0,
-        "sensor_width_mm": 36.0
+        "sensor_width_mm": 36.0,
+        "look": {
+          "zoom_in": 2.0,
+          "zoom_out": 1.0
+        }
       }
     ],
     "cinematic": {
@@ -1054,11 +1822,39 @@ const CFG = {
 };
 const WCE_LIGHT_INTENSITY_DIVISOR = 1000;
 const _wceIsMobileView = () => window.matchMedia("(hover:none) and (pointer:coarse)").matches;
-const WCE_OVERLAYS = /*WCE_OVERLAYS_START*/[]/*WCE_OVERLAYS_END*/;
-const WCE_THEME = /*WCE_THEME_START*/{"colors": {"bg": "#0a0a0b", "panel": "#101013", "border": "#1c1c22", "accent": "#c8a96e", "a2": "#4a8cff", "ok": "#4caf7d", "hot": "#ff6b35", "cam": "#9b59b6", "text": "#e2ddd6", "muted": "#52526a"}, "panel2Bg": "#000000", "panel2Opacity": 100, "panelLayout": "tabs", "panelWidth": 300, "panelHidden": false, "deviceOverrides": {"mobileH": null, "mobileV": null}, "typography": {"family": "Rajdhani", "size": 100, "letterSpacing": 0.07, "weight": 500, "italic": false, "transform": "lowercase"}, "groups": [{"id": "primary", "label": "Global", "selectors": [".pb2", ".gb", ".tb", ".anim-btn", ".cam-btn", ".tt-btn", ".vc", ".tnb", ".cin-btn", "#ar-btn", ".wce-overlay-action-btn", ".sr select"], "shape": "rounded", "radius": 3, "padY": 7, "padX": 10, "borderWidth": 1}], "overlays": [], "customGroups": [], "profiles": [], "startupProfileId": null, "thumbnailGroups": [], "highlightGroups": [], "globalThumbProps": {"size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff"}, "chromeOverrides": {}, "startupPage": {"bgImage": null, "bgOpacity": 100, "iconImage": null, "iconOpacity": 100, "iconSize": 28, "colTxt": "", "colBar": "", "colErr": "#c0392b", "txtBoot": "INITIALISING", "txtInit": "LOADING CONFIG", "txtModel": "LOADING MODEL", "txtReady": "READY", "txtErr": "ERROR \u2014", "txtErrSt": "LOAD ERROR", "perStateMedia": false, "readyMinHoldMs": 0, "textOpacity": 100, "circleThickness": 1.5, "fontFamily": "", "fontSize": 10, "fontWeight": 400, "fontItalic": false}, "annotationPopup": {"bgColor": "#0a0a0c", "bgOpacity": 92, "borderColor": "#c8a96e", "borderWidth": 1, "radius": 6, "textColor": "#ffffff", "textFontSize": 14, "videoWidthPct": 26, "imageWidthPct": 26, "triggerMode": "hover", "markerColor": "#c8a96e", "markerOpacity": 100, "markerBorderWidth": 2, "markerGlow": 6}, "annotationContent": {}, "pricing": {"items": {}, "groups": []}, "mediaViewer": {"coverPct": 80, "fit": "contain", "bgMode": "dim", "dimPct": 75, "blurPx": 12, "bgColor": "#000000", "showClose": true, "closeOnBackdrop": true, "closeOnEsc": true, "anim": "fade", "animMs": 220, "radius": 6, "borderWidth": 0, "borderColor": "#ffffff", "shadow": true, "vidAutoplay": true, "vidLoop": true, "vidMuted": false, "vidControls": true}}/*WCE_THEME_END*/;
+const WCE_OVERLAYS = /*WCE_OVERLAYS_START*/[{"kind": "color", "image": "", "imageScale": 100, "x": 23.8961, "y": 47.1474, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "LIGHTS ON", "type": "geo_subset", "name": "LIGHTS_ON", "uid": "bce0a0cbc8534f13b8a62911b6d8746e", "state": {"GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_ON", "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_ON"}, "color": "#ffffff", "id": "geo_subset::bce0a0cbc8534f13b8a62911b6d8746e", "gid": "egroup::1793613900753_cmj2yv", "width": 45, "height": 46}, {"kind": "color", "image": "", "imageScale": 100, "x": 58.961, "y": 46.6681, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "LIGHTS OFF", "type": "geo_subset", "name": "LIGHTS_OFF", "uid": "e900fff89c3b43b7959b549d6a431d59", "state": {"GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_OFF", "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_OFF"}, "color": "#1a1a1a", "id": "geo_subset::e900fff89c3b43b7959b549d6a431d59", "gid": "egroup::1793613900753_cmj2yv", "width": 45, "height": 46}, {"id": "group::1793612842759_qbpy8t", "type": "group", "label": "CONFIGURE", "x": 2.7344, "y": 5, "width": 258, "height": 399, "collapsed": false, "direction": "horizontal", "opacity": 100, "_hdrInit": true, "arrowColor": "#ffffff", "arrowSize": 25, "shelfBgOpacity": 100, "shelfBg": "#292929", "expandTrigger": "header", "headerAlign": "center", "titleFontSize": 24}, {"id": "text::1793612943197_r2j3m0", "type": "text", "label": "LAMPS", "color": "#000000", "fontSize": 30, "x": 33.8941, "y": 37.5288, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613900753_cmj2yv"}, {"id": "text::1793612979161_uknind", "type": "text", "label": "COLORS", "color": "#000000", "fontSize": 30, "x": 31.5868, "y": 5.3227, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613897110_jxw3ri"}, {"kind": "color", "image": "", "imageScale": 100, "x": 11.2338, "y": 14.8994, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "WHITE", "type": "mat_subset", "name": "WHITE", "uid": "0dbb1c12f0fb4e2dad408420429842b6", "state": {"BODYPAINT": "CARPAINT_METALLIC_2_GLTF", "BODYPAINTWITHAO": "CARPAINT_METALLIC_2_GLTF.001"}, "color": "#ffffff", "id": "mat_subset::0dbb1c12f0fb4e2dad408420429842b6", "gid": "egroup::1793613897110_jxw3ri"}, {"kind": "color", "image": "", "imageScale": 100, "x": 40.4548, "y": 14.8994, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "BLUE", "type": "mat_subset", "name": "BLUE", "uid": "443ce6c179194717b9cc3fda182db324", "state": {"BODYPAINT": "CARPAINT_METALLIC_3_GLTF", "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"}, "color": "#152d8e", "id": "mat_subset::443ce6c179194717b9cc3fda182db324", "gid": "egroup::1793613897110_jxw3ri"}, {"kind": "color", "image": "", "imageScale": 100, "x": 69.6755, "y": 14.8994, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "GREY", "type": "mat_subset", "name": "GREY", "uid": "2ffb818c7ed342beaa959ecee783f1e7", "state": {"BODYPAINT": "CARPAINT_METALLIC_1_GLTF", "BODYPAINTWITHAO": "CARPAINT_METALLIC_1_GLTF.001"}, "color": "#808080", "id": "mat_subset::2ffb818c7ed342beaa959ecee783f1e7", "gid": "egroup::1793613897110_jxw3ri"}, {"id": "text::1793613397474_nvijlc", "type": "text", "label": "DOORS", "color": "#000000", "fontSize": 30, "x": 34.1274, "y": 70.1383, "groupId": "group::1793612842759_qbpy8t"}, {"id": "shape::1793613540208_fesoxw", "type": "shape", "label": "Design Element", "x": 6.5504, "y": 4.6394, "width": 220, "height": 99, "shape": "square", "radius": 12, "color": "#d9d9d9", "fillOpacity": 100, "borderWidth": 2, "borderColor": "#444444", "opacity": 100, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613897110_jxw3ri"}, {"id": "shape::1793613586917_a6es9p", "type": "shape", "label": "Design Element", "x": 6.5544, "y": 37.0835, "width": 220, "height": 99, "shape": "square", "radius": 12, "color": "#d9d9d9", "fillOpacity": 100, "borderWidth": 2, "borderColor": "#444444", "opacity": 100, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613900753_cmj2yv"}, {"id": "shape::1793613607821_9mf4we", "type": "shape", "label": "Design Element", "x": 6.5544, "y": 69.342, "width": 220, "height": 99, "shape": "square", "radius": 12, "color": "#d9d9d9", "fillOpacity": 100, "borderWidth": 2, "borderColor": "#444444", "opacity": 100, "groupId": "group::1793612842759_qbpy8t"}, {"kind": "color", "image": "", "imageScale": 100, "x": 35.4948, "y": 5.9713, "size": 227, "shape": "square", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": null, "label": "FREECAM", "type": "camera", "name": "FREECAM", "color": "#ffffff", "id": "camera::FREECAM", "width": 227, "height": 62, "z": 3}, {"id": "text::1793614005608_n4mqu4", "type": "text", "label": "EXTERIOR", "color": "#000000", "fontSize": 30, "x": 38.4304, "y": 6.9599, "groupId": null, "gid": "egroup::1793614005608_mgtk5z"}, {"kind": "color", "image": "", "imageScale": 100, "x": 50.3385, "y": 5.9713, "size": 46, "shape": "square", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": null, "label": "DASHCAM", "type": "camera", "name": "DASHCAM", "color": "#ffffff", "id": "camera::1793614052389_gdh8k7", "width": 227, "height": 61, "z": 4, "hidden": false}, {"id": "text::1793614052389_lohkgi", "type": "text", "label": "INTERIOR", "color": "#000000", "fontSize": 30, "x": 53.4068, "y": 6.9599, "groupId": null, "gid": "egroup::1793614052389_lmnyaf", "hidden": false}, {"kind": "color", "image": "", "imageScale": 100, "x": 41.2338, "y": 78.9187, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "Anim Set 1", "type": "anim_combo", "name": "Anim Set 1", "color": "#ffffff", "id": "anim_combo::Anim Set 1", "width": 46, "height": 46}, {"kind": "color", "image": "", "imageScale": 100, "x": 21.875, "y": 8.125, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": null, "label": "BLINKERS", "type": "geo_anim", "name": "__geov__GEOMETRIES_BLINKERS", "color": "#16a085", "id": "geo_anim::__geov__GEOMETRIES_BLINKERS"}]/*WCE_OVERLAYS_END*/;
+const WCE_THEME = /*WCE_THEME_START*/{"colors": {"bg": "#0a0a0b", "panel": "#101013", "border": "#1c1c22", "accent": "#c8a96e", "a2": "#4a8cff", "ok": "#4caf7d", "hot": "#ff6b35", "cam": "#9b59b6", "text": "#e2ddd6", "muted": "#52526a"}, "panel2Bg": "#000000", "panel2Opacity": 100, "panelLayout": "tabs", "panelWidth": 300, "panelHidden": false, "deviceOverrides": {"mobileH": null, "mobileV": null}, "typography": {"family": "Rajdhani", "size": 100, "letterSpacing": 0.07, "weight": 500, "italic": false, "transform": "lowercase"}, "groups": [{"id": "primary", "label": "Global", "selectors": [".pb2", ".gb", ".tb", ".anim-btn", ".cam-btn", ".tt-btn", ".vc", ".tnb", ".cin-btn", "#ar-btn", ".wce-overlay-action-btn", ".sr select"], "shape": "rounded", "radius": 3, "padY": 7, "padX": 10, "borderWidth": 1}], "overlays": [{"kind": "color", "image": "", "imageScale": 100, "x": 23.8961, "y": 47.1474, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "LIGHTS ON", "type": "geo_subset", "name": "LIGHTS_ON", "uid": "bce0a0cbc8534f13b8a62911b6d8746e", "state": {"GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_ON", "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_ON"}, "color": "#ffffff", "id": "geo_subset::bce0a0cbc8534f13b8a62911b6d8746e", "gid": "egroup::1793613900753_cmj2yv", "width": 45, "height": 46}, {"kind": "color", "image": "", "imageScale": 100, "x": 58.961, "y": 46.6681, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "LIGHTS OFF", "type": "geo_subset", "name": "LIGHTS_OFF", "uid": "e900fff89c3b43b7959b549d6a431d59", "state": {"GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_OFF", "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_OFF"}, "color": "#1a1a1a", "id": "geo_subset::e900fff89c3b43b7959b549d6a431d59", "gid": "egroup::1793613900753_cmj2yv", "width": 45, "height": 46}, {"id": "group::1793612842759_qbpy8t", "type": "group", "label": "CONFIGURE", "x": 2.7344, "y": 5, "width": 258, "height": 399, "collapsed": false, "direction": "horizontal", "opacity": 100, "_hdrInit": true, "arrowColor": "#ffffff", "arrowSize": 25, "shelfBgOpacity": 100, "shelfBg": "#292929", "expandTrigger": "header", "headerAlign": "center", "titleFontSize": 24}, {"id": "text::1793612943197_r2j3m0", "type": "text", "label": "LAMPS", "color": "#000000", "fontSize": 30, "x": 33.8941, "y": 37.5288, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613900753_cmj2yv"}, {"id": "text::1793612979161_uknind", "type": "text", "label": "COLORS", "color": "#000000", "fontSize": 30, "x": 31.5868, "y": 5.3227, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613897110_jxw3ri"}, {"kind": "color", "image": "", "imageScale": 100, "x": 11.2338, "y": 14.8994, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "WHITE", "type": "mat_subset", "name": "WHITE", "uid": "0dbb1c12f0fb4e2dad408420429842b6", "state": {"BODYPAINT": "CARPAINT_METALLIC_2_GLTF", "BODYPAINTWITHAO": "CARPAINT_METALLIC_2_GLTF.001"}, "color": "#ffffff", "id": "mat_subset::0dbb1c12f0fb4e2dad408420429842b6", "gid": "egroup::1793613897110_jxw3ri"}, {"kind": "color", "image": "", "imageScale": 100, "x": 40.4548, "y": 14.8994, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "BLUE", "type": "mat_subset", "name": "BLUE", "uid": "443ce6c179194717b9cc3fda182db324", "state": {"BODYPAINT": "CARPAINT_METALLIC_3_GLTF", "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"}, "color": "#152d8e", "id": "mat_subset::443ce6c179194717b9cc3fda182db324", "gid": "egroup::1793613897110_jxw3ri"}, {"kind": "color", "image": "", "imageScale": 100, "x": 69.6755, "y": 14.8994, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "GREY", "type": "mat_subset", "name": "GREY", "uid": "2ffb818c7ed342beaa959ecee783f1e7", "state": {"BODYPAINT": "CARPAINT_METALLIC_1_GLTF", "BODYPAINTWITHAO": "CARPAINT_METALLIC_1_GLTF.001"}, "color": "#808080", "id": "mat_subset::2ffb818c7ed342beaa959ecee783f1e7", "gid": "egroup::1793613897110_jxw3ri"}, {"id": "text::1793613397474_nvijlc", "type": "text", "label": "DOORS", "color": "#000000", "fontSize": 30, "x": 34.1274, "y": 70.1383, "groupId": "group::1793612842759_qbpy8t"}, {"id": "shape::1793613540208_fesoxw", "type": "shape", "label": "Design Element", "x": 6.5504, "y": 4.6394, "width": 220, "height": 99, "shape": "square", "radius": 12, "color": "#d9d9d9", "fillOpacity": 100, "borderWidth": 2, "borderColor": "#444444", "opacity": 100, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613897110_jxw3ri"}, {"id": "shape::1793613586917_a6es9p", "type": "shape", "label": "Design Element", "x": 6.5544, "y": 37.0835, "width": 220, "height": 99, "shape": "square", "radius": 12, "color": "#d9d9d9", "fillOpacity": 100, "borderWidth": 2, "borderColor": "#444444", "opacity": 100, "groupId": "group::1793612842759_qbpy8t", "gid": "egroup::1793613900753_cmj2yv"}, {"id": "shape::1793613607821_9mf4we", "type": "shape", "label": "Design Element", "x": 6.5544, "y": 69.342, "width": 220, "height": 99, "shape": "square", "radius": 12, "color": "#d9d9d9", "fillOpacity": 100, "borderWidth": 2, "borderColor": "#444444", "opacity": 100, "groupId": "group::1793612842759_qbpy8t"}, {"kind": "color", "image": "", "imageScale": 100, "x": 35.4948, "y": 5.9713, "size": 227, "shape": "square", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": null, "label": "FREECAM", "type": "camera", "name": "FREECAM", "color": "#ffffff", "id": "camera::FREECAM", "width": 227, "height": 62, "z": 3}, {"id": "text::1793614005608_n4mqu4", "type": "text", "label": "EXTERIOR", "color": "#000000", "fontSize": 30, "x": 38.4304, "y": 6.9599, "groupId": null, "gid": "egroup::1793614005608_mgtk5z"}, {"kind": "color", "image": "", "imageScale": 100, "x": 50.3385, "y": 5.9713, "size": 46, "shape": "square", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": null, "label": "DASHCAM", "type": "camera", "name": "DASHCAM", "color": "#ffffff", "id": "camera::1793614052389_gdh8k7", "width": 227, "height": 61, "z": 4, "hidden": false}, {"id": "text::1793614052389_lohkgi", "type": "text", "label": "INTERIOR", "color": "#000000", "fontSize": 30, "x": 53.4068, "y": 6.9599, "groupId": null, "gid": "egroup::1793614052389_lmnyaf", "hidden": false}, {"kind": "color", "image": "", "imageScale": 100, "x": 41.2338, "y": 78.9187, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#000000", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": "group::1793612842759_qbpy8t", "label": "Anim Set 1", "type": "anim_combo", "name": "Anim Set 1", "color": "#ffffff", "id": "anim_combo::Anim Set 1", "width": 46, "height": 46}, {"kind": "color", "image": "", "imageScale": 100, "x": 21.875, "y": 8.125, "size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff", "opacity": 100, "hover": {"scale": 108, "border": "auto"}, "groupId": null, "label": "BLINKERS", "type": "geo_anim", "name": "__geov__GEOMETRIES_BLINKERS", "color": "#16a085", "id": "geo_anim::__geov__GEOMETRIES_BLINKERS"}], "customGroups": [], "profiles": [], "startupProfileId": null, "thumbnailGroups": [], "highlightGroups": [], "globalThumbProps": {"size": 46, "shape": "circle", "radius": 12, "borderWidth": 2, "borderColor": "#ffffff"}, "chromeOverrides": {}, "startupPage": {"bgImage": null, "bgOpacity": 100, "iconImage": null, "iconOpacity": 100, "iconSize": 28, "colTxt": "", "colBar": "", "colErr": "#c0392b", "txtBoot": "INITIALISING", "txtInit": "LOADING CONFIG", "txtModel": "LOADING MODEL", "txtReady": "READY", "txtErr": "ERROR \u2014", "txtErrSt": "LOAD ERROR", "perStateMedia": false, "readyMinHoldMs": 0, "textOpacity": 100, "circleThickness": 1.5, "fontFamily": "", "fontSize": 10, "fontWeight": 400, "fontItalic": false}, "annotationPopup": {"bgColor": "#0a0a0c", "bgOpacity": 92, "borderColor": "#c8a96e", "borderWidth": 1, "radius": 6, "textColor": "#ffffff", "textFontSize": 14, "videoWidthPct": 26, "imageWidthPct": 26, "triggerMode": "hover", "markerColor": "#c8a96e", "markerOpacity": 100, "markerBorderWidth": 2, "markerGlow": 6}, "annotationContent": {}, "pricing": {"items": {}, "groups": []}, "mediaViewer": {"coverPct": 80, "fit": "contain", "bgMode": "dim", "dimPct": 75, "blurPx": 12, "bgColor": "#000000", "showClose": true, "closeOnBackdrop": true, "closeOnEsc": true, "anim": "fade", "animMs": 220, "radius": 6, "borderWidth": 0, "borderColor": "#ffffff", "shadow": true, "vidAutoplay": true, "vidLoop": true, "vidMuted": false, "vidControls": true}, "designerGrid": {"show": false, "color": "#000000", "snap": true, "size": 40, "level": 6, "showByMode": {"edit": false}}, "uiScale": null, "elementGroups": [{"id": "egroup::1793613897110_jxw3ri", "name": "Group 1"}, {"id": "egroup::1793613900753_cmj2yv", "name": "Group 2"}, {"id": "egroup::1793614005608_mgtk5z", "name": "Group 4"}, {"id": "egroup::1793614052389_lmnyaf", "name": "Group 7"}], "panelHiddenByDevice": {"desktop": false, "mobileV": false, "mobileH": false}}/*WCE_THEME_END*/;
 const WCE_PROFILES = /*WCE_PROFILES_START*/[]/*WCE_PROFILES_END*/;
 const WCE_THUMBNAIL_GROUPS = /*WCE_THUMBGROUPS_START*/[]/*WCE_THUMBGROUPS_END*/;
 const _initHdri = (CFG.hdris && CFG.hdris.length) ? (CFG.hdris.find(h => h.default) || CFG.hdris[0]) : null;
+const _wceBC={};
+(function(){
+  const src=CFG.mat_bc||{};
+  Object.keys(src).forEach(function(k){ _wceBC[k]=src[k]; });
+  Object.keys(src).forEach(function(k){
+    const r=CFG.mat_name_map&&CFG.mat_name_map[k];
+    if(r && !_wceBC[r]) _wceBC[r]=src[k];
+  });
+  if(!Object.keys(_wceBC).length) return;
+  const proto=THREE.Material.prototype;
+  const baseKey=proto.customProgramCacheKey;
+  function entry(m){
+    if(!m || !m.name) return null;
+    const i=m.name.indexOf('__wce_');
+    return _wceBC[i>0 ? m.name.slice(0,i) : m.name] || null;
+  }
+  function lit(v){ return (Math.round(Number(v)*10000)/10000).toFixed(4); }
+  proto.onBeforeCompile=function(sh){
+    const e=entry(this);
+    const chunk='#include <color_fragment>';
+    if(!e || !sh || !sh.fragmentShader || sh.fragmentShader.indexOf(chunk)<0) return;
+    sh.fragmentShader=sh.fragmentShader.replace(chunk, chunk+'\n  diffuseColor.rgb=max((diffuseColor.rgb-0.5)*'+lit(e.c)+'+0.5,0.0)*'+lit(e.b)+';');
+  };
+  proto.customProgramCacheKey=function(){
+    const e=entry(this);
+    return e ? ('wce-bc-'+lit(e.b)+'-'+lit(e.c)) : baseKey.call(this);
+  };
+})();
 let root=null, matMap={}, varData={}, activeV=null, geoSt={}, matSt={};
 let _hoverHulls=[];
 let _panMin=null, _panMax=null;
@@ -1180,10 +1976,18 @@ scene.add(_ambientLight);
 const cam=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,0.1,500);
 cam.position.set(0,2,((CFG.camera&&CFG.camera.zoom_max)||15.0)*0.65);
 let _activeCamFocal=null,_activeCamSensor=null;
+const _wceFitOnResize=!(CFG.camera && CFG.camera.fit_on_resize===false);
+const _wceCfgRefAspect=(CFG.camera && +CFG.camera.ref_aspect>0) ? +CFG.camera.ref_aspect : null;
+let _wceRefAspect=null;
 function _computeVFov(focal, sensorW){
   if(!focal || !sensorW) return null;
   const hFov=2*Math.atan(sensorW/(2*focal));
-  const vFov=2*Math.atan(Math.tan(hFov/2)/cam.aspect);
+  if(!_wceFitOnResize && _wceCfgRefAspect){
+    const vF=_wceCfgRefAspect>=1 ? 2*Math.atan(Math.tan(hFov/2)/_wceCfgRefAspect) : hFov;
+    return vF*180/Math.PI;
+  }
+  const asp=(_wceFitOnResize || !_wceRefAspect) ? cam.aspect : _wceRefAspect;
+  const vFov=2*Math.atan(Math.tan(hFov/2)/asp);
   return vFov*180/Math.PI;
 }
 function _wceSampleFovTrack(track, t){
@@ -1211,6 +2015,7 @@ _updateCamFov();
 cam.updateProjectionMatrix();
 let _wceZoomDef=null, _wceZoomPending=null, _wceZoomPendingT=0;
 let _wceEffFocal=null, _wceLookZoom=1, _wceBaseRotate=null;
+let _wceLastInteract=performance.now(), _wceReturning=false;
 let _lookAzMin=-Infinity, _lookAzMax=Infinity, _lookPolMin=0, _lookPolMax=Math.PI;
 const _camLockedPos=new THREE.Vector3();
 const _wcePanDown=new Set(), _wceMods={shift:false,ctrl:false,alt:false};
@@ -1281,6 +2086,13 @@ canvas.addEventListener('pointermove',function(ev){
 function _wcePtrEnd(ev){ _wcePtrs.delete(ev.pointerId); _wcePinchD=0; }
 canvas.addEventListener('pointerup',_wcePtrEnd);
 canvas.addEventListener('pointercancel',_wcePtrEnd);
+canvas.addEventListener('pointerdown',function(){ try{ window.focus(); }catch(_e){} });
+canvas.addEventListener('pointerenter',function(){
+  if(window.parent!==window && !document.hasFocus()){ try{ window.focus(); }catch(_e){} }
+});
+window.addEventListener('wheel',function(){ _wceLastInteract=performance.now(); },{passive:true});
+window.addEventListener('keydown',function(){ _wceLastInteract=performance.now(); });
+window.addEventListener('touchstart',function(){ _wceLastInteract=performance.now(); },{passive:true});
 function _wceSetupLookLimits(def, dir){
   _lookAzMin=-Infinity; _lookAzMax=Infinity; _lookPolMin=0; _lookPolMax=Math.PI;
   const L=def && def.look;
@@ -1348,6 +2160,9 @@ function _wcePanStep(dt){
   _wcePanVel.lerp(_wcePanDes,k);
   if(_wcePanDes.lengthSq()===0 && _wcePanVel.lengthSq()<1e-8){ _wcePanVel.set(0,0,0); return; }
   _wceTmpA.copy(_wcePanVel).multiplyScalar(Math.min(dt,0.1));
+  const _vm=0.015*dist;
+  _wceTmpA.y=Math.max(_wceTmpA.y, Math.min(0, FLOOR_Z+_vm-cam.position.y));
+  if(ROOF_Z!=null) _wceTmpA.y=Math.min(_wceTmpA.y, Math.max(0, ROOF_Z-_vm-cam.position.y));
   ctrl.target.add(_wceTmpA); cam.position.add(_wceTmpA);
   requestRender(200);
 }
@@ -1358,19 +2173,47 @@ function _wceTickCamExtras(dt){
       const tol=(p.lock==='free')?0.6:0.05;
       const near=Math.hypot(cam.position.x-p.position[0],cam.position.y-p.position[1],cam.position.z-p.position[2])<tol;
       if(near || performance.now()-_wceZoomPendingT>3000){
-        _wceZoomDef=p; _wceZoomPending=null; _wceEffFocal=null; _wceLookZoom=1;
+        if(near && !_camDistanceLocked && (p.lock==='zoom_pan' || p.lock==='place')){
+          if(p.lock==='place') _wceEngagePlaceLock(); else _wceEngageZoomPanLock(cam.position, ctrl.target);
+          _wceRecomputeCamPolarBounds();
+          cam.lookAt(ctrl.target);
+        }
+        _wceZoomDef=p; _wceZoomPending=null; _wceEffFocal=null; _wceLookZoom=1; _wceReturning=false; _wceLastInteract=performance.now();
       }
     }
   }
   const def=_wceZoomDef;
   if(!def){
+    _wceReturning=false;
     ctrl.enablePan=false;
+    ctrl.mouseButtons.RIGHT=null;
     if(_wceBaseRotate!=null) ctrl.rotateSpeed=_wceBaseRotate;
     return;
   }
   const panOn=_wcePanEnabled();
   ctrl.enablePan=panOn;
+  const _PC=CFG.camera && CFG.camera.pan;
+  ctrl.mouseButtons.RIGHT=(panOn && !(_PC && _PC.rmb===false)) ? THREE.MOUSE.PAN : null;
   if(panOn) _wcePanStep(dt); else if(_wcePanVel.lengthSq()>0) _wcePanVel.set(0,0,0);
+  const _rnow=performance.now();
+  if(_userInteracting || _wcePanDown.size || _wcePanVel.lengthSq()>1e-8) _wceLastInteract=_rnow;
+  if(panOn && _PC && _PC.return && def.target){
+    _wceTmpB.set(def.target[0],def.target[1],def.target[2]).sub(ctrl.target);
+    const _roff=_wceTmpB.length();
+    if(_wceReturning && (_userInteracting || _wcePanDown.size)) _wceReturning=false;
+    if(!_wceReturning && _roff>0.05 && !_userInteracting && !_wcePanDown.size
+       && _rnow-_wceLastInteract>Math.max(0.5,_PC.return_s||5)*1000){
+      _wceReturning=true; _wcePanVel.set(0,0,0);
+    }
+    if(_wceReturning){
+      if(_roff<0.004){ ctrl.target.add(_wceTmpB); cam.position.add(_wceTmpB); _wceReturning=false; }
+      else {
+        _wceTmpB.multiplyScalar(1-Math.exp(-Math.min(dt,0.1)/0.3));
+        ctrl.target.add(_wceTmpB); cam.position.add(_wceTmpB);
+      }
+      requestRender(200);
+    }
+  } else { _wceReturning=false; }
   const hasZ=!!(def.fov_zones && def.fov_zones.zones && def.fov_zones.zones.length);
   const hasLZ=_wceLookZoomActive();
   if(_wceBaseRotate==null) _wceBaseRotate=ctrl.rotateSpeed;
@@ -1907,7 +2750,11 @@ function _triggerGeoFlicker(def){
   if(typeof requestRender==='function') requestRender(totalMs+300);
 }
 const ctrl=new OrbitControls(cam,canvas);
-ctrl.enableDamping=true; ctrl.dampingFactor=0.06;
+{
+  const _od=(CFG.camera && CFG.camera.orbit_damping!=null) ? +CFG.camera.orbit_damping : 0.06;
+  if(_od>0){ ctrl.enableDamping=true; ctrl.dampingFactor=Math.min(1,_od); }
+  else { ctrl.enableDamping=false; ctrl.dampingFactor=0.06; }
+}
 ctrl.minDistance=CFG.camera.zoom_min;
 ctrl.maxDistance=CFG.camera.zoom_max;
 ctrl.enablePan=false;
@@ -1939,6 +2786,7 @@ if(_wceZoomLocked()) ctrl.enableZoom=false;
     ctrl.target.copy(cam.position).addScaledVector(fwd,3.0);
   }
   cam.lookAt(ctrl.target);
+  window._wceNearCamDef=def;
   _activeCamFocal=def.focal_length_mm||null;
   _activeCamSensor=def.sensor_width_mm||null;
   _wceZoomPending=def; _wceZoomPendingT=performance.now();
@@ -3342,7 +4190,9 @@ function _wceHandleResize(){
   const _rs=_wceResizeSeen, _prc=Math.min(window.devicePixelRatio||1,_WCE_PR_CAP);
   if(_rs.n>=2 && _rs.w===innerWidth && _rs.h===innerHeight && Math.abs(_rs.pr-_prc)<1e-6) return;
   _rs.w=innerWidth; _rs.h=innerHeight; _rs.pr=_prc; _rs.n++;
-  cam.aspect=innerWidth/innerHeight; _updateCamFov(); cam.updateProjectionMatrix();
+  cam.aspect=innerWidth/innerHeight;
+  if(_rs.n<=2 || !_wceRefAspect) _wceRefAspect=cam.aspect;
+  _updateCamFov(); cam.updateProjectionMatrix();
   const _prNow=Math.min(window.devicePixelRatio||1,_WCE_PR_CAP);
   const _prChanged=Math.abs(_prNow-renderer.getPixelRatio())>1e-6;
   if(_prChanged){ renderer.setPixelRatio(_prNow); if(typeof comp.setPixelRatio==='function') comp.setPixelRatio(_prNow); }
@@ -4033,10 +4883,38 @@ function _wceRecomputeCamPolarBounds(){
   }
 }
 const _zoomMinCenter=new THREE.Vector3(), _zoomMaxCenter=new THREE.Vector3();
+function _wcePanKeepInSpheres(){
+  let moved=false;
+  for(let pass=0; pass<2; pass++){
+    let d=cam.position.distanceTo(_zoomMaxCenter);
+    if(d>ZOOM_MAX && d>1e-6){
+      _wceTmpA.subVectors(_zoomMaxCenter,cam.position).multiplyScalar((d-ZOOM_MAX)/d);
+      cam.position.add(_wceTmpA); ctrl.target.add(_wceTmpA); moved=true;
+    }
+    d=ctrl.target.distanceTo(_zoomMaxCenter);
+    if(d>ZOOM_MAX && d>1e-6){
+      _wceTmpA.subVectors(_zoomMaxCenter,ctrl.target).multiplyScalar((d-ZOOM_MAX)/d);
+      cam.position.add(_wceTmpA); ctrl.target.add(_wceTmpA); moved=true;
+    }
+    d=cam.position.distanceTo(_zoomMinCenter);
+    if(d<ZOOM_MIN && d>1e-6){
+      _wceTmpA.subVectors(cam.position,_zoomMinCenter).multiplyScalar((ZOOM_MIN-d)/d);
+      cam.position.add(_wceTmpA); ctrl.target.add(_wceTmpA); moved=true;
+    }
+  }
+  if(moved){ if(ctrl._panOffset) ctrl._panOffset.set(0,0,0); _wcePanVel.set(0,0,0); }
+}
 function _wceApplyZoomBoundsClamp(){
   if(_camDistanceLocked) return;
-  _zoomMinCenter.set(ctrl.target.x+ZOOM_MIN_OFFSET[0], ctrl.target.y, ctrl.target.z+ZOOM_MIN_OFFSET[1]);
-  _zoomMaxCenter.set(ctrl.target.x+ZOOM_MAX_OFFSET[0], ctrl.target.y, ctrl.target.z+ZOOM_MAX_OFFSET[1]);
+  const _pd=_wceZoomDef;
+  if(_pd && _pd.lock==='free' && _pd.allow_pan && _pd.target){
+    _zoomMinCenter.set(_pd.target[0]+ZOOM_MIN_OFFSET[0], _pd.target[1], _pd.target[2]+ZOOM_MIN_OFFSET[1]);
+    _zoomMaxCenter.set(_pd.target[0]+ZOOM_MAX_OFFSET[0], _pd.target[1], _pd.target[2]+ZOOM_MAX_OFFSET[1]);
+    if(ctrl.state===2 || ctrl.state===4 || ctrl.state===5 || _wcePanVel.lengthSq()>1e-8 || _wceReturning) _wcePanKeepInSpheres();
+  } else {
+    _zoomMinCenter.set(ctrl.target.x+ZOOM_MIN_OFFSET[0], ctrl.target.y, ctrl.target.z+ZOOM_MIN_OFFSET[1]);
+    _zoomMaxCenter.set(ctrl.target.x+ZOOM_MAX_OFFSET[0], ctrl.target.y, ctrl.target.z+ZOOM_MAX_OFFSET[1]);
+  }
   let _moved=false;
   let d=cam.position.distanceTo(_zoomMinCenter);
   if(d<ZOOM_MIN && d>1e-6){
@@ -4105,12 +4983,13 @@ function flyToCamera(camName, forceTransition){
      && cam.position.distanceTo(destPos)<0.001 && ctrl.target.distanceTo(destTgt)<0.001
      && (destFov==null || Math.abs(cam.fov-destFov)<0.01
          || (_wceZoomDef===def && (def.fov_zones || (def.look && def.look.zoom_in))))){
+    _wceSetNearCam(def);
     return;
   }
   _activeCamFocal=def.focal_length_mm||null;
   _activeCamSensor=def.sensor_width_mm||null;
   _wceZoomDef=null; _wceZoomPending=def; _wceZoomPendingT=performance.now();
-  _wcePanVel.set(0,0,0); _wcePanDown.clear(); ctrl.enablePan=false;
+  _wcePanVel.set(0,0,0); _wcePanDown.clear(); ctrl.enablePan=false; _wceReturning=false;
   function _wceInstantCameraJump(){
     _camDistanceLocked=false;
     _wceSetZoomEnabled(true);
@@ -4119,6 +4998,8 @@ function flyToCamera(camName, forceTransition){
     ctrl.target.copy(destTgt);
     if(destFov!=null){ cam.fov=destFov; cam.updateProjectionMatrix(); }
     cam.lookAt(ctrl.target);
+    window._wceNearPending=null;
+    _wceSetNearCam(def);
     const _lockMode=_wceCamLockMode(def);
     if(_lockMode==='place'){
       _wceEngagePlaceLock();
@@ -4161,6 +5042,7 @@ function flyToCamera(camName, forceTransition){
   _flyEaseIn=!!def.ease_in;
   _flyEaseOut=!!def.ease_out;
   _flyPending=true; _flyActive=false;
+  window._wceNearPending=def;
   document.querySelectorAll('.cam-btn').forEach(b=>b.classList.toggle('active',b.dataset.cam===camName));
   document.querySelector('.tt-btn')?.classList.remove('active');
 }
@@ -4544,6 +5426,7 @@ function _wceResolveTrack(def){
 }
 const _matGeoActive={};
 const _matGeoWatchers={};
+const _matGeoStopping={};
 function _matGeoResolve(kind, def, variantName){
   if(def.source_type==='container'){ const _st={}; _st[def.container]=variantName; return {name:variantName, state:_st}; }
   if(def.source_type==='geo_variant'){ const _ch=(def.variant_chains||{})[variantName]; return (_ch&&_ch.length)?{name:variantName, chain:_ch, state:null}:undefined; }
@@ -4598,6 +5481,16 @@ function _matGeoStep(kind, def){
   def._idx = next;
   _matGeoApplyVariant(kind, def, order[def._idx]);
 }
+function _matGeoStopTargetIdx(def){
+  const c=def.cycle||{};
+  if(def.play_mode==='step' || c.stop_mode!=='target' || !c.stop_target) return -1;
+  return (def.play_order||[]).indexOf(c.stop_target);
+}
+function _matGeoHalt(key){
+  _matGeoActive[key] = false;
+  delete _matGeoStopping[key];
+  if(_matGeoWatchers[key]){ clearTimeout(_matGeoWatchers[key]); delete _matGeoWatchers[key]; }
+}
 function _matGeoScheduleNext(kind, def){
   const key = def.source_key;
   if(_matGeoWatchers[key]) return;
@@ -4606,6 +5499,7 @@ function _matGeoScheduleNext(kind, def){
     delete _matGeoWatchers[key];
     if(!_matGeoActive[key]) return;
     _matGeoStep(kind, def);
+    if(_matGeoStopping[key] && def._idx===_matGeoStopTargetIdx(def)){ _matGeoHalt(key); return; }
     _matGeoScheduleNext(kind, def);
   }, pauseMs);
 }
@@ -4615,10 +5509,22 @@ function triggerMatGeoAnim(kind, sourceKey){
   if(!def) return;
   const key = def.source_key;
   if(_matGeoActive[key]){
-    _matGeoActive[key] = false;
-    if(_matGeoWatchers[key]){ clearTimeout(_matGeoWatchers[key]); delete _matGeoWatchers[key]; }
+    const ti = _matGeoStopTargetIdx(def);
+    if(ti>=0 && !_matGeoStopping[key]){
+      const order = def.play_order||[];
+      const showing = _matGeoShowingIdx(kind, def);
+      const cur = showing>=0 ? showing : def._idx;
+      if(cur===ti){ _matGeoHalt(key); return; }
+      if(def.cycle.stop_reach==='jump'){
+        _matGeoHalt(key); def._idx = ti; _matGeoApplyVariant(kind, def, order[ti]); return;
+      }
+      _matGeoStopping[key] = true;
+      return;
+    }
+    _matGeoHalt(key);
     return;
   }
+  delete _matGeoStopping[key];
   _matGeoActive[key] = true;
   _matGeoStep(kind, def);
   _matGeoScheduleNext(kind, def);
@@ -5604,13 +6510,42 @@ function _initAnnotations(){
   }
 }
 const _hsRay=new THREE.Raycaster();
-const HOTSPOT_OCCLUSION_BIAS=0.12;
+const HOTSPOT_OCCLUSION_BIAS=(typeof CFG!=='undefined' && CFG && CFG.hotspot_occlusion_bias!=null) ? +CFG.hotspot_occlusion_bias : 0.06;
+function _wceSetNearCam(def){
+  window._wceNearCamDef=def;
+  try{ _hsViewSeq++; }catch(e){}
+  try{ if(typeof requestRender==='function') requestRender(800); }catch(e){}
+}
+function _wceCamHides(p0){
+  const d=window._wceNearCamDef, L=d && d.hide_items;
+  if(!L || !L.length || !p0) return false;
+  for(let i=0;i<L.length;i++){
+    const q=L[i].pos;
+    if(Math.abs(q[0]-p0.x)<0.003 && Math.abs(q[1]-p0.y)<0.003 && Math.abs(q[2]-p0.z)<0.003) return true;
+  }
+  return false;
+}
+function _wceNearFade(dist,kind){
+  const _cd=window._wceNearCamDef;
+  let n=null;
+  if(_cd){ const v=(kind==='img') ? _cd.hide_image_dist : _cd.hide_hotspot_dist; if(v!=null) n=+v; }
+  if(n==null) n=(typeof CFG!=='undefined' && CFG && CFG.near_hide_distance!=null) ? +CFG.near_hide_distance : 0.5;
+  if(!(n>0)) return 1;
+  const t=(dist-n)/(n*0.5);
+  if(t<=0) return 0;
+  if(t>=1) return 1;
+  return t*t*(3-2*t);
+}
 const _hsDir=new THREE.Vector3();
 const _hsTmpV=new THREE.Vector3();
 const _HS_SAMPLES=[[0,0]];
 const _HS_NDC={x:0,y:0};
-const _HS_OCC_INTERVAL_MS=100;
+const _HS_OCC_INTERVAL_MS=50;
+const _HS_SCENE_RECHECK_MS=200;
+let _hsLastScene=0,_hsSceneTick=false;
 let _hsCamX=1e9,_hsCamY=1e9,_hsCamZ=1e9,_hsCamMoved=true;
+let _hsQx=9,_hsQy=9,_hsQz=9,_hsQw=9,_hsFov=-1,_hsAsp=-1,_hsViewMoved=true;
+let _hsViewSeq=0;
 let _hsFrame=0;
 function _hsSampleOccluded(nx,ny,distToHs){
   if(!root||!_occluderMeshes.length) return false;
@@ -5627,24 +6562,35 @@ function _hsSampleOccluded(nx,ny,distToHs){
 }
 function _tickHotspots(){
   _hsFrame++;
+  if(window._wceNearPending && !_flyActive && !_flyPending){ const _pd=window._wceNearPending; window._wceNearPending=null; _wceSetNearCam(_pd); }
   const _uiK=1/(window.__wceUiScale||1);
   const W=innerWidth*_uiK,H=innerHeight*_uiK;
   const cp=cam.position;
   _hsCamMoved=(Math.abs(cp.x-_hsCamX)+Math.abs(cp.y-_hsCamY)+Math.abs(cp.z-_hsCamZ))>1e-4;
   if(_hsCamMoved){ _hsCamX=cp.x; _hsCamY=cp.y; _hsCamZ=cp.z; }
+  const _cq=cam.quaternion;
+  _hsViewMoved=_hsCamMoved
+    || (Math.abs(_cq.x-_hsQx)+Math.abs(_cq.y-_hsQy)+Math.abs(_cq.z-_hsQz)+Math.abs(_cq.w-_hsQw))>1e-5
+    || Math.abs(cam.fov-_hsFov)>1e-4 || Math.abs(cam.aspect-_hsAsp)>1e-5;
+  const _hsT=performance.now(); _hsSceneTick=(_hsT-_hsLastScene)>_HS_SCENE_RECHECK_MS; if(_hsSceneTick) _hsLastScene=_hsT;
+  if(_hsSceneTick) _hsViewMoved=true;
+  if(_hsViewMoved){ _hsQx=_cq.x; _hsQy=_cq.y; _hsQz=_cq.z; _hsQw=_cq.w; _hsFov=cam.fov; _hsAsp=cam.aspect; _hsViewSeq++; }
   hotspots.forEach((hs,idx)=>{
+    if(!hs._p0) hs._p0=hs.pos.clone();
     if(hs.hidden){ hs.el.style.display='none'; return; }
     if(hs.track){ hs.track.node.localToWorld(hs.pos.copy(hs.track.offset)); }
-    if(hs.op!=null && hs.op<0.012 && !_hsCamMoved && !hs.track) return;
+    if(hs.op!=null && hs.op<0.012 && hs._seq===_hsViewSeq && !hs.track) return;
     if(hs._offScreen && (_hsFrame%3)!==(idx%3)){
       if(hs.op>0.012){hs.op*=0.8; hs.el.style.opacity=hs.op.toFixed(3); if(hs.op<0.012) hs.el.style.display='none';}
       return;
     }
     _hsTmpV.copy(hs.pos).project(cam);
     if(!isFinite(_hsTmpV.x)||!isFinite(_hsTmpV.y)||!isFinite(_hsTmpV.z)) return;
+    hs._seq=_hsViewSeq;
     let target;
     if(_hsTmpV.z>1||_hsTmpV.x<-1.3||_hsTmpV.x>1.3||_hsTmpV.y<-1.3||_hsTmpV.y>1.3){
       hs._offScreen=true; target=0;
+      if(_hsCamMoved) hs.vis=null;
     } else {
       hs._offScreen=false;
       const sx=(_hsTmpV.x*0.5+0.5)*W, sy=(-_hsTmpV.y*0.5+0.5)*H;
@@ -5652,7 +6598,7 @@ function _tickHotspots(){
       hs.el.style.top =sy+'px';
       const _nowMs=performance.now();
       const _stagger=idx*(_HS_OCC_INTERVAL_MS/Math.max(1,hotspots.length));
-      if(hs.vis==null || (_hsCamMoved && (_nowMs-(hs._lastOcc||0))>=_HS_OCC_INTERVAL_MS)){
+      if(hs.vis==null || _hsSceneTick || (_hsCamMoved && (_nowMs-(hs._lastOcc||0))>=_HS_OCC_INTERVAL_MS)){
         hs._lastOcc=_nowMs+_stagger;
         _hsDir.copy(hs.pos).sub(cam.position);
         const distToHs=_hsDir.length();
@@ -5667,8 +6613,9 @@ function _tickHotspots(){
         hs.vis=v*v*(3-2*v);
       }
       target=hs.vis;
+      if(!hs.isAnnotation){ target*=_wceNearFade(hs.pos.distanceTo(cam.position),'hs'); if(_flyActive||_flyPending||_wceCamHides(hs._p0)) target=0; }
     }
-    hs.op=(hs.op==null)?target:hs.op+(target-hs.op)*0.3;
+    hs.op=(hs.op==null)?target:hs.op+(target-hs.op)*(target<hs.op?0.7:0.3);
     if(hs.op<0.012){
       hs.el.style.display='none';
     } else {
@@ -5751,18 +6698,21 @@ function _tickImgTriggers(){
   const _uiK=1/(window.__wceUiScale||1);
   const W=innerWidth*_uiK, H=innerHeight*_uiK;
   const _nowMs=performance.now();
-  const _OCC_MS=100;
+  const _OCC_MS=_HS_OCC_INTERVAL_MS;
   _imgTriggers.forEach((it,idx)=>{
+    if(!it._p0) it._p0=it.worldPos.clone();
     if(it.hidden){ it.el.style.display='none'; return; }
     if(it.track){ it.track.node.localToWorld(it.worldPos.copy(it.track.offset)); }
-    if(it.op!=null && it.op<0.012 && !_hsCamMoved && !it.track){ it.el.style.display='none'; return; }
+    if(it.op!=null && it.op<0.012 && it._seq===_hsViewSeq && !it.track){ it.el.style.display='none'; return; }
     if(it._offScreen && (_hsFrame%2)!==(idx%2)){
       if(it.op>0.012){it.op*=0.8; it.el.style.opacity=it.op.toFixed(3);}
       return;
     }
     _hsTmpV.copy(it.worldPos).project(cam);
+    it._seq=_hsViewSeq;
     if(_hsTmpV.z>1||_hsTmpV.x<-1.4||_hsTmpV.x>1.4||_hsTmpV.y<-1.4||_hsTmpV.y>1.4){
       it._offScreen=true; it.op=(it.op??0)*0.7;
+      if(_hsCamMoved) it.vis=null;
       if(it.op<0.012){ it.el.style.display='none'; }
       return;
     }
@@ -5770,7 +6720,7 @@ function _tickImgTriggers(){
     const sx=(_hsTmpV.x*0.5+0.5)*W;
     const sy=(-_hsTmpV.y*0.5+0.5)*H;
     const _stagger=idx*(_OCC_MS/Math.max(1,_imgTriggers.length));
-    if(it.vis==null||(_hsCamMoved&&(_nowMs-(it._lastOcc||0))>=_OCC_MS)){
+    if(it.vis==null||_hsSceneTick||(_hsCamMoved&&(_nowMs-(it._lastOcc||0))>=_OCC_MS)){
       it._lastOcc=_nowMs+_stagger;
       _hsDir.copy(it.worldPos).sub(cam.position);
       const dist=_hsDir.length();
@@ -5779,8 +6729,8 @@ function _tickImgTriggers(){
       const hits=_hsRay.intersectObjects(_occluderMeshes,false);
       it.vis=hits.length===0?1:0;
     }
-    const target=it.vis??0;
-    it.op=(it.op==null)?target:it.op+(target-it.op)*0.3;
+    const target=(_flyActive||_flyPending||_wceCamHides(it._p0)) ? 0 : (it.vis??0)*_wceNearFade(it.worldPos.distanceTo(cam.position),'img');
+    it.op=(it.op==null)?target:it.op+(target-it.op)*(target<it.op?0.7:0.3);
     if(it.op<0.012){
       it.el.style.display='none';
       return;
@@ -5911,6 +6861,14 @@ let _wceOcean=null;
         cam.position.x+=_dx; cam.position.y+=_dy; cam.position.z+=_dz;
         if(ctrl._panOffset) ctrl._panOffset.set(0,0,0);
       }
+    }
+    if(_wceZoomDef && _wceZoomDef.lock==='free' && _wceZoomDef.allow_pan && !_camDistanceLocked
+       && (ctrl.state===2 || ctrl.state===4 || ctrl.state===5)){
+      const _pm=0.015*Math.max(0.05,cam.position.distanceTo(ctrl.target));
+      let _py=0;
+      if(cam.position.y<FLOOR_Z+_pm) _py=FLOOR_Z+_pm-cam.position.y;
+      else if(ROOF_Z!=null && cam.position.y>ROOF_Z-_pm) _py=ROOF_Z-_pm-cam.position.y;
+      if(_py){ ctrl.target.y+=_py; cam.position.y+=_py; if(ctrl._panOffset) ctrl._panOffset.set(0,0,0); }
     }
   }
   }
@@ -6218,8 +7176,8 @@ function _arInvalidate(){
 _initAR();
 const ldEl=document.getElementById('ld'),lbEl=document.getElementById('lb'),lbwEl=document.getElementById('lbw'),
       ltEl=document.getElementById('lt'),stEl=document.getElementById('st'),licEl=document.getElementById('lic');
-const SU_TXT=/*WCE_STARTUP_TEXT_START*/{"init": "LOADING CONFIG", "model": "LOADING MODEL", "ready": "READY"}/*WCE_STARTUP_TEXT_END*/;
-const prog=(p,m)=>{const pc=Math.min(100,Math.max(0,p));lbEl.style.width=pc+'%';if(licEl)licEl.style.left=pc+'%';if(m!=null)ltEl.textContent=m;};
+const SU_TXT=/*WCE_STARTUP_TEXT_START*/{"init": "", "model": "", "ready": ""}/*WCE_STARTUP_TEXT_END*/;
+const prog=(p,m)=>{const pc=Math.min(100,Math.max(0,p));lbEl.style.width=pc+'%';if(licEl){licEl.style.left=pc+'%';if(licEl.dataset.road)licEl.style.transform='translateX(-'+pc+'%)';}if(m!=null)ltEl.textContent=m;};
 const SU_STATE_MEDIA=/*WCE_STARTUP_STATE_MEDIA_START*/{"boot": {"imageUrl": "", "videoUrl": "", "videoKey": "", "imageFit": "fill", "videoFit": "fill", "imageOpacity": 100, "videoOpacity": 100, "videoLoop": true, "videoMuted": true, "videoContinuity": "continue"}, "init": {"imageUrl": "", "videoUrl": "", "videoKey": "", "imageFit": "fill", "videoFit": "fill", "imageOpacity": 100, "videoOpacity": 100, "videoLoop": true, "videoMuted": true, "videoContinuity": "continue"}, "model": {"imageUrl": "", "videoUrl": "", "videoKey": "", "imageFit": "fill", "videoFit": "fill", "imageOpacity": 100, "videoOpacity": 100, "videoLoop": true, "videoMuted": true, "videoContinuity": "continue"}, "ready": {"imageUrl": "", "videoUrl": "", "videoKey": "", "imageFit": "fill", "videoFit": "fill", "imageOpacity": 100, "videoOpacity": 100, "videoLoop": true, "videoMuted": true, "videoContinuity": "continue"}, "error": {"imageUrl": "", "videoUrl": "", "videoKey": "", "imageFit": "fill", "videoFit": "fill", "imageOpacity": 100, "videoOpacity": 100, "videoLoop": true, "videoMuted": true, "videoContinuity": "continue"}}/*WCE_STARTUP_STATE_MEDIA_END*/;
 const _suWarm={};
 let _suPending=null;
@@ -6920,10 +7878,12 @@ async function _onModelLoaded(gltf){
     try{ window._builtinActive=_builtinActive; }catch(e){}
     try{ window._keepPlayingActive=_keepPlayingActive; }catch(e){}
     try{ window._matGeoActive=_matGeoActive; }catch(e){}
+    try{ window._matGeoStopping=_matGeoStopping; }catch(e){}
     try{ window._geoFlickerTimers=_geoFlickerTimers; }catch(e){}
     window.camCfg=camCfg; window._TRANS=_TRANS; window.SFX=SFX; window._defId=_defId; window._animDefByRef=_animDefByRef;
     window.triggerAnim=triggerAnim; window.flyToAnimState=flyToAnimState; window.flyToCamera=flyToCamera;
     window.triggerMatGeoAnim=triggerMatGeoAnim; window._matGeoStep=_matGeoStep;
+    window.buildMatGeoAnimUI=buildMatGeoAnimUI;
     window._isFlyActive=function(){return _flyActive||_flyPending;};
     window.applyMat=applyMat; window.applyGeoSubset=applyGeoSubset;
     window.applyGeoToggle=applyGeoToggle; window.applyVariant=applyVariant; window._wceResolveWantedMat=_wceResolveWantedMat;

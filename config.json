@@ -2,13 +2,13 @@
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF"
+      "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
-      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
+      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_1_GLTF.001"
     ]
   },
@@ -16,13 +16,13 @@
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF"
+      "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
-      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
+      "CARPAINT_METALLIC_3_GLTF.001",
       "CARPAINT_METALLIC_1_GLTF.001"
     ]
   },
@@ -30,14 +30,36 @@
     "items": []
   },
   "mat_colors": {
-    "CARPAINT_METALLIC_3_GLTF": {
+    "CARPAINT_METALLIC_3_GLTF.001": {
       "color": [
-        0.026241226121783257,
-        0.04970657825469971,
-        0.09989875555038452
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
       ],
-      "metallic": 0.5,
-      "roughness": 0.1,
+      "metallic": 0.3776,
+      "roughness": 0.0544,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_2_GLTF.001": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.1329,
+      "roughness": 0.25,
       "emissive": [
         1.0,
         1.0,
@@ -45,7 +67,73 @@
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
+      "clearcoatRoughness": 0.65,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.0,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_1_GLTF": {
+      "color": [
+        0.05690384283661842,
+        0.05287881940603256,
+        0.05287881940603256
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0544,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0544,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_2_GLTF": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.113,
+      "roughness": 0.088,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.65,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
@@ -54,113 +142,71 @@
     },
     "CARPAINT_METALLIC_1_GLTF.001": {
       "color": [
-        0.06812375783920288,
-        0.06812379509210587,
-        0.07157954573631287
+        0.05690384283661842,
+        0.05287881940603256,
+        0.05287881940603256
       ],
-      "metallic": 0.5,
-      "roughness": 0.1,
+      "metallic": 0.3776,
+      "roughness": 0.0544,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2137,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
       "ior": 1.5,
-      "specularIntensity": 0.2734
+      "specularIntensity": 0.0498
+    }
+  },
+  "mat_bc": {
+    "Driver Seat": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_2_GLTF": {
-      "color": [
-        0.7071032524108887,
-        0.7071032524108887,
-        0.7071032524108887
-      ],
-      "metallic": 0.5,
-      "roughness": 0.25,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "DRIVER SEAT": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_2_GLTF.001": {
-      "color": [
-        0.7071032524108887,
-        0.7071032524108887,
-        0.7071032524108887
-      ],
-      "metallic": 0.5,
-      "roughness": 0.25,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "PASS_SEAT.001": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_3_GLTF.001": {
-      "color": [
-        0.026241226121783257,
-        0.04970657825469971,
-        0.09989875555038452
-      ],
-      "metallic": 0.5,
-      "roughness": 0.1,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "Passenger Seat": {
+      "b": 2.5,
+      "c": 1.0
     },
-    "CARPAINT_METALLIC_1_GLTF": {
-      "color": [
-        0.06812375783920288,
-        0.06812379509210587,
-        0.07157954573631287
-      ],
-      "metallic": 0.5,
-      "roughness": 0.1,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.2024,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+    "PERFORATION 1.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "DRIVER SEAT.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "PERFORATION 1.003": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "PERFORATION.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "REAR SEAT.001": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "PERFORATION 1.005": {
+      "b": 2.5,
+      "c": 1.0
+    },
+    "REAR SEAT.003": {
+      "b": 2.5,
+      "c": 1.0
     }
   },
   "light_mat_links": [],
@@ -180,44 +226,86 @@
           "children": []
         }
       ]
+    },
+    "GEOMETRIES_LAMPS": {
+      "name": "GEOMETRIES_LAMPS",
+      "enabled": true,
+      "children": [
+        {
+          "name": "GEOMETRIES_LAMPS_ON",
+          "enabled": true,
+          "children": []
+        },
+        {
+          "name": "GEOMETRIES_LAMPS_OFF",
+          "enabled": true,
+          "children": []
+        }
+      ]
+    },
+    "GEOMETRIES_BLINKERS": {
+      "name": "GEOMETRIES_BLINKERS",
+      "enabled": true,
+      "children": [
+        {
+          "name": "GEOMETRIES_BLINKERS_ON",
+          "enabled": true,
+          "children": []
+        },
+        {
+          "name": "GEOMETRIES_BLINKERS_OFF",
+          "enabled": true,
+          "children": []
+        }
+      ]
     }
   },
   "geometry_subsets": [
     {
-      "name": "Geo Set 1",
+      "name": "LIGHTS_ON",
       "uid": "bce0a0cbc8534f13b8a62911b6d8746e",
       "state": {
-        "LIGHTS": "NONE",
-        "ENVIRONMENTS": "NONE"
+        "GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_ON",
+        "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_ON",
+        "GEOMETRIES_BLINKERS": "GEOMETRIES_BLINKERS_ON"
+      }
+    },
+    {
+      "name": "LIGHTS_OFF",
+      "uid": "e900fff89c3b43b7959b549d6a431d59",
+      "state": {
+        "GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+        "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_OFF",
+        "GEOMETRIES_BLINKERS": "GEOMETRIES_BLINKERS_OFF"
       }
     }
   ],
   "mat_subset_categories": [
-    "PAINT"
+    "PAINTS"
   ],
   "mat_subsets": [
     {
-      "name": "BLUE",
-      "uid": "dd82b36b51f94b529fae4e1e3db925af",
-      "category": "PAINT",
-      "state": {
-        "BODYPAINT": "CARPAINT_METALLIC_3_GLTF",
-        "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"
-      }
-    },
-    {
       "name": "WHITE",
-      "uid": "b3172618f78842df811803876ba27878",
-      "category": "PAINT",
+      "uid": "0dbb1c12f0fb4e2dad408420429842b6",
+      "category": "PAINTS",
       "state": {
         "BODYPAINT": "CARPAINT_METALLIC_2_GLTF",
         "BODYPAINTWITHAO": "CARPAINT_METALLIC_2_GLTF.001"
       }
     },
     {
+      "name": "BLUE",
+      "uid": "443ce6c179194717b9cc3fda182db324",
+      "category": "PAINTS",
+      "state": {
+        "BODYPAINT": "CARPAINT_METALLIC_3_GLTF",
+        "BODYPAINTWITHAO": "CARPAINT_METALLIC_3_GLTF.001"
+      }
+    },
+    {
       "name": "GREY",
-      "uid": "11bbb0f2676d4addac4f6e0677e5f069",
-      "category": "PAINT",
+      "uid": "2ffb818c7ed342beaa959ecee783f1e7",
+      "category": "PAINTS",
       "state": {
         "BODYPAINT": "CARPAINT_METALLIC_1_GLTF",
         "BODYPAINTWITHAO": "CARPAINT_METALLIC_1_GLTF.001"
@@ -227,7 +315,59 @@
   "global_mat_sets": [],
   "mat_animations": [],
   "sounds": [],
-  "geo_animations": [],
+  "geo_animations": [
+    {
+      "source_key": "__geov__GEOMETRIES_BLINKERS",
+      "label": "BLINKERS",
+      "play_mode": "cycle",
+      "transition_sec": 0.0,
+      "play_order": [
+        "GEOMETRIES_BLINKERS_OFF",
+        "GEOMETRIES_BLINKERS_ON"
+      ],
+      "cycle": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": [],
+        "start_mode": "trigger",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "pause_sec": 0.5,
+        "stop_mode": "target",
+        "stop_target": "GEOMETRIES_BLINKERS_OFF",
+        "stop_reach": "jump"
+      },
+      "step": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": []
+      },
+      "source_type": "geo_variant",
+      "geo_parent": "GEOMETRIES_BLINKERS",
+      "variant_chains": {
+        "GEOMETRIES_BLINKERS_OFF": [
+          {
+            "parent": "GEOMETRIES_BLINKERS",
+            "child": "GEOMETRIES_BLINKERS_OFF",
+            "siblings": [
+              "GEOMETRIES_BLINKERS_ON",
+              "GEOMETRIES_BLINKERS_OFF"
+            ]
+          }
+        ],
+        "GEOMETRIES_BLINKERS_ON": [
+          {
+            "parent": "GEOMETRIES_BLINKERS",
+            "child": "GEOMETRIES_BLINKERS_ON",
+            "siblings": [
+              "GEOMETRIES_BLINKERS_ON",
+              "GEOMETRIES_BLINKERS_OFF"
+            ]
+          }
+        ]
+      }
+    }
+  ],
   "area_lights": [],
   "light_shadows": {},
   "light_intensity_divisors": {},
@@ -280,14 +420,14 @@
     },
     "aa": {
       "enabled": true,
-      "desktop_method": "FXAA",
+      "desktop_method": "MSAA_FXAA",
       "mobile_method": "FXAA",
       "fallback_method": "FXAA",
       "msaa_samples": 4,
       "msaa_max_pixel_ratio": 1.5,
       "idle_enabled": true,
       "idle_frames": 16,
-      "idle_delay_ms": 200,
+      "idle_delay_ms": 50,
       "idle_mobile": true,
       "snapshot_max_quality": true,
       "lowend_downgrade": true,
@@ -298,15 +438,16 @@
   },
   "mat_name_map": {},
   "default_geo_state": {
-    "LIGHTS": "NONE",
-    "ENVIRONMENTS": "NONE"
+    "GEOMETRIES_INTERIOR_LIGHTS": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+    "GEOMETRIES_LAMPS": "GEOMETRIES_LAMPS_OFF",
+    "GEOMETRIES_BLINKERS": "GEOMETRIES_BLINKERS_OFF"
   },
   "default_variant": null,
   "default_global_set": null,
   "default_mat_subsets": [
     {
-      "name": "BLUE",
-      "category": "PAINT"
+      "name": "GREY",
+      "category": "PAINTS"
     }
   ],
   "default_sound_on": true,
@@ -317,7 +458,8 @@
   "startup_sound_loop": false,
   "startup_sound": "",
   "camera": {
-    "zoom_min": 1.46,
+    "orbit_damping": 0.25,
+    "zoom_min": 4.366,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -330,8 +472,13 @@
     "floor_z": 0.0,
     "lock_zoom": "off",
     "lock_zoom_phone": false,
+    "fit_on_resize": false,
+    "ref_aspect": 1.77778,
     "pan": {
       "speed": 0.3,
+      "rmb": true,
+      "return": false,
+      "return_s": 5.0,
       "bindings": [
         {
           "action": "left",
@@ -371,7 +518,7 @@
         }
       ]
     },
-    "focal_length_mm": 50.0,
+    "focal_length_mm": 20.0,
     "sensor_width_mm": 36.0,
     "roof_z": null
   },
@@ -397,7 +544,7 @@
       "file": "hdri/environment_1.hdr",
       "strength": 1.0,
       "background": false,
-      "rotation_z": 0.0,
+      "rotation_z": -10.89,
       "flatten_ground": false,
       "ground_height": -1.0,
       "ground_radius": 25.0,
@@ -414,7 +561,7 @@
       "ground_contrast": 0.0,
       "ground_skybox_file": null,
       "grade_exposure": 0.0,
-      "grade_brightness": 1.3,
+      "grade_brightness": 1.2,
       "grade_contrast": 1.1,
       "grade_saturation": 1.1,
       "grade_bloom": 0.1,
@@ -444,7 +591,7 @@
     "env_rotation": [
       0.0,
       0.0,
-      0.0
+      -10.89
     ],
     "env_scale": [
       1.0,
@@ -483,6 +630,7 @@
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -506,6 +654,7 @@
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -529,6 +678,7 @@
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -552,6 +702,7 @@
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -575,6 +726,7 @@
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -598,6 +750,7 @@
         "anim_type": "SCENE",
         "states": 2,
         "trigger": "button",
+        "hidden_ui": true,
         "state_names": [
           "Start",
           "End"
@@ -617,8 +770,514 @@
         "id": "control:SLIDING_NLA"
       }
     ],
-    "combos": [],
-    "sequences": []
+    "combos": [
+      {
+        "name": "Anim Set 1",
+        "members": [
+          "PASS_DOOR_NLA",
+          "DRIVER_DOOR_NLA",
+          "FOOTSTEP_NLA",
+          "RR_RH_DOOR_NLA",
+          "RR_LH_DOOR_NLA",
+          "SLIDING_NLA"
+        ],
+        "trigger": "button",
+        "states": 2,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "member_fracs": {
+          "PASS_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "DRIVER_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "FOOTSTEP_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_RH_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_LH_DOOR_NLA": [
+            0.0,
+            1.0
+          ],
+          "SLIDING_NLA": [
+            0.0,
+            1.0
+          ]
+        },
+        "playback_mode": "PINGPONG",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "combo",
+        "id": "combo:Anim Set 1",
+        "member_ids": [
+          "control:PASS_DOOR_NLA",
+          "control:DRIVER_DOOR_NLA",
+          "control:FOOTSTEP_NLA",
+          "control:RR_RH_DOOR_NLA",
+          "control:RR_LH_DOOR_NLA",
+          "control:SLIDING_NLA"
+        ]
+      }
+    ],
+    "sequences": [
+      {
+        "name": "DASHCAM_GOING_IN",
+        "trigger": "image",
+        "label": "DASHCAM_GOING_IN",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "Interior.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          -1.2213,
+          0.5183,
+          1.1614
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.19,
+        "image_height": 0.19,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "DASHCAM",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "DASHCAM",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "FIRST_ROW",
+        "trigger": "image",
+        "label": "FIRST_ROW",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "FrontSeat.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          0.8162,
+          1.2373,
+          0.5923
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "FIRSTROW",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "FIRSTROW",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "LAST_ROW",
+        "trigger": "image",
+        "label": "LAST_ROW",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "RearSeat.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          2.4311,
+          1.2867,
+          0.6467
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "REARSEAT",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "REARSEAT",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "DASHCAM_IN",
+        "trigger": "image",
+        "label": "DASHCAM_IN",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "Interior.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          -1.1257,
+          1.169,
+          0.0049
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "DASHCAM",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "DASHCAM",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "FREECAM",
+        "trigger": "image",
+        "label": "FREECAM",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "image_file": "Exterior.png",
+        "image_opacity": 0.85,
+        "image_position": [
+          -1.6765,
+          0.6274,
+          0.7004
+        ],
+        "image_rotation_x": 0.0,
+        "image_rotation_y": 0.0,
+        "image_rotation_z": 0.0,
+        "image_width": 0.1133,
+        "image_height": 0.1133,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "flyto",
+            "action_name": "FREECAM",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "FREECAM",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "LAMP_ON",
+        "trigger": "button",
+        "label": "LAMP_ON",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_INTERIOR_LIGHTS",
+                "child": "GEOMETRIES_INTERIOR_LIGHTS_ON",
+                "siblings": [
+                  "GEOMETRIES_INTERIOR_LIGHTS_ON",
+                  "GEOMETRIES_INTERIOR_LIGHTS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_LAMPS",
+                "child": "GEOMETRIES_LAMPS_ON",
+                "siblings": [
+                  "GEOMETRIES_LAMPS_ON",
+                  "GEOMETRIES_LAMPS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_anim",
+            "action_name": "",
+            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "start",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "LAMP_OFF",
+        "trigger": "button",
+        "label": "LAMP_OFF",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": false,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_INTERIOR_LIGHTS",
+                "child": "GEOMETRIES_INTERIOR_LIGHTS_OFF",
+                "siblings": [
+                  "GEOMETRIES_INTERIOR_LIGHTS_ON",
+                  "GEOMETRIES_INTERIOR_LIGHTS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_variant",
+            "action_name": "",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": [
+              {
+                "parent": "GEOMETRIES_LAMPS",
+                "child": "GEOMETRIES_LAMPS_OFF",
+                "siblings": [
+                  "GEOMETRIES_LAMPS_ON",
+                  "GEOMETRIES_LAMPS_OFF"
+                ]
+              }
+            ]
+          },
+          {
+            "together": true,
+            "action_type": "geo_anim",
+            "action_name": "",
+            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "stop",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "DOOR_OPEN",
+        "trigger": "button",
+        "label": "DOOR_OPEN",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": true,
+            "action_type": "combo",
+            "action_name": "Anim Set 1",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      },
+      {
+        "name": "DOOR_CLOSED",
+        "trigger": "button",
+        "label": "DOOR_CLOSED",
+        "hotspot_object": "",
+        "hotspot_color": [
+          0.21,
+          0.62,
+          1.0
+        ],
+        "hotspot_scale": 0.25,
+        "mesh_trigger_objects": [],
+        "mesh_hover": null,
+        "sound": "",
+        "steps": [
+          {
+            "together": true,
+            "action_type": "combo",
+            "action_name": "Anim Set 1",
+            "target_name": "",
+            "target_uid": "",
+            "target_state": 0,
+            "sound_action": "",
+            "matgeo_action": "",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          }
+        ]
+      }
+    ]
   },
   "annotations": [],
   "annotation_popup_style": {
@@ -639,7 +1298,7 @@
   },
   "media_items": [],
   "anim_textures": [],
-  "page_title": "CONFIGURATOR",
+  "page_title": "3D Configurator",
   "page_icon": "",
   "global_pointer": null,
   "model_file": "Highest/26566b275491.gltf",
@@ -650,7 +1309,7 @@
   ],
   "cameras": {
     "fly_duration": 1.2,
-    "zoom_min": 1.46,
+    "zoom_min": 4.366,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -677,7 +1336,7 @@
     },
     "static": [
       {
-        "name": "Camera",
+        "name": "DASHCAM",
         "position": [
           -1.0952,
           1.169,
@@ -689,17 +1348,23 @@
           0.0092
         ],
         "lock": "zoom_pan",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.5,
+        "hide_image_dist": 0.5,
         "default": false,
         "focal_length_mm": 15.0,
-        "sensor_width_mm": 36.0
+        "sensor_width_mm": 36.0,
+        "look": {
+          "zoom_in": 2.0,
+          "zoom_out": 1.0
+        }
       },
       {
-        "name": "Camera.001",
+        "name": "FREECAM",
         "position": [
           -9.5598,
           0.6711,
@@ -711,18 +1376,20 @@
           -0.0
         ],
         "lock": "free",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.0,
+        "hide_image_dist": 0.0,
         "default": true,
         "focal_length_mm": 50.0,
         "sensor_width_mm": 36.0,
         "allow_pan": true
       },
       {
-        "name": "Camera.002",
+        "name": "FIRSTROW",
         "position": [
           0.2961,
           1.1354,
@@ -734,17 +1401,33 @@
           0.1661
         ],
         "lock": "zoom_pan",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.0,
+        "hide_image_dist": 0.0,
         "default": false,
         "focal_length_mm": 20.0,
-        "sensor_width_mm": 36.0
+        "sensor_width_mm": 36.0,
+        "hide_items": [
+          {
+            "name": "IMG_SEQUENCE_FIRST_ROW",
+            "pos": [
+              0.8162,
+              1.2373,
+              0.5923
+            ]
+          }
+        ],
+        "look": {
+          "zoom_in": 2.0,
+          "zoom_out": 1.0
+        }
       },
       {
-        "name": "Camera.003",
+        "name": "REARSEAT",
         "position": [
           2.6414,
           1.1638,
@@ -756,14 +1439,20 @@
           0.1679
         ],
         "lock": "zoom_pan",
-        "transition": "fly",
+        "transition": "dip",
         "fly_duration": 1.2,
         "ease_in": false,
         "ease_out": true,
         "dip_duration": 0.4,
+        "hide_hotspot_dist": 0.5,
+        "hide_image_dist": 0.5,
         "default": false,
         "focal_length_mm": 20.0,
-        "sensor_width_mm": 36.0
+        "sensor_width_mm": 36.0,
+        "look": {
+          "zoom_in": 2.0,
+          "zoom_out": 1.0
+        }
       }
     ],
     "cinematic": {
