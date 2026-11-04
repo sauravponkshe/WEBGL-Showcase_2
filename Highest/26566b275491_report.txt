@@ -3,8 +3,8 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT\Highest\26566b275491.gltf
-Generated: 2026-11-03 02:22:15
-Total size (this .gltf + its .bin + every texture file): 40.19 MB
+Generated: 2026-11-04 11:52:08
+Total size (this .gltf + its .bin + every texture file): 41.65 MB
 
 ======================================================================
 EXPORT CONFIGURATION
@@ -35,22 +35,22 @@ None: every animated object sits under its own ANIM_ empty.
 SIZE BREAKDOWN (approximate — see notes)
 ======================================================================
 Geometry (vertex/index buffers): 0 B
-Textures (loose files, External Textures mode):    12.53 MB
-Unaccounted (other bufferViews): 27.14 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
+Textures (loose files, External Textures mode):    12.42 MB
+Unaccounted (other bufferViews): 28.68 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
 Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
 
 ======================================================================
 GEOMETRY
 ======================================================================
-Meshes: 399   Primitives: 479
-Triangles: 4,280,000   Vertices: 4,075,259
+Meshes: 406   Primitives: 491
+Triangles: 4,235,433   Vertices: 4,043,586
 Draco compression: ACTIVE
 
 ======================================================================
 TEXTURES
 ======================================================================
 KTX2 (GPU-compressed) active: YES
-Texture count: 83
+Texture count: 81
 Name                                     Format       Colorspace    Disk size    Est. VRAM
 Carpaint_Clearcoat                       image/jpeg   unknown        219.1 KB      1.71 MB
 Carpaint_Normal                          image/jpeg   linear         213.3 KB      1.67 MB
@@ -77,38 +77,35 @@ leather_red_02_nor_gl_1k                 image/ktx2   unknown        127.2 KB   
 Interior_Body_001_ao                     image/ktx2   unknown        252.5 KB     252.5 KB
 leather_red_02_rough_1k                  image/ktx2   unknown        120.3 KB     120.3 KB
 Fabric04_1K_Normal                       image/jpeg   linear         379.0 KB      2.96 MB
-LWB_ROOF_01_00_ao                        image/ktx2   unknown        334.1 KB     334.1 KB
+LWB_ROOF_01_00_ao                        image/ktx2   unknown         40.3 KB      40.3 KB
 Fabric04_1K_Roughness                    image/jpeg   linear          37.1 KB     296.4 KB
 Object127817_ao                          image/ktx2   unknown        153.4 KB     153.4 KB
-Image_45                                 image/jpeg   unknown          2.7 KB      21.8 KB
+FRONT_STICKER_SPEC                       image/jpeg   unknown          2.8 KB      22.2 KB
 Image_44                                 image/ktx2   unknown        186.0 KB     186.0 KB
-Image_43                                 image/ktx2   unknown         46.5 KB      46.5 KB
 Object127853_ao                          image/ktx2   unknown         98.0 KB      98.0 KB
 Image_61                                 image/ktx2   unknown          5.7 KB       5.7 KB
 Rack_Black_ao                            image/ktx2   unknown         80.0 KB      80.0 KB
 Rack_White_ao                            image/ktx2   unknown        128.9 KB     128.9 KB
-Image_41                                 image/ktx2   unknown          7.3 KB       7.3 KB
+Image_41                                 image/jpeg   sRGB             6.5 KB      52.1 KB
 Image_47                                 image/jpeg   linear          28.8 KB     230.5 KB
 Image_48                                 image/jpeg   sRGB            24.6 KB     196.8 KB
 Image_49                                 image/jpeg   linear          39.7 KB     317.5 KB
 Image_37                                 image/ktx2   unknown         24.0 KB      24.0 KB
-Image_60                                 image/ktx2   unknown        120.5 KB     120.5 KB
-Wood_Carpet_ao                           image/ktx2   unknown        172.5 KB     172.5 KB
 Image_60                                 image/ktx2   unknown        114.2 KB     114.2 KB
 CAB_DOOR_RH_ao                           image/ktx2   unknown        115.1 KB     115.1 KB
 Image_20                                 image/ktx2   unknown         92.6 KB      92.6 KB
 Image_57                                 image/ktx2   unknown        229.5 KB     229.5 KB
 Image_42                                 image/ktx2   unknown           853 B        853 B
-Image_54                                 image/ktx2   unknown         76.8 KB      76.8 KB
+Image_54                                 image/jpeg   sRGB           116.1 KB     928.7 KB
 Object127862_ao                          image/ktx2   unknown        257.8 KB     257.8 KB
 Open_body_132_ao                         image/ktx2   unknown         47.6 KB      47.6 KB
 GSMBiDim_001_ao                          image/ktx2   unknown         95.7 KB      95.7 KB
-Image_46                                 image/ktx2   unknown         99.3 KB      99.3 KB
+Image_46                                 image/jpeg   sRGB           120.1 KB     961.1 KB
 polySurface4_001_ao                      image/ktx2   unknown        194.8 KB     194.8 KB
-Normal_GrainedPlastic                    image/ktx2   unknown         72.5 KB      72.5 KB
+Normal_GrainedPlastic                    image/jpeg   linear          98.2 KB     785.5 KB
 Steering_001_ao                          image/ktx2   unknown        153.9 KB     153.9 KB
 Steering_002_ao                          image/ktx2   unknown        241.4 KB     241.4 KB
-Image_2                                  image/ktx2   unknown        498.5 KB     498.5 KB
+Image_2                                  image/jpeg   linear         701.2 KB      5.48 MB
 Steering_003_ao                          image/ktx2   unknown        146.5 KB     146.5 KB
 Steering_004_ao                          image/ktx2   unknown        160.4 KB     160.4 KB
 Image_53                                 image/ktx2   unknown         88.9 KB      88.9 KB
@@ -117,8 +114,8 @@ Image_29                                 image/jpeg   sRGB           149.8 KB   
 Image_31                                 image/jpeg   linear         942.9 KB      7.37 MB
 Object127784-Image_33                    image/ktx2   unknown        251.6 KB     251.6 KB
 Image_32                                 image/jpeg   sRGB           332.2 KB      2.59 MB
-Pasanger_Seat_012_001_ao                 image/ktx2   unknown        200.5 KB     200.5 KB
-Image_35                                 image/ktx2   unknown         88.9 KB      88.9 KB
+Pasanger_Seat_012_ao                     image/ktx2   unknown        194.8 KB     194.8 KB
+Image_35                                 image/jpeg   sRGB           153.9 KB      1.20 MB
 Image_17                                 image/ktx2   unknown         69.2 KB      69.2 KB
 Image_15                                 image/ktx2   unknown        221.3 KB     221.3 KB
 Image_16                                 image/ktx2   unknown        165.3 KB     165.3 KB
@@ -126,7 +123,7 @@ Image_12                                 image/jpeg   unknown        129.7 KB   
 Image_9                                  image/ktx2   unknown        224.7 KB     224.7 KB
 Image_10                                 image/ktx2   unknown        160.8 KB     160.8 KB
 Image_11                                 image/ktx2   unknown         81.0 KB      81.0 KB
-Image_22                                 image/ktx2   unknown        329.4 KB     329.4 KB
+Image_22                                 image/jpeg   linear         455.4 KB      3.56 MB
 Object125_ao                             image/ktx2   unknown        224.7 KB     224.7 KB
 Image_23                                 image/ktx2   unknown         76.9 KB      76.9 KB
 Image_25                                 image/jpeg   linear         984.6 KB      7.69 MB
@@ -135,30 +132,38 @@ Open_body_144_ao                         image/ktx2   unknown        197.7 KB   
 SEATSYSTEMAO_ao                          image/ktx2   unknown        202.0 KB     202.0 KB
 SEAT_SYSTEM_TWIN_PASSENGER_RECLINE_SEAT_ image/ktx2   unknown        258.0 KB     258.0 KB
 Seat_Accesories_2_001_ao                 image/ktx2   unknown        312.2 KB     312.2 KB
+Image_43                                 image/ktx2   unknown         46.5 KB      46.5 KB
 
-Estimated total VRAM for textures: 37.11 MB
+Estimated total VRAM for textures: 48.29 MB
 
 ======================================================================
 MATERIALS / DRAW CALLS
 ======================================================================
-Materials: 196
-Primitives (mesh x material combinations): 479
+Materials: 201
+Primitives (mesh x material combinations): 491
 Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
 
 ======================================================================
 ANIMATIONS (this file)
 ======================================================================
-Clips: 6
+Clips: 12
   - ANIM_PASS_DOOR_NLA
   - ANIM_DRIVER_DOOR_NLA
+  - ANIM_HOSE_LH
+  - ANIM_HOSE_RH
   - ANIM_FOOTSTEP_NLA
+  - ANIM_RR_DOOR_RL_STEP1_NLA
+  - ANIM_RR_DOOR_RL_STEP2_NLA
   - ANIM_RR_RH_DOOR_NLA
   - ANIM_RR_LH_DOOR_NLA
+  - ANIM_RR_DOOR_RH_STEP1_NLA
+  - ANIM_RR_DOOR_RH_STEP2_NLA
   - ANIM_SLIDING_NLA
 
-Configurator-driven animation triggers (material): 0
-Configurator-driven animation triggers (geometry): 1
-  - BLINKERS  (trigger: None)
+Configurator-driven animation triggers (material): 2
+  - REAR INDICATOR  (trigger: None)
+  - SIDE LIGHT  (trigger: None)
+Configurator-driven animation triggers (geometry): 0
 
 ======================================================================
 HDRI / ENVIRONMENT
@@ -169,9 +174,12 @@ Environments: 1
 ======================================================================
 CONTAINERS (material swap targets)
 ======================================================================
-Containers: 2
+Containers: 5
   - BODYPAINT
   - BODYPAINTWITHAO
+  - LIGHT
+  - SIDE_LIGHT
+  - REAR_INDICATOR
 
 ======================================================================
 CONFIGS (Full Configurations)
@@ -198,7 +206,7 @@ Categories: 1   Options: 3
 ======================================================================
 CAMERAS
 ======================================================================
-Zoom range: 5.067 - 11.469
+Zoom range: 5.619 - 11.469
 Floor Z: 0.0   Roof Z: None
 Static cameras: 4  (Free: 1, Locked: 3)
   - DASHCAM  [zoom_pan]

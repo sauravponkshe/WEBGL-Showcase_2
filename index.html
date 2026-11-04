@@ -209,9 +209,10 @@ html,body{font-family:'Rajdhani',sans-serif;font-size:13px}
 #fx .TabBtn-field input:checked+label{font-family:"AcherusGrotesque-ExtraBold",sans-serif;font-weight:800;border-bottom:3px solid #000;background-color:#fff;opacity:1}
 /* sliding control panel */
 #fx-stage{position:fixed;inset:0;pointer-events:none}
-#fx .controlPanel{position:relative;z-index:99;width:270px;border:1px solid #ccc;padding:30px 20px 0 20px;background:#fff;transition:all 1s ease;pointer-events:auto;max-height:100vh;overflow:visible}
+#fx .controlPanel{position:relative;z-index:99;width:270px;border:1px solid #ccc;padding:0;background:#fff;transition:all 1s ease;pointer-events:auto;max-height:100vh;overflow:visible}
 /* short screens (e.g. phone landscape): the content scrolls inside the panel; the slide arrow stays put. When everything fits, nothing changes. */
-#fx .fx-scroll{max-height:calc(100vh - 31px);max-height:calc(100dvh - 31px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
+/* the panel's own padding lives INSIDE the scroller, so the heading's top and the selected swatch's shadow are never clipped */
+#fx .fx-scroll{box-sizing:border-box;padding:30px 20px 0 20px;max-height:calc(100vh - 2px);max-height:calc(100dvh - 2px);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}
 #fx .controlPanel.slideIn{left:270px;margin-left:-270px}
 #fx .controlPanel.slideOut{left:-270px;margin-left:0}
 #fx .togglebtn{position:absolute;top:50%;right:-31px;width:40px;height:40px;transform:translateY(-50%);display:flex;justify-content:center;align-items:center;border:0;border-radius:5px;padding:0;background-color:#fff;color:#212529;cursor:pointer}
@@ -365,42 +366,66 @@ const CFG = {
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
+      "CARPAINT_METALLIC_1_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
-      "CARPAINT_METALLIC_3_GLTF.001",
-      "CARPAINT_METALLIC_1_GLTF.001"
+      "CARPAINT_METALLIC_3_GLTF.001"
+    ],
+    "LIGHT": [
+      "Orange.001",
+      "Orange_Blinkers"
+    ],
+    "SIDE_LIGHT": [
+      "GLASS_4_GLTF.002",
+      "Orange_Blinkers"
+    ],
+    "REAR_INDICATOR": [
+      "GLASS_4_GLTF",
+      "Orange_Blinkers.001"
     ]
   },
   "render_priority": {},
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
+      "CARPAINT_METALLIC_1_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
-      "CARPAINT_METALLIC_3_GLTF.001",
-      "CARPAINT_METALLIC_1_GLTF.001"
+      "CARPAINT_METALLIC_3_GLTF.001"
+    ],
+    "LIGHT": [
+      "Orange.001",
+      "Orange_Blinkers"
+    ],
+    "SIDE_LIGHT": [
+      "GLASS_4_GLTF.002",
+      "Orange_Blinkers"
+    ],
+    "REAR_INDICATOR": [
+      "GLASS_4_GLTF",
+      "Orange_Blinkers.001"
     ]
   },
   "color_selector": {
     "items": []
   },
   "mat_colors": {
-    "CARPAINT_METALLIC_3_GLTF.001": {
+    "GLASS_4_GLTF.002": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
+        0.22691115736961365,
+        0.22691115736961365,
+        0.22691115736961365
       ],
-      "metallic": 0.3776,
-      "roughness": 0.0544,
+      "metallic": 0.0,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
@@ -408,12 +433,100 @@ const CFG = {
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "clearcoatRoughness": 0.0,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 1.0,
+      "ior": 4.45,
+      "specularIntensity": 0.5
+    },
+    "CARPAINT_METALLIC_3_GLTF.001": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.1292,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
       "ior": 1.5,
       "specularIntensity": 0.0498
+    },
+    "Orange.001": {
+      "color": [
+        0.8057554364204407,
+        0.3130273222923279,
+        0.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
+      "sheen": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
+      "ior": 1.5,
+      "specularIntensity": 0.5
+    },
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.5,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2077,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_2_GLTF": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.113,
+      "roughness": 0.088,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.65,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
     },
     "CARPAINT_METALLIC_2_GLTF.001": {
       "color": [
@@ -444,7 +557,7 @@ const CFG = {
         0.05287881940603256
       ],
       "metallic": 0.3776,
-      "roughness": 0.0544,
+      "roughness": 0.5,
       "emissive": [
         1.0,
         1.0,
@@ -452,56 +565,78 @@ const CFG = {
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "clearcoatRoughness": 0.2077,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
       "ior": 1.5,
       "specularIntensity": 0.0498
     },
-    "CARPAINT_METALLIC_3_GLTF": {
+    "Orange_Blinkers": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "metallic": 0.3776,
-      "roughness": 0.0544,
+      "metallic": 0.0,
+      "roughness": 0.0,
       "emissive": [
-        1.0,
-        1.0,
-        1.0
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "emissiveIntensity": 10.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
       "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
       "ior": 1.5,
-      "specularIntensity": 0.0498
+      "specularIntensity": 0.5
     },
-    "CARPAINT_METALLIC_2_GLTF": {
+    "Orange_Blinkers.001": {
       "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "metallic": 0.113,
-      "roughness": 0.088,
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
+      ],
+      "emissiveIntensity": 15.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
+      "sheen": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
+      "ior": 1.5,
+      "specularIntensity": 0.5
+    },
+    "GLASS_4_GLTF": {
+      "color": [
+        0.02809673361480236,
+        0.02809673361480236,
+        0.02809673361480236
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.65,
+      "clearcoat": 0.2054,
+      "clearcoatRoughness": 0.0,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+      "transmission": 1.0,
+      "ior": 1.0,
+      "specularIntensity": 0.5
     },
     "CARPAINT_METALLIC_1_GLTF.001": {
       "color": [
@@ -510,7 +645,7 @@ const CFG = {
         0.05287881940603256
       ],
       "metallic": 0.3776,
-      "roughness": 0.0544,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
@@ -518,7 +653,7 @@ const CFG = {
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "clearcoatRoughness": 0.1292,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
@@ -551,6 +686,16 @@ const CFG = {
       "b": 2.5,
       "c": 1.0
     },
+    "METAL_GRID_1_GLTF": {
+      "b": 1.5,
+      "c": 1.5
+    },
+    "MILKY.001": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 1.5,
+      "bm": 1
+    },
     "PERFORATION 1.003": {
       "b": 2.5,
       "c": 1.0
@@ -563,13 +708,25 @@ const CFG = {
       "b": 2.5,
       "c": 1.0
     },
-    "PERFORATION 1.005": {
+    "TAIL_LAMP.001": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 1.5,
+      "bm": 1
+    },
+    "PERFORATION 1.004": {
       "b": 2.5,
       "c": 1.0
     },
     "REAR SEAT.003": {
       "b": 2.5,
       "c": 1.0
+    },
+    "Orange_Blinkers": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 8.0,
+      "bm": 0
     }
   },
   "light_mat_links": [],
@@ -676,17 +833,15 @@ const CFG = {
     }
   ],
   "global_mat_sets": [],
-  "mat_animations": [],
-  "sounds": [],
-  "geo_animations": [
+  "mat_animations": [
     {
-      "source_key": "__geov__GEOMETRIES_BLINKERS",
-      "label": "BLINKERS",
+      "source_key": "__ctr__REAR_INDICATOR",
+      "label": "REAR INDICATOR",
       "play_mode": "cycle",
       "transition_sec": 0.0,
       "play_order": [
-        "GEOMETRIES_BLINKERS_OFF",
-        "GEOMETRIES_BLINKERS_ON"
+        "GLASS_4_GLTF",
+        "Orange_Blinkers.001"
       ],
       "cycle": {
         "trigger_type": "button",
@@ -697,40 +852,49 @@ const CFG = {
         "play_from_startup_mobile": true,
         "pause_sec": 0.5,
         "stop_mode": "target",
-        "stop_target": "GEOMETRIES_BLINKERS_OFF",
-        "stop_reach": "jump"
+        "stop_target": "GLASS_4_GLTF",
+        "stop_reach": "cycle"
       },
       "step": {
         "trigger_type": "button",
         "extra_hotspots": [],
         "extra_images": []
       },
-      "source_type": "geo_variant",
-      "geo_parent": "GEOMETRIES_BLINKERS",
-      "variant_chains": {
-        "GEOMETRIES_BLINKERS_OFF": [
-          {
-            "parent": "GEOMETRIES_BLINKERS",
-            "child": "GEOMETRIES_BLINKERS_OFF",
-            "siblings": [
-              "GEOMETRIES_BLINKERS_ON",
-              "GEOMETRIES_BLINKERS_OFF"
-            ]
-          }
-        ],
-        "GEOMETRIES_BLINKERS_ON": [
-          {
-            "parent": "GEOMETRIES_BLINKERS",
-            "child": "GEOMETRIES_BLINKERS_ON",
-            "siblings": [
-              "GEOMETRIES_BLINKERS_ON",
-              "GEOMETRIES_BLINKERS_OFF"
-            ]
-          }
-        ]
-      }
+      "source_type": "container",
+      "container": "REAR_INDICATOR"
+    },
+    {
+      "source_key": "__ctr__SIDE_LIGHT",
+      "label": "SIDE LIGHT",
+      "play_mode": "cycle",
+      "transition_sec": 0.0,
+      "play_order": [
+        "GLASS_4_GLTF.002",
+        "Orange_Blinkers"
+      ],
+      "cycle": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": [],
+        "start_mode": "trigger",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "pause_sec": 0.5,
+        "stop_mode": "target",
+        "stop_target": "GLASS_4_GLTF.002",
+        "stop_reach": "cycle"
+      },
+      "step": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": []
+      },
+      "source_type": "container",
+      "container": "SIDE_LIGHT"
     }
   ],
+  "sounds": [],
+  "geo_animations": [],
   "area_lights": [],
   "light_shadows": {},
   "light_intensity_divisors": {},
@@ -822,7 +986,7 @@ const CFG = {
   "startup_sound": "",
   "camera": {
     "orbit_damping": 0.25,
-    "zoom_min": 4.366,
+    "zoom_min": 5.619,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -907,7 +1071,7 @@ const CFG = {
       "file": "hdri/environment_1.hdr",
       "strength": 1.0,
       "background": false,
-      "rotation_z": -10.89,
+      "rotation_z": 90.0,
       "flatten_ground": false,
       "ground_height": -1.0,
       "ground_radius": 25.0,
@@ -954,7 +1118,7 @@ const CFG = {
     "env_rotation": [
       0.0,
       0.0,
-      -10.89
+      90.0
     ],
     "env_scale": [
       1.0,
@@ -975,7 +1139,7 @@ const CFG = {
     "mat_add_crossfade": false,
     "geometry": true,
     "mat_sec": 0.3,
-    "geo_sec": 0.18
+    "geo_sec": 0.0
   },
   "mat_category_transition_overrides": {},
   "mat_container_transition_overrides": {},
@@ -1061,54 +1225,6 @@ const CFG = {
         "id": "control:FOOTSTEP_NLA"
       },
       {
-        "name": "RR_RH_DOOR_NLA",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:RR_RH_DOOR_NLA"
-      },
-      {
-        "name": "RR_LH_DOOR_NLA",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:RR_LH_DOOR_NLA"
-      },
-      {
         "name": "SLIDING_NLA",
         "anim_type": "SCENE",
         "states": 2,
@@ -1131,6 +1247,150 @@ const CFG = {
         "extra_images": [],
         "kind": "control",
         "id": "control:SLIDING_NLA"
+      },
+      {
+        "name": "RR_DOOR_RL_STEP1_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RL_STEP1_NLA"
+      },
+      {
+        "name": "RR_DOOR_RH_STEP2_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RH_STEP2_NLA"
+      },
+      {
+        "name": "RR_DOOR_RH_STEP1_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RH_STEP1_NLA"
+      },
+      {
+        "name": "RR_DOOR_RL_STEP2_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RL_STEP2_NLA"
+      },
+      {
+        "name": "HOSE_LH",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:HOSE_LH"
+      },
+      {
+        "name": "HOSE_RH",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:HOSE_RH"
       }
     ],
     "combos": [
@@ -1140,9 +1400,13 @@ const CFG = {
           "PASS_DOOR_NLA",
           "DRIVER_DOOR_NLA",
           "FOOTSTEP_NLA",
-          "RR_RH_DOOR_NLA",
-          "RR_LH_DOOR_NLA",
-          "SLIDING_NLA"
+          "SLIDING_NLA",
+          "RR_DOOR_RL_STEP1_NLA",
+          "RR_DOOR_RH_STEP2_NLA",
+          "RR_DOOR_RH_STEP1_NLA",
+          "RR_DOOR_RL_STEP2_NLA",
+          "HOSE_LH",
+          "HOSE_RH"
         ],
         "trigger": "button",
         "states": 2,
@@ -1163,15 +1427,31 @@ const CFG = {
             0.0,
             1.0
           ],
-          "RR_RH_DOOR_NLA": [
-            0.0,
-            1.0
-          ],
-          "RR_LH_DOOR_NLA": [
-            0.0,
-            1.0
-          ],
           "SLIDING_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RL_STEP1_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RH_STEP2_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RH_STEP1_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RL_STEP2_NLA": [
+            0.0,
+            1.0
+          ],
+          "HOSE_LH": [
+            0.0,
+            1.0
+          ],
+          "HOSE_RH": [
             0.0,
             1.0
           ]
@@ -1189,9 +1469,13 @@ const CFG = {
           "control:PASS_DOOR_NLA",
           "control:DRIVER_DOOR_NLA",
           "control:FOOTSTEP_NLA",
-          "control:RR_RH_DOOR_NLA",
-          "control:RR_LH_DOOR_NLA",
-          "control:SLIDING_NLA"
+          "control:SLIDING_NLA",
+          "control:RR_DOOR_RL_STEP1_NLA",
+          "control:RR_DOOR_RH_STEP2_NLA",
+          "control:RR_DOOR_RH_STEP1_NLA",
+          "control:RR_DOOR_RL_STEP2_NLA",
+          "control:HOSE_LH",
+          "control:HOSE_RH"
         ]
       }
     ],
@@ -1481,9 +1765,24 @@ const CFG = {
           },
           {
             "together": true,
-            "action_type": "geo_anim",
+            "action_type": "mat_anim",
             "action_name": "",
-            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_name": "__ctr__REAR_INDICATOR",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "start",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          },
+          {
+            "together": true,
+            "action_type": "mat_anim",
+            "action_name": "",
+            "target_name": "__ctr__SIDE_LIGHT",
             "target_uid": "",
             "target_state": 1,
             "sound_action": "",
@@ -1561,9 +1860,24 @@ const CFG = {
           },
           {
             "together": true,
-            "action_type": "geo_anim",
+            "action_type": "mat_anim",
             "action_name": "",
-            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_name": "__ctr__REAR_INDICATOR",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "stop",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          },
+          {
+            "together": true,
+            "action_type": "mat_anim",
+            "action_name": "",
+            "target_name": "__ctr__SIDE_LIGHT",
             "target_uid": "",
             "target_state": 1,
             "sound_action": "",
@@ -1672,7 +1986,7 @@ const CFG = {
   ],
   "cameras": {
     "fly_duration": 1.2,
-    "zoom_min": 4.366,
+    "zoom_min": 5.619,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -1839,6 +2153,11 @@ const WCE_PROFILES = /*WCE_PROFILES_START*/[]/*WCE_PROFILES_END*/;
 const WCE_THUMBNAIL_GROUPS = /*WCE_THUMBGROUPS_START*/[]/*WCE_THUMBGROUPS_END*/;
 const _initHdri = (CFG.hdris && CFG.hdris.length) ? (CFG.hdris.find(h => h.default) || CFG.hdris[0]) : null;
 const _wceBC={};
+function _wceModEntry(m){
+  if(!m || !m.name) return null;
+  const i=m.name.indexOf('__wce_');
+  return _wceBC[i>0 ? m.name.slice(0,i) : m.name] || null;
+}
 (function(){
   const src=CFG.mat_bc||{};
   Object.keys(src).forEach(function(k){ _wceBC[k]=src[k]; });
@@ -1849,21 +2168,54 @@ const _wceBC={};
   if(!Object.keys(_wceBC).length) return;
   const proto=THREE.Material.prototype;
   const baseKey=proto.customProgramCacheKey;
-  function entry(m){
-    if(!m || !m.name) return null;
-    const i=m.name.indexOf('__wce_');
-    return _wceBC[i>0 ? m.name.slice(0,i) : m.name] || null;
-  }
   function lit(v){ return (Math.round(Number(v)*10000)/10000).toFixed(4); }
+  const HSV_GLSL=[
+    'vec3 wceRgb2Hsv(vec3 c){',
+    '  vec4 K=vec4(0.0,-1.0/3.0,2.0/3.0,-1.0);',
+    '  vec4 p=mix(vec4(c.bg,K.wz),vec4(c.gb,K.xy),step(c.b,c.g));',
+    '  vec4 q=mix(vec4(p.xyw,c.r),vec4(c.r,p.yzx),step(p.x,c.r));',
+    '  float d=q.x-min(q.w,q.y); float e=1.0e-10;',
+    '  return vec3(abs(q.z+(q.w-q.y)/(6.0*d+e)),d/(q.x+e),q.x);',
+    '}',
+    'vec3 wceHsv2Rgb(vec3 c){',
+    '  vec4 K=vec4(1.0,2.0/3.0,1.0/3.0,3.0);',
+    '  vec3 p=abs(fract(c.xxx+K.xyz)*6.0-K.www);',
+    '  return c.z*mix(K.xxx,clamp(p-K.xxx,0.0,1.0),c.y);',
+    '}'
+  ].join('\n');
   proto.onBeforeCompile=function(sh){
-    const e=entry(this);
-    const chunk='#include <color_fragment>';
-    if(!e || !sh || !sh.fragmentShader || sh.fragmentShader.indexOf(chunk)<0) return;
-    sh.fragmentShader=sh.fragmentShader.replace(chunk, chunk+'\n  diffuseColor.rgb=max((diffuseColor.rgb-0.5)*'+lit(e.c)+'+0.5,0.0)*'+lit(e.b)+';');
+    const e=_wceModEntry(this);
+    if(!e || !sh || !sh.fragmentShader) return;
+    let fs=sh.fragmentShader;
+    const b=(e.b!=null?e.b:1), c=(e.c!=null?e.c:1), hh=(e.h!=null?e.h:0.5), ss=(e.s!=null?e.s:1);
+    const doBC=(Math.abs(b-1)>1e-4 || Math.abs(c-1)>1e-4);
+    const doHS=(Math.abs(hh-0.5)>1e-4 || Math.abs(ss-1)>1e-4);
+    const cChunk='#include <color_fragment>';
+    if((doBC || doHS) && fs.indexOf(cChunk)>=0){
+      let code='';
+      if(doBC) code+='\n  diffuseColor.rgb=max((diffuseColor.rgb-0.5)*'+lit(c)+'+0.5,0.0)*'+lit(b)+';';
+      if(doHS){
+        code+='\n  { vec3 wceH=wceRgb2Hsv(max(diffuseColor.rgb,0.0)); wceH.x=fract(wceH.x+'+lit(hh-0.5)+'); wceH.y=clamp(wceH.y*'+lit(ss)+',0.0,1.0); diffuseColor.rgb=wceHsv2Rgb(wceH); }';
+        if(fs.indexOf('wceRgb2Hsv')<0 && fs.indexOf('#include <common>')>=0) fs=fs.replace('#include <common>','#include <common>\n'+HSV_GLSL);
+      }
+      fs=fs.replace(cChunk, cChunk+code);
+    }
+    const fa=(e.fa!=null?e.fa:0);
+    const nChunk='#include <normal_fragment_maps>';
+    if(fa>0 && fs.indexOf(nChunk)>=0 && fs.indexOf('#include <roughnessmap_fragment>')>=0 && fs.indexOf('vViewPosition')>=0){
+      const fe=(e.fe!=null?e.fe:0.05), fp=(e.fp!=null?e.fp:3);
+      fs=fs.replace(nChunk, nChunk+'\n  { float wceNV=clamp(abs(dot(normalize(normal),normalize(vViewPosition))),0.0,1.0); roughnessFactor=mix(roughnessFactor,'+lit(fe)+','+lit(fa)+'*pow(1.0-wceNV,'+lit(fp)+')); }');
+    }
+    const eChunk='#include <emissivemap_fragment>';
+    if(e.ba>0 && !e.bm && fs.indexOf(eChunk)>=0 && fs.indexOf('totalEmissiveRadiance')>=0){
+      const col=e.bk ? ('vec3('+lit(e.bk[0])+','+lit(e.bk[1])+','+lit(e.bk[2])+')') : 'diffuseColor.rgb';
+      fs=fs.replace(eChunk, eChunk+'\n  totalEmissiveRadiance+='+col+'*'+lit(e.ba)+';');
+    }
+    sh.fragmentShader=fs;
   };
   proto.customProgramCacheKey=function(){
-    const e=entry(this);
-    return e ? ('wce-bc-'+lit(e.b)+'-'+lit(e.c)) : baseKey.call(this);
+    const e=_wceModEntry(this);
+    return e ? ('wce-mod-'+JSON.stringify(e)) : baseKey.call(this);
   };
 })();
 let root=null, matMap={}, varData={}, activeV=null, geoSt={}, matSt={};
@@ -3227,6 +3579,131 @@ if(_anyBloom){
   bloomPass=new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight),
     _bloomStrength,0.4,_bloomThreshold);
   comp.addPass(bloomPass);
+}
+const _wceSelOn=Object.keys(_wceBC).some(function(k){ const e=_wceBC[k]; return !!(e && e.bm===1 && e.ba>0); });
+let _wceSelBloom=null;
+if(_wceSelOn){
+  class WceSelectiveBloomPass extends WcePassBase{
+    constructor(sc,cam){
+      super();
+      this.scene=sc; this.camera=cam; this.needsSwap=true;
+      this._rt=null; this._w=2; this._h=2;
+      this._bloom=new UnrealBloomPass(new THREE.Vector2(2,2),1.0,0.5,0.0);
+      this._black=new THREE.MeshBasicMaterial({color:0x000000});
+      this._glow=new WeakMap();
+      this._clr=new THREE.Color();
+      this._mix=new THREE.ShaderMaterial({
+        uniforms:{ tBase:{value:null}, tGlow:{value:null} },
+        vertexShader:_WCE_AA_VERT,
+        fragmentShader:'uniform sampler2D tBase; uniform sampler2D tGlow; varying vec2 vUv; void main(){ vec4 b=texture2D(tBase,vUv); gl_FragColor=vec4(b.rgb+texture2D(tGlow,vUv).rgb,b.a); }'
+      });
+      this._quad=new WceFullScreenQuad(this._mix);
+    }
+    setSize(w,h){
+      this._w=Math.max(2,Math.floor(w/2)); this._h=Math.max(2,Math.floor(h/2));
+      if(this._rt) this._rt.setSize(this._w,this._h);
+      this._bloom.setSize(this._w,this._h);
+    }
+    dispose(){
+      if(this._rt){ this._rt.dispose(); this._rt=null; }
+      this._bloom.dispose(); this._black.dispose(); this._mix.dispose(); this._quad.dispose();
+    }
+    _entry(m){ const e=m?_wceModEntry(m):null; return (e && e.bm===1 && e.ba>0) ? e : null; }
+    _glowFor(src,e){
+      let g=this._glow.get(src);
+      if(!g){
+        g=new THREE.MeshBasicMaterial();
+        const useBase=!e.bk;
+        g.map=useBase ? (src.map||null) : null;
+        g.vertexColors=useBase && !!src.vertexColors;
+        g.alphaMap=src.alphaMap||null;
+        g.alphaTest=src.alphaTest||0;
+        g.transparent=!!src.transparent;
+        g.opacity=(src.opacity!=null) ? src.opacity : 1;
+        g.side=src.side;
+        g.clippingPlanes=src.clippingPlanes||null;
+        g.toneMapped=false;
+        this._glow.set(src,g);
+      }
+      if(e.bk) g.color.setRGB(e.bk[0],e.bk[1],e.bk[2]);
+      else if(src.color) g.color.copy(src.color);
+      else g.color.setRGB(1,1,1);
+      g.color.multiplyScalar(e.ba);
+      return g;
+    }
+    _anyGlow(o){
+      if(!o.visible) return false;
+      if(o.isMesh){
+        const ms=Array.isArray(o.material) ? o.material : [o.material];
+        for(let i=0;i<ms.length;i++) if(this._entry(ms[i])) return true;
+      }
+      for(let i=0;i<o.children.length;i++) if(this._anyGlow(o.children[i])) return true;
+      return false;
+    }
+    render(renderer,writeBuffer,readBuffer,deltaTime){
+      const sc=this.scene, cam=this.camera, self=this;
+      if((renderer.xr && renderer.xr.isPresenting) || !this._anyGlow(sc)){ this.needsSwap=false; return; }
+      this.needsSwap=true;
+      if(!this._rt){
+        this._rt=new THREE.WebGLRenderTarget(this._w,this._h,{type:THREE.HalfFloatType,depthBuffer:true});
+        this._bloom.setSize(this._w,this._h);
+      }
+      const swaps=[], hidden=[], noop=function(){};
+      const walk=function(o){
+        if(!o.visible) return;
+        if(o.isMesh){
+          const arr=Array.isArray(o.material);
+          const ms=arr ? o.material : [o.material];
+          let glows=false;
+          const out=ms.map(function(m){ const e=self._entry(m); if(e){ glows=true; return self._glowFor(m,e); } return self._black; });
+          const m0=ms[0];
+          if(!arr && !glows && m0 && (m0.transmission>0 || (m0.transparent && m0.opacity<0.99))){ hidden.push(o); o.visible=false; return; }
+          const own=Object.prototype.hasOwnProperty.call(o,'onBeforeRender');
+          swaps.push({o:o,mat:o.material,own:own,obr:o.onBeforeRender});
+          o.material=arr ? out : out[0];
+          o.onBeforeRender=noop;
+        } else if(o.isPoints || o.isLine || o.isSprite){
+          hidden.push(o); o.visible=false; return;
+        }
+        for(let i=0;i<o.children.length;i++) walk(o.children[i]);
+      };
+      const oldBg=sc.background, oldFog=sc.fog, oldAuto=renderer.autoClear, oldRT=renderer.getRenderTarget();
+      const oldClear=renderer.getClearColor(this._clr).getHex(), oldAlpha=renderer.getClearAlpha();
+      const sm=renderer.shadowMap, oldSA=sm.autoUpdate, oldSN=sm.needsUpdate;
+      walk(sc);
+      sc.background=null; sc.fog=null;
+      sm.autoUpdate=false; sm.needsUpdate=false;
+      renderer.autoClear=false;
+      try{
+        renderer.setRenderTarget(this._rt);
+        renderer.setClearColor(0x000000,0);
+        renderer.clear(true,true,true);
+        renderer.render(sc,cam);
+      } finally {
+        for(let i=0;i<swaps.length;i++){
+          const s=swaps[i];
+          s.o.material=s.mat;
+          if(s.own) s.o.onBeforeRender=s.obr; else delete s.o.onBeforeRender;
+        }
+        for(let i=0;i<hidden.length;i++) hidden[i].visible=true;
+        sc.background=oldBg; sc.fog=oldFog;
+        sm.autoUpdate=oldSA; sm.needsUpdate=oldSN;
+        renderer.autoClear=oldAuto;
+        renderer.setClearColor(oldClear,oldAlpha);
+        renderer.setRenderTarget(oldRT);
+      }
+      this._bloom.threshold=0.0; this._bloom.strength=1.0; this._bloom.radius=0.5;
+      this._bloom.render(renderer,null,this._rt,deltaTime,false);
+      const h=this._bloom.renderTargetsHorizontal;
+      const glowTex=(h && h[0]) ? h[0].texture : this._rt.texture;
+      this._mix.uniforms.tBase.value=readBuffer.texture;
+      this._mix.uniforms.tGlow.value=glowTex;
+      renderer.setRenderTarget(this.renderToScreen ? null : writeBuffer);
+      this._quad.render(renderer);
+    }
+  }
+  _wceSelBloom=new WceSelectiveBloomPass(scene,cam);
+  comp.addPass(_wceSelBloom);
 }
 comp.addPass(new OutputPass());
 const _GradeShader = {
@@ -4994,7 +5471,7 @@ function flyToCamera(camName, forceTransition){
      && cam.position.distanceTo(destPos)<0.001 && ctrl.target.distanceTo(destTgt)<0.001
      && (destFov==null || Math.abs(cam.fov-destFov)<0.01
          || (_wceZoomDef===def && (def.fov_zones || (def.look && def.look.zoom_in))))){
-    _wceSetNearCam(def);
+    _wceSetNearCam(def,true);
     return;
   }
   _activeCamFocal=def.focal_length_mm||null;
@@ -5057,6 +5534,22 @@ function flyToCamera(camName, forceTransition){
   document.querySelectorAll('.cam-btn').forEach(b=>b.classList.toggle('active',b.dataset.cam===camName));
   document.querySelector('.tt-btn')?.classList.remove('active');
 }
+const _flyQ=new THREE.Quaternion(), _flyQ0=new THREE.Quaternion();
+function _wceFlyDir(a,b,t,out){
+  const POLE=0.9995;
+  if(Math.abs(a.y)<POLE && Math.abs(b.y)<POLE){
+    const el0=Math.asin(THREE.MathUtils.clamp(a.y,-1,1)), el1=Math.asin(THREE.MathUtils.clamp(b.y,-1,1));
+    const az0=Math.atan2(a.x,a.z), az1=Math.atan2(b.x,b.z);
+    let d=az1-az0;
+    while(d>Math.PI) d-=2*Math.PI;
+    while(d<=-Math.PI) d+=2*Math.PI;
+    const el=el0+(el1-el0)*t, az=az0+d*t, ce=Math.cos(el);
+    return out.set(ce*Math.sin(az), Math.sin(el), ce*Math.cos(az));
+  }
+  _flyQ.setFromUnitVectors(a,b);
+  _flyQ0.identity().slerp(_flyQ,t);
+  return out.copy(a).applyQuaternion(_flyQ0).normalize();
+}
 function _tickFly(dt){
   if(!_flyActive) return;
   _flyT+=dt/_flyDur;
@@ -5074,7 +5567,7 @@ function _tickFly(dt){
   const rawToR=_flyToPos.distanceTo(_flyToTgt);
   const toR=_flyDestSkipRadiusClamp ? rawToR : Math.min(Math.max(rawToR,ZOOM_MIN),ZOOM_MAX);
   const radius=THREE.MathUtils.lerp(fromR,toR,t);
-  const dir=new THREE.Vector3().lerpVectors(fromDir,toDir,t).normalize();
+  const dir=_wceFlyDir(fromDir,toDir,t,new THREE.Vector3());
   cam.position.copy(tgt).addScaledVector(dir,radius);
   ctrl.target.copy(tgt);
   if(_flyToFov!=null){
@@ -6522,8 +7015,12 @@ function _initAnnotations(){
 }
 const _hsRay=new THREE.Raycaster();
 const HOTSPOT_OCCLUSION_BIAS=(typeof CFG!=='undefined' && CFG && CFG.hotspot_occlusion_bias!=null) ? +CFG.hotspot_occlusion_bias : 0.06;
-function _wceSetNearCam(def){
+function _wceSetNearCam(def,keepState){
   window._wceNearCamDef=def;
+  if(!keepState){
+    try{ hotspots.forEach(h=>{ h.vis=null; h.op=0; h._lastOcc=0; h._offScreen=false; if(h.el) h.el.style.display='none'; }); }catch(e){}
+    try{ _imgTriggers.forEach(h=>{ h.vis=null; h.op=0; h._lastOcc=0; h._offScreen=false; if(h.el) h.el.style.display='none'; }); }catch(e){}
+  }
   try{ _hsViewSeq++; }catch(e){}
   try{ if(typeof requestRender==='function') requestRender(800); }catch(e){}
 }

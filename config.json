@@ -2,42 +2,66 @@
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
+      "CARPAINT_METALLIC_1_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
-      "CARPAINT_METALLIC_3_GLTF.001",
-      "CARPAINT_METALLIC_1_GLTF.001"
+      "CARPAINT_METALLIC_3_GLTF.001"
+    ],
+    "LIGHT": [
+      "Orange.001",
+      "Orange_Blinkers"
+    ],
+    "SIDE_LIGHT": [
+      "GLASS_4_GLTF.002",
+      "Orange_Blinkers"
+    ],
+    "REAR_INDICATOR": [
+      "GLASS_4_GLTF",
+      "Orange_Blinkers.001"
     ]
   },
   "render_priority": {},
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
+      "CARPAINT_METALLIC_1_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
-      "CARPAINT_METALLIC_3_GLTF.001",
-      "CARPAINT_METALLIC_1_GLTF.001"
+      "CARPAINT_METALLIC_3_GLTF.001"
+    ],
+    "LIGHT": [
+      "Orange.001",
+      "Orange_Blinkers"
+    ],
+    "SIDE_LIGHT": [
+      "GLASS_4_GLTF.002",
+      "Orange_Blinkers"
+    ],
+    "REAR_INDICATOR": [
+      "GLASS_4_GLTF",
+      "Orange_Blinkers.001"
     ]
   },
   "color_selector": {
     "items": []
   },
   "mat_colors": {
-    "CARPAINT_METALLIC_3_GLTF.001": {
+    "GLASS_4_GLTF.002": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
+        0.22691115736961365,
+        0.22691115736961365,
+        0.22691115736961365
       ],
-      "metallic": 0.3776,
-      "roughness": 0.0544,
+      "metallic": 0.0,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
@@ -45,12 +69,100 @@
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "clearcoatRoughness": 0.0,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 1.0,
+      "ior": 4.45,
+      "specularIntensity": 0.5
+    },
+    "CARPAINT_METALLIC_3_GLTF.001": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.1292,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
       "ior": 1.5,
       "specularIntensity": 0.0498
+    },
+    "Orange.001": {
+      "color": [
+        0.8057554364204407,
+        0.3130273222923279,
+        0.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
+      "sheen": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
+      "ior": 1.5,
+      "specularIntensity": 0.5
+    },
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.5,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2077,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_2_GLTF": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.113,
+      "roughness": 0.088,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.65,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
     },
     "CARPAINT_METALLIC_2_GLTF.001": {
       "color": [
@@ -81,7 +193,7 @@
         0.05287881940603256
       ],
       "metallic": 0.3776,
-      "roughness": 0.0544,
+      "roughness": 0.5,
       "emissive": [
         1.0,
         1.0,
@@ -89,56 +201,78 @@
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "clearcoatRoughness": 0.2077,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
       "ior": 1.5,
       "specularIntensity": 0.0498
     },
-    "CARPAINT_METALLIC_3_GLTF": {
+    "Orange_Blinkers": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "metallic": 0.3776,
-      "roughness": 0.0544,
+      "metallic": 0.0,
+      "roughness": 0.0,
       "emissive": [
-        1.0,
-        1.0,
-        1.0
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "emissiveIntensity": 10.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
       "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
       "ior": 1.5,
-      "specularIntensity": 0.0498
+      "specularIntensity": 0.5
     },
-    "CARPAINT_METALLIC_2_GLTF": {
+    "Orange_Blinkers.001": {
       "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "metallic": 0.113,
-      "roughness": 0.088,
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
+      ],
+      "emissiveIntensity": 15.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
+      "sheen": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
+      "ior": 1.5,
+      "specularIntensity": 0.5
+    },
+    "GLASS_4_GLTF": {
+      "color": [
+        0.02809673361480236,
+        0.02809673361480236,
+        0.02809673361480236
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.65,
+      "clearcoat": 0.2054,
+      "clearcoatRoughness": 0.0,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
+      "transmission": 1.0,
+      "ior": 1.0,
+      "specularIntensity": 0.5
     },
     "CARPAINT_METALLIC_1_GLTF.001": {
       "color": [
@@ -147,7 +281,7 @@
         0.05287881940603256
       ],
       "metallic": 0.3776,
-      "roughness": 0.0544,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
@@ -155,7 +289,7 @@
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2137,
+      "clearcoatRoughness": 0.1292,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
@@ -188,6 +322,16 @@
       "b": 2.5,
       "c": 1.0
     },
+    "METAL_GRID_1_GLTF": {
+      "b": 1.5,
+      "c": 1.5
+    },
+    "MILKY.001": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 1.5,
+      "bm": 1
+    },
     "PERFORATION 1.003": {
       "b": 2.5,
       "c": 1.0
@@ -200,13 +344,25 @@
       "b": 2.5,
       "c": 1.0
     },
-    "PERFORATION 1.005": {
+    "TAIL_LAMP.001": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 1.5,
+      "bm": 1
+    },
+    "PERFORATION 1.004": {
       "b": 2.5,
       "c": 1.0
     },
     "REAR SEAT.003": {
       "b": 2.5,
       "c": 1.0
+    },
+    "Orange_Blinkers": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 8.0,
+      "bm": 0
     }
   },
   "light_mat_links": [],
@@ -313,17 +469,15 @@
     }
   ],
   "global_mat_sets": [],
-  "mat_animations": [],
-  "sounds": [],
-  "geo_animations": [
+  "mat_animations": [
     {
-      "source_key": "__geov__GEOMETRIES_BLINKERS",
-      "label": "BLINKERS",
+      "source_key": "__ctr__REAR_INDICATOR",
+      "label": "REAR INDICATOR",
       "play_mode": "cycle",
       "transition_sec": 0.0,
       "play_order": [
-        "GEOMETRIES_BLINKERS_OFF",
-        "GEOMETRIES_BLINKERS_ON"
+        "GLASS_4_GLTF",
+        "Orange_Blinkers.001"
       ],
       "cycle": {
         "trigger_type": "button",
@@ -334,40 +488,49 @@
         "play_from_startup_mobile": true,
         "pause_sec": 0.5,
         "stop_mode": "target",
-        "stop_target": "GEOMETRIES_BLINKERS_OFF",
-        "stop_reach": "jump"
+        "stop_target": "GLASS_4_GLTF",
+        "stop_reach": "cycle"
       },
       "step": {
         "trigger_type": "button",
         "extra_hotspots": [],
         "extra_images": []
       },
-      "source_type": "geo_variant",
-      "geo_parent": "GEOMETRIES_BLINKERS",
-      "variant_chains": {
-        "GEOMETRIES_BLINKERS_OFF": [
-          {
-            "parent": "GEOMETRIES_BLINKERS",
-            "child": "GEOMETRIES_BLINKERS_OFF",
-            "siblings": [
-              "GEOMETRIES_BLINKERS_ON",
-              "GEOMETRIES_BLINKERS_OFF"
-            ]
-          }
-        ],
-        "GEOMETRIES_BLINKERS_ON": [
-          {
-            "parent": "GEOMETRIES_BLINKERS",
-            "child": "GEOMETRIES_BLINKERS_ON",
-            "siblings": [
-              "GEOMETRIES_BLINKERS_ON",
-              "GEOMETRIES_BLINKERS_OFF"
-            ]
-          }
-        ]
-      }
+      "source_type": "container",
+      "container": "REAR_INDICATOR"
+    },
+    {
+      "source_key": "__ctr__SIDE_LIGHT",
+      "label": "SIDE LIGHT",
+      "play_mode": "cycle",
+      "transition_sec": 0.0,
+      "play_order": [
+        "GLASS_4_GLTF.002",
+        "Orange_Blinkers"
+      ],
+      "cycle": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": [],
+        "start_mode": "trigger",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "pause_sec": 0.5,
+        "stop_mode": "target",
+        "stop_target": "GLASS_4_GLTF.002",
+        "stop_reach": "cycle"
+      },
+      "step": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": []
+      },
+      "source_type": "container",
+      "container": "SIDE_LIGHT"
     }
   ],
+  "sounds": [],
+  "geo_animations": [],
   "area_lights": [],
   "light_shadows": {},
   "light_intensity_divisors": {},
@@ -459,7 +622,7 @@
   "startup_sound": "",
   "camera": {
     "orbit_damping": 0.25,
-    "zoom_min": 4.366,
+    "zoom_min": 5.619,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
@@ -544,7 +707,7 @@
       "file": "hdri/environment_1.hdr",
       "strength": 1.0,
       "background": false,
-      "rotation_z": -10.89,
+      "rotation_z": 90.0,
       "flatten_ground": false,
       "ground_height": -1.0,
       "ground_radius": 25.0,
@@ -591,7 +754,7 @@
     "env_rotation": [
       0.0,
       0.0,
-      -10.89
+      90.0
     ],
     "env_scale": [
       1.0,
@@ -612,7 +775,7 @@
     "mat_add_crossfade": false,
     "geometry": true,
     "mat_sec": 0.3,
-    "geo_sec": 0.18
+    "geo_sec": 0.0
   },
   "mat_category_transition_overrides": {},
   "mat_container_transition_overrides": {},
@@ -698,54 +861,6 @@
         "id": "control:FOOTSTEP_NLA"
       },
       {
-        "name": "RR_RH_DOOR_NLA",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:RR_RH_DOOR_NLA"
-      },
-      {
-        "name": "RR_LH_DOOR_NLA",
-        "anim_type": "SCENE",
-        "states": 2,
-        "trigger": "button",
-        "hidden_ui": true,
-        "state_names": [
-          "Start",
-          "End"
-        ],
-        "state_fracs": [
-          0.0,
-          1.0
-        ],
-        "playback_mode": "LOOP",
-        "play_from_startup": false,
-        "play_from_startup_mobile": true,
-        "keep_playing": false,
-        "keep_playing_pause_sec": 1.0,
-        "extra_hotspots": [],
-        "extra_images": [],
-        "kind": "control",
-        "id": "control:RR_LH_DOOR_NLA"
-      },
-      {
         "name": "SLIDING_NLA",
         "anim_type": "SCENE",
         "states": 2,
@@ -768,6 +883,150 @@
         "extra_images": [],
         "kind": "control",
         "id": "control:SLIDING_NLA"
+      },
+      {
+        "name": "RR_DOOR_RL_STEP1_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RL_STEP1_NLA"
+      },
+      {
+        "name": "RR_DOOR_RH_STEP2_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RH_STEP2_NLA"
+      },
+      {
+        "name": "RR_DOOR_RH_STEP1_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RH_STEP1_NLA"
+      },
+      {
+        "name": "RR_DOOR_RL_STEP2_NLA",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:RR_DOOR_RL_STEP2_NLA"
+      },
+      {
+        "name": "HOSE_LH",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:HOSE_LH"
+      },
+      {
+        "name": "HOSE_RH",
+        "anim_type": "SCENE",
+        "states": 2,
+        "trigger": "button",
+        "hidden_ui": true,
+        "state_names": [
+          "Start",
+          "End"
+        ],
+        "state_fracs": [
+          0.0,
+          1.0
+        ],
+        "playback_mode": "LOOP",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "keep_playing": false,
+        "keep_playing_pause_sec": 1.0,
+        "extra_hotspots": [],
+        "extra_images": [],
+        "kind": "control",
+        "id": "control:HOSE_RH"
       }
     ],
     "combos": [
@@ -777,9 +1036,13 @@
           "PASS_DOOR_NLA",
           "DRIVER_DOOR_NLA",
           "FOOTSTEP_NLA",
-          "RR_RH_DOOR_NLA",
-          "RR_LH_DOOR_NLA",
-          "SLIDING_NLA"
+          "SLIDING_NLA",
+          "RR_DOOR_RL_STEP1_NLA",
+          "RR_DOOR_RH_STEP2_NLA",
+          "RR_DOOR_RH_STEP1_NLA",
+          "RR_DOOR_RL_STEP2_NLA",
+          "HOSE_LH",
+          "HOSE_RH"
         ],
         "trigger": "button",
         "states": 2,
@@ -800,15 +1063,31 @@
             0.0,
             1.0
           ],
-          "RR_RH_DOOR_NLA": [
-            0.0,
-            1.0
-          ],
-          "RR_LH_DOOR_NLA": [
-            0.0,
-            1.0
-          ],
           "SLIDING_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RL_STEP1_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RH_STEP2_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RH_STEP1_NLA": [
+            0.0,
+            1.0
+          ],
+          "RR_DOOR_RL_STEP2_NLA": [
+            0.0,
+            1.0
+          ],
+          "HOSE_LH": [
+            0.0,
+            1.0
+          ],
+          "HOSE_RH": [
             0.0,
             1.0
           ]
@@ -826,9 +1105,13 @@
           "control:PASS_DOOR_NLA",
           "control:DRIVER_DOOR_NLA",
           "control:FOOTSTEP_NLA",
-          "control:RR_RH_DOOR_NLA",
-          "control:RR_LH_DOOR_NLA",
-          "control:SLIDING_NLA"
+          "control:SLIDING_NLA",
+          "control:RR_DOOR_RL_STEP1_NLA",
+          "control:RR_DOOR_RH_STEP2_NLA",
+          "control:RR_DOOR_RH_STEP1_NLA",
+          "control:RR_DOOR_RL_STEP2_NLA",
+          "control:HOSE_LH",
+          "control:HOSE_RH"
         ]
       }
     ],
@@ -1118,9 +1401,24 @@
           },
           {
             "together": true,
-            "action_type": "geo_anim",
+            "action_type": "mat_anim",
             "action_name": "",
-            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_name": "__ctr__REAR_INDICATOR",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "start",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          },
+          {
+            "together": true,
+            "action_type": "mat_anim",
+            "action_name": "",
+            "target_name": "__ctr__SIDE_LIGHT",
             "target_uid": "",
             "target_state": 1,
             "sound_action": "",
@@ -1198,9 +1496,24 @@
           },
           {
             "together": true,
-            "action_type": "geo_anim",
+            "action_type": "mat_anim",
             "action_name": "",
-            "target_name": "__geov__GEOMETRIES_BLINKERS",
+            "target_name": "__ctr__REAR_INDICATOR",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "stop",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          },
+          {
+            "together": true,
+            "action_type": "mat_anim",
+            "action_name": "",
+            "target_name": "__ctr__SIDE_LIGHT",
             "target_uid": "",
             "target_state": 1,
             "sound_action": "",
@@ -1309,7 +1622,7 @@
   ],
   "cameras": {
     "fly_duration": 1.2,
-    "zoom_min": 4.366,
+    "zoom_min": 5.619,
     "zoom_max": 11.469,
     "zoom_min_offset": [
       0.0,
