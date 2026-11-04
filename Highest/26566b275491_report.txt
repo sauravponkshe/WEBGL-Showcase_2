@@ -3,8 +3,8 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT\Highest\26566b275491.gltf
-Generated: 2026-11-04 11:52:08
-Total size (this .gltf + its .bin + every texture file): 41.65 MB
+Generated: 2026-11-04 12:53:33
+Total size (this .gltf + its .bin + every texture file): 41.87 MB
 
 ======================================================================
 EXPORT CONFIGURATION
@@ -35,7 +35,7 @@ None: every animated object sits under its own ANIM_ empty.
 SIZE BREAKDOWN (approximate — see notes)
 ======================================================================
 Geometry (vertex/index buffers): 0 B
-Textures (loose files, External Textures mode):    12.42 MB
+Textures (loose files, External Textures mode):    12.65 MB
 Unaccounted (other bufferViews): 28.68 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
 Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
 
@@ -60,7 +60,7 @@ Group_001_ao                             image/ktx2   unknown        164.5 KB   
 Group_ao                                 image/ktx2   unknown        230.7 KB     230.7 KB
 Image_21                                 image/ktx2   unknown          3.3 KB       3.3 KB
 Image_18                                 image/ktx2   unknown         16.2 KB      16.2 KB
-Image_19                                 image/ktx2   unknown         42.8 KB      42.8 KB
+Image_19                                 image/jpeg   sRGB            93.7 KB     749.9 KB
 CARPET_ao                                image/ktx2   unknown         40.6 KB      40.6 KB
 Image_55                                 image/ktx2   unknown          6.8 KB       6.8 KB
 Image_56                                 image/ktx2   unknown         45.3 KB      45.3 KB
@@ -73,9 +73,9 @@ Front_Tyre005_006_ao                     image/ktx2   unknown        174.6 KB   
 Image_40                                 image/ktx2   unknown          9.9 KB       9.9 KB
 Image                                    image/ktx2   unknown           361 B        361 B
 Image_4                                  image/jpeg   sRGB           111.8 KB     894.2 KB
-leather_red_02_nor_gl_1k                 image/ktx2   unknown        127.2 KB     127.2 KB
+leather_red_02_nor_gl_1k                 image/jpeg   linear         184.6 KB      1.44 MB
 Interior_Body_001_ao                     image/ktx2   unknown        252.5 KB     252.5 KB
-leather_red_02_rough_1k                  image/ktx2   unknown        120.3 KB     120.3 KB
+leather_red_02_rough_1k                  image/jpeg   linear         175.2 KB      1.37 MB
 Fabric04_1K_Normal                       image/jpeg   linear         379.0 KB      2.96 MB
 LWB_ROOF_01_00_ao                        image/ktx2   unknown         40.3 KB      40.3 KB
 Fabric04_1K_Roughness                    image/jpeg   linear          37.1 KB     296.4 KB
@@ -125,7 +125,7 @@ Image_10                                 image/ktx2   unknown        160.8 KB   
 Image_11                                 image/ktx2   unknown         81.0 KB      81.0 KB
 Image_22                                 image/jpeg   linear         455.4 KB      3.56 MB
 Object125_ao                             image/ktx2   unknown        224.7 KB     224.7 KB
-Image_23                                 image/ktx2   unknown         76.9 KB      76.9 KB
+Image_23                                 image/jpeg   sRGB           142.6 KB      1.11 MB
 Image_25                                 image/jpeg   linear         984.6 KB      7.69 MB
 Image_26                                 image/ktx2   unknown        230.1 KB     230.1 KB
 Open_body_144_ao                         image/ktx2   unknown        197.7 KB     197.7 KB
@@ -134,7 +134,7 @@ SEAT_SYSTEM_TWIN_PASSENGER_RECLINE_SEAT_ image/ktx2   unknown        258.0 KB   
 Seat_Accesories_2_001_ao                 image/ktx2   unknown        312.2 KB     312.2 KB
 Image_43                                 image/ktx2   unknown         46.5 KB      46.5 KB
 
-Estimated total VRAM for textures: 48.29 MB
+Estimated total VRAM for textures: 52.59 MB
 
 ======================================================================
 MATERIALS / DRAW CALLS
