@@ -2,9 +2,9 @@
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
+      "CARPAINT_METALLIC_3_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF",
-      "CARPAINT_METALLIC_3_GLTF"
+      "CARPAINT_METALLIC_2_GLTF"
     ],
     "BODYPAINTWITHAO": [
       "CARPAINT_METALLIC_1_GLTF.001",
@@ -28,9 +28,9 @@
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
+      "CARPAINT_METALLIC_3_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF",
-      "CARPAINT_METALLIC_3_GLTF"
+      "CARPAINT_METALLIC_2_GLTF"
     ],
     "BODYPAINTWITHAO": [
       "CARPAINT_METALLIC_1_GLTF.001",
@@ -54,49 +54,27 @@
     "items": []
   },
   "mat_colors": {
-    "GLASS_4_GLTF.002": {
+    "Orange_Blinkers": {
       "color": [
-        0.22691115736961365,
-        0.22691115736961365,
-        0.22691115736961365
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
       "metallic": 0.0,
       "roughness": 0.0,
       "emissive": [
-        1.0,
-        1.0,
-        1.0
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
       ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.0,
+      "emissiveIntensity": 10.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
       "sheen": 0.0,
-      "sheenRoughness": 0.0,
+      "sheenRoughness": 0.5,
       "transmission": 1.0,
-      "ior": 4.45,
-      "specularIntensity": 0.5
-    },
-    "CARPAINT_METALLIC_3_GLTF.001": {
-      "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.0,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.1292,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
       "ior": 1.5,
-      "specularIntensity": 0.0498
+      "specularIntensity": 0.5
     },
     "Orange.001": {
       "color": [
@@ -112,116 +90,6 @@
         0.0
       ],
       "emissiveIntensity": 0.0,
-      "clearcoat": 0.0,
-      "clearcoatRoughness": 0.03,
-      "sheen": 0.0,
-      "sheenRoughness": 0.5,
-      "transmission": 1.0,
-      "ior": 1.5,
-      "specularIntensity": 0.5
-    },
-    "CARPAINT_METALLIC_3_GLTF": {
-      "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.5,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2077,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.0498
-    },
-    "CARPAINT_METALLIC_2_GLTF": {
-      "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
-      ],
-      "metallic": 0.113,
-      "roughness": 0.088,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.65,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.2734
-    },
-    "CARPAINT_METALLIC_2_GLTF.001": {
-      "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
-      ],
-      "metallic": 0.1329,
-      "roughness": 0.25,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 0.5,
-      "clearcoatRoughness": 0.65,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.0,
-      "specularIntensity": 0.2734
-    },
-    "CARPAINT_METALLIC_1_GLTF": {
-      "color": [
-        0.05690384283661842,
-        0.05287881940603256,
-        0.05287881940603256
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.5,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2077,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.0498
-    },
-    "Orange_Blinkers": {
-      "color": [
-        0.8069524765014648,
-        0.3139888048171997,
-        0.0
-      ],
-      "metallic": 0.0,
-      "roughness": 0.0,
-      "emissive": [
-        0.8069524765014648,
-        0.3139888048171997,
-        0.0
-      ],
-      "emissiveIntensity": 10.0,
       "clearcoat": 0.0,
       "clearcoatRoughness": 0.03,
       "sheen": 0.0,
@@ -274,6 +142,138 @@
       "ior": 1.0,
       "specularIntensity": 0.5
     },
+    "CARPAINT_METALLIC_2_GLTF.001": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.1329,
+      "roughness": 0.25,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.65,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.0,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_2_GLTF": {
+      "color": [
+        0.6583749651908875,
+        0.6583749651908875,
+        0.6583749651908875
+      ],
+      "metallic": 0.113,
+      "roughness": 0.088,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 0.5,
+      "clearcoatRoughness": 0.65,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.2734
+    },
+    "CARPAINT_METALLIC_3_GLTF.001": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.126,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.008568127639591694,
+        0.014443841762840748,
+        0.026241226121783257
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.5,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2077,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_1_GLTF": {
+      "color": [
+        0.05690384283661842,
+        0.05287881940603256,
+        0.05287881940603256
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.5,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2077,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "GLASS_4_GLTF.002": {
+      "color": [
+        0.22691115736961365,
+        0.22691115736961365,
+        0.22691115736961365
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.0,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 1.0,
+      "ior": 4.45,
+      "specularIntensity": 0.5
+    },
     "CARPAINT_METALLIC_1_GLTF.001": {
       "color": [
         0.05690384283661842,
@@ -289,7 +289,7 @@
       ],
       "emissiveIntensity": 0.0,
       "clearcoat": 1.0,
-      "clearcoatRoughness": 0.1292,
+      "clearcoatRoughness": 0.126,
       "sheen": 0.0,
       "sheenRoughness": 0.0,
       "transmission": 0.0,
@@ -298,6 +298,12 @@
     }
   },
   "mat_bc": {
+    "Dashboard": {
+      "b": 1.7967,
+      "c": 0.9917,
+      "h": 0.5,
+      "s": 0.1017
+    },
     "Driver Seat": {
       "b": 2.5,
       "c": 1.0
@@ -347,8 +353,13 @@
     "TAIL_LAMP.001": {
       "b": 1.0,
       "c": 1.0,
-      "ba": 1.5,
-      "bm": 1
+      "ba": 0.75,
+      "bm": 1,
+      "bk": [
+        0.49,
+        0.0,
+        0.0
+      ]
     },
     "PERFORATION 1.004": {
       "b": 2.5,
@@ -539,6 +550,18 @@
     "enabled": false
   },
   "post_process": {
+    "bloom_override": {
+      "desktop": {
+        "enabled": true,
+        "res": "full",
+        "type": "material"
+      },
+      "phone": {
+        "enabled": true,
+        "res": "half",
+        "type": "emissive"
+      }
+    },
     "noise": {
       "enabled": false,
       "amount": 0.05,
