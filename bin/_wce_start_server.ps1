@@ -114,13 +114,13 @@ try {
             # The page files (index.html, ui.js, config.json, variants.json, the Page Icon) sit in the folder itself.
             # A top-level request that isn't there is answered from bin/ (an older export kept them there) -- the
             # launcher's own files are never served this way.
-            if (-not (Test-Path $filePath -PathType Leaf) -and $reqPath -notmatch '[\\/]' -and $reqPath -notmatch '\.(ps1|bat|lnk)$') {
+            if (-not (Test-Path -LiteralPath $filePath -PathType Leaf) -and $reqPath -notmatch '[\\/]' -and $reqPath -notmatch '\.(ps1|bat|lnk)$') {
                 $binPath = Join-Path (Join-Path $root 'bin') $reqPath
-                if (Test-Path $binPath -PathType Leaf) { $filePath = $binPath }
+                if (Test-Path -LiteralPath $binPath -PathType Leaf) { $filePath = $binPath }
             }
             $fullFile = $null
-            if (Test-Path $filePath -PathType Leaf) {
-                $fullFile = (Resolve-Path $filePath).Path
+            if (Test-Path -LiteralPath $filePath -PathType Leaf) {
+                $fullFile = (Resolve-Path -LiteralPath $filePath).Path
             }
 
             # Guard against "../" style paths escaping the export folder.

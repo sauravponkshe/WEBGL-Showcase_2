@@ -2,14 +2,14 @@
   "config_warnings": [],
   "containers": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF"
+      "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
-      "CARPAINT_METALLIC_1_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
-      "CARPAINT_METALLIC_3_GLTF.001"
+      "CARPAINT_METALLIC_3_GLTF.001",
+      "CARPAINT_METALLIC_1_GLTF.001"
     ],
     "LIGHT": [
       "Orange.001",
@@ -21,6 +21,10 @@
     ],
     "REAR_INDICATOR": [
       "GLASS_4_GLTF",
+      "Orange_Blinkers.001"
+    ],
+    "HEADLAMP_INDICATOR": [
+      "Material.003",
       "Orange_Blinkers.001"
     ]
   },
@@ -28,14 +32,14 @@
   "render_priority_dynamic_groups": [],
   "containers_all": {
     "BODYPAINT": [
-      "CARPAINT_METALLIC_3_GLTF",
+      "CARPAINT_METALLIC_2_GLTF",
       "CARPAINT_METALLIC_1_GLTF",
-      "CARPAINT_METALLIC_2_GLTF"
+      "CARPAINT_METALLIC_3_GLTF"
     ],
     "BODYPAINTWITHAO": [
-      "CARPAINT_METALLIC_1_GLTF.001",
       "CARPAINT_METALLIC_2_GLTF.001",
-      "CARPAINT_METALLIC_3_GLTF.001"
+      "CARPAINT_METALLIC_3_GLTF.001",
+      "CARPAINT_METALLIC_1_GLTF.001"
     ],
     "LIGHT": [
       "Orange.001",
@@ -48,12 +52,82 @@
     "REAR_INDICATOR": [
       "GLASS_4_GLTF",
       "Orange_Blinkers.001"
+    ],
+    "HEADLAMP_INDICATOR": [
+      "Material.003",
+      "Orange_Blinkers.001"
     ]
   },
   "color_selector": {
     "items": []
   },
   "mat_colors": {
+    "CARPAINT_METALLIC_3_GLTF": {
+      "color": [
+        0.0001,
+        0.0168,
+        0.05931
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.5,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2077,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "CARPAINT_METALLIC_3_GLTF.001": {
+      "color": [
+        0.0001,
+        0.0168,
+        0.05931
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.126,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "GLASS_4_GLTF.002": {
+      "color": [
+        0.22691115736961365,
+        0.22691115736961365,
+        0.22691115736961365
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.0,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 1.0,
+      "ior": 4.45,
+      "specularIntensity": 0.5
+    },
     "Orange_Blinkers": {
       "color": [
         0.8069524765014648,
@@ -98,27 +172,27 @@
       "ior": 1.5,
       "specularIntensity": 0.5
     },
-    "Orange_Blinkers.001": {
+    "CARPAINT_METALLIC_1_GLTF": {
       "color": [
-        0.8069524765014648,
-        0.3139888048171997,
-        0.0
+        0.0674,
+        0.0609,
+        0.0648
       ],
-      "metallic": 0.0,
-      "roughness": 0.0,
+      "metallic": 0.3776,
+      "roughness": 0.5,
       "emissive": [
-        0.8069524765014648,
-        0.3139888048171997,
-        0.0
+        1.0,
+        1.0,
+        1.0
       ],
-      "emissiveIntensity": 15.0,
-      "clearcoat": 0.0,
-      "clearcoatRoughness": 0.03,
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.2077,
       "sheen": 0.0,
-      "sheenRoughness": 0.5,
-      "transmission": 1.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
       "ior": 1.5,
-      "specularIntensity": 0.5
+      "specularIntensity": 0.0498
     },
     "GLASS_4_GLTF": {
       "color": [
@@ -144,12 +218,12 @@
     },
     "CARPAINT_METALLIC_2_GLTF.001": {
       "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
+        1.0,
+        1.0,
+        0.987
       ],
-      "metallic": 0.1329,
-      "roughness": 0.25,
+      "metallic": 0.06,
+      "roughness": 0.0,
       "emissive": [
         1.0,
         1.0,
@@ -164,14 +238,58 @@
       "ior": 1.0,
       "specularIntensity": 0.2734
     },
+    "CARPAINT_METALLIC_1_GLTF.001": {
+      "color": [
+        0.0674,
+        0.0609,
+        0.0648
+      ],
+      "metallic": 0.3776,
+      "roughness": 0.0,
+      "emissive": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "emissiveIntensity": 0.0,
+      "clearcoat": 1.0,
+      "clearcoatRoughness": 0.126,
+      "sheen": 0.0,
+      "sheenRoughness": 0.0,
+      "transmission": 0.0,
+      "ior": 1.5,
+      "specularIntensity": 0.0498
+    },
+    "Orange_Blinkers.001": {
+      "color": [
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
+      ],
+      "metallic": 0.0,
+      "roughness": 0.0,
+      "emissive": [
+        0.8069524765014648,
+        0.3139888048171997,
+        0.0
+      ],
+      "emissiveIntensity": 15.0,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
+      "sheen": 0.0,
+      "sheenRoughness": 0.5,
+      "transmission": 1.0,
+      "ior": 1.5,
+      "specularIntensity": 0.5
+    },
     "CARPAINT_METALLIC_2_GLTF": {
       "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
+        1.0,
+        1.0,
+        0.987
       ],
-      "metallic": 0.113,
-      "roughness": 0.088,
+      "metallic": 0.06,
+      "roughness": 0.5,
       "emissive": [
         1.0,
         1.0,
@@ -186,115 +304,27 @@
       "ior": 1.5,
       "specularIntensity": 0.2734
     },
-    "CARPAINT_METALLIC_3_GLTF.001": {
+    "Material.003": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.0,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.126,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.0498
-    },
-    "CARPAINT_METALLIC_3_GLTF": {
-      "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.5,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2077,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.0498
-    },
-    "CARPAINT_METALLIC_1_GLTF": {
-      "color": [
-        0.05690384283661842,
-        0.05287881940603256,
-        0.05287881940603256
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.5,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.2077,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 0.0,
-      "ior": 1.5,
-      "specularIntensity": 0.0498
-    },
-    "GLASS_4_GLTF.002": {
-      "color": [
-        0.22691115736961365,
-        0.22691115736961365,
-        0.22691115736961365
+        0.800000011920929,
+        0.800000011920929,
+        0.800000011920929
       ],
       "metallic": 0.0,
-      "roughness": 0.0,
+      "roughness": 0.5,
       "emissive": [
         1.0,
         1.0,
         1.0
       ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.0,
+      "emissiveIntensity": 5.9,
+      "clearcoat": 0.0,
+      "clearcoatRoughness": 0.03,
       "sheen": 0.0,
-      "sheenRoughness": 0.0,
-      "transmission": 1.0,
-      "ior": 4.45,
-      "specularIntensity": 0.5
-    },
-    "CARPAINT_METALLIC_1_GLTF.001": {
-      "color": [
-        0.05690384283661842,
-        0.05287881940603256,
-        0.05287881940603256
-      ],
-      "metallic": 0.3776,
-      "roughness": 0.0,
-      "emissive": [
-        1.0,
-        1.0,
-        1.0
-      ],
-      "emissiveIntensity": 0.0,
-      "clearcoat": 1.0,
-      "clearcoatRoughness": 0.126,
-      "sheen": 0.0,
-      "sheenRoughness": 0.0,
+      "sheenRoughness": 0.5,
       "transmission": 0.0,
       "ior": 1.5,
-      "specularIntensity": 0.0498
+      "specularIntensity": 0.5
     }
   },
   "mat_bc": {
@@ -328,9 +358,16 @@
       "b": 2.5,
       "c": 1.0
     },
+    "Material #950048.001": {
+      "b": 0.9501,
+      "c": 1.03
+    },
     "METAL_GRID_1_GLTF": {
-      "b": 1.5,
-      "c": 1.5
+      "b": 1.0,
+      "c": 1.0,
+      "fa": 1.0,
+      "fe": 1.0,
+      "fp": 7.58
     },
     "MILKY.001": {
       "b": 1.0,
@@ -405,22 +442,6 @@
         },
         {
           "name": "GEOMETRIES_LAMPS_OFF",
-          "enabled": true,
-          "children": []
-        }
-      ]
-    },
-    "GEOMETRIES_BLINKERS": {
-      "name": "GEOMETRIES_BLINKERS",
-      "enabled": true,
-      "children": [
-        {
-          "name": "GEOMETRIES_BLINKERS_ON",
-          "enabled": true,
-          "children": []
-        },
-        {
-          "name": "GEOMETRIES_BLINKERS_OFF",
           "enabled": true,
           "children": []
         }
@@ -500,7 +521,7 @@
         "pause_sec": 0.5,
         "stop_mode": "target",
         "stop_target": "GLASS_4_GLTF",
-        "stop_reach": "cycle"
+        "stop_reach": "jump"
       },
       "step": {
         "trigger_type": "button",
@@ -529,7 +550,7 @@
         "pause_sec": 0.5,
         "stop_mode": "target",
         "stop_target": "GLASS_4_GLTF.002",
-        "stop_reach": "cycle"
+        "stop_reach": "jump"
       },
       "step": {
         "trigger_type": "button",
@@ -538,6 +559,35 @@
       },
       "source_type": "container",
       "container": "SIDE_LIGHT"
+    },
+    {
+      "source_key": "__ctr__HEADLAMP_INDICATOR",
+      "label": "HEADLAMP INDICATOR",
+      "play_mode": "cycle",
+      "transition_sec": 0.0,
+      "play_order": [
+        "Material.003",
+        "Orange_Blinkers.001"
+      ],
+      "cycle": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": [],
+        "start_mode": "trigger",
+        "play_from_startup": false,
+        "play_from_startup_mobile": true,
+        "pause_sec": 0.5,
+        "stop_mode": "target",
+        "stop_target": "Material.003",
+        "stop_reach": "jump"
+      },
+      "step": {
+        "trigger_type": "button",
+        "extra_hotspots": [],
+        "extra_images": []
+      },
+      "source_type": "container",
+      "container": "HEADLAMP_INDICATOR"
     }
   ],
   "sounds": [],
@@ -613,7 +663,7 @@
       "msaa_max_pixel_ratio": 1.5,
       "idle_enabled": true,
       "idle_frames": 16,
-      "idle_delay_ms": 50,
+      "idle_delay_ms": 500,
       "idle_mobile": true,
       "snapshot_max_quality": true,
       "lowend_downgrade": true,
@@ -655,7 +705,7 @@
       0.0,
       -0.0
     ],
-    "floor_z": 0.0,
+    "floor_z": 0.187,
     "lock_zoom": "off",
     "lock_zoom_phone": false,
     "fit_on_resize": false,
@@ -1451,6 +1501,21 @@
             "container_name": "",
             "container_material": "",
             "geo_toggle_chain": []
+          },
+          {
+            "together": true,
+            "action_type": "mat_anim",
+            "action_name": "",
+            "target_name": "__ctr__HEADLAMP_INDICATOR",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "start",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
           }
         ]
       },
@@ -1537,6 +1602,21 @@
             "action_type": "mat_anim",
             "action_name": "",
             "target_name": "__ctr__SIDE_LIGHT",
+            "target_uid": "",
+            "target_state": 1,
+            "sound_action": "",
+            "matgeo_action": "stop",
+            "playback_mode": "once",
+            "camera": "",
+            "container_name": "",
+            "container_material": "",
+            "geo_toggle_chain": []
+          },
+          {
+            "together": false,
+            "action_type": "mat_anim",
+            "action_name": "",
+            "target_name": "__ctr__HEADLAMP_INDICATOR",
             "target_uid": "",
             "target_state": 1,
             "sound_action": "",
