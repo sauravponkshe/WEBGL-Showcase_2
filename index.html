@@ -428,9 +428,9 @@ const CFG = {
   "mat_colors": {
     "CARPAINT_METALLIC_3_GLTF": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
+        0.0001,
+        0.0168,
+        0.05931
       ],
       "metallic": 0.3776,
       "roughness": 0.5,
@@ -450,9 +450,9 @@ const CFG = {
     },
     "CARPAINT_METALLIC_3_GLTF.001": {
       "color": [
-        0.008568127639591694,
-        0.014443841762840748,
-        0.026241226121783257
+        0.0001,
+        0.0168,
+        0.05931
       ],
       "metallic": 0.3776,
       "roughness": 0.0,
@@ -538,9 +538,9 @@ const CFG = {
     },
     "CARPAINT_METALLIC_1_GLTF": {
       "color": [
-        0.05690384283661842,
-        0.05287881940603256,
-        0.05287881940603256
+        0.0674,
+        0.0609,
+        0.0648
       ],
       "metallic": 0.3776,
       "roughness": 0.5,
@@ -582,11 +582,11 @@ const CFG = {
     },
     "CARPAINT_METALLIC_2_GLTF.001": {
       "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
+        1.0,
+        1.0,
+        0.987
       ],
-      "metallic": 0.1329,
+      "metallic": 0.06,
       "roughness": 0.0,
       "emissive": [
         1.0,
@@ -604,9 +604,9 @@ const CFG = {
     },
     "CARPAINT_METALLIC_1_GLTF.001": {
       "color": [
-        0.05690384283661842,
-        0.05287881940603256,
-        0.05287881940603256
+        0.0674,
+        0.0609,
+        0.0648
       ],
       "metallic": 0.3776,
       "roughness": 0.0,
@@ -648,11 +648,11 @@ const CFG = {
     },
     "CARPAINT_METALLIC_2_GLTF": {
       "color": [
-        0.6583749651908875,
-        0.6583749651908875,
-        0.6583749651908875
+        1.0,
+        1.0,
+        0.987
       ],
-      "metallic": 0.113,
+      "metallic": 0.06,
       "roughness": 0.5,
       "emissive": [
         1.0,
@@ -968,12 +968,16 @@ const CFG = {
       "desktop": {
         "enabled": true,
         "res": "full",
-        "type": "material"
+        "type": "material",
+        "match_size": false,
+        "ref_width": 1920
       },
       "phone": {
         "enabled": true,
         "res": "half",
-        "type": "emissive"
+        "type": "material",
+        "match_size": true,
+        "ref_width": 1920
       }
     },
     "noise": {
