@@ -2263,7 +2263,7 @@ const _wceBloomOv=(function(){
     const d=phone ? o.phone : o.desktop;
     if(!d || !d.enabled) return null;
     const sc=({full:1, half:0.5, quarter:0.25})[d.res];
-    return {type:(d.type||'material'), scale:(sc||1)};
+    return {type:(d.type||'material'), scale:(sc||1), match:!!d.match_size, ref:(Number(d.ref_width)>0 ? Number(d.ref_width) : 1920)};
   }catch(e){ return null; }
 })();
 const _wceBC={};
@@ -3692,13 +3692,23 @@ function _wceUpdateDofFocus(){
   dofPass.uniforms['focus'].value=dist;
 }
 const _wceBovS = _wceBloomOv ? _wceBloomOv.scale : 1;
+// Bloom Override > Match Size: the blur kernels are a fixed number of texels, so on a small screen (a phone) the same bloom covers a
+// much bigger part of the picture than on a desktop. With this on, the weights are shifted by log2(reference width / screen width)
+// more blur levels (on top of the Resolution shift below), so the glow keeps about the same SIZE on screen as on a reference-width desktop.
+const _wceBovMatchSize = !!(_wceBloomOv && _wceBloomOv.match);
+function _wceBovShift(){
+  const w=Math.max(1, innerWidth);
+  const sh=Math.log2(1/_wceBovS) + (_wceBovMatchSize ? Math.log2(Math.max(1,_wceBloomOv.ref/w)) : 0);
+  return Math.max(0,Math.min(4,Math.round(sh)));
+}
 function _wceBovMatch(pass,r){
-  if(!pass || _wceBovS>=1) return;
+  if(!pass || (_wceBovS>=1 && !_wceBovMatchSize)) return;
   try{
     const u=pass.compositeMaterial && pass.compositeMaterial.uniforms && pass.compositeMaterial.uniforms['bloomFactors'];
     if(!u || !u.value || u.value.length!==5) return;
-    const eff=Array.prototype.map.call(u.value,function(f){ return f*(1-r)+(1.2-f)*r; });
-    const k=Math.max(0,Math.min(4,Math.round(Math.log2(1/_wceBovS))));
+    if(!pass._wceBovEff) pass._wceBovEff=Array.prototype.map.call(u.value,function(f){ return f*(1-r)+(1.2-f)*r; });
+    const eff=pass._wceBovEff;
+    const k=_wceBovShift();
     const out=[0,0,0,0,0];
     for(let m=0;m<5;m++) out[Math.max(0,m-k)]+=eff[m];
     pass.radius=0;
@@ -3714,9 +3724,9 @@ if(_anyBloom){
   bloomPass=new UnrealBloomPass(new THREE.Vector2(innerWidth*_wceBovS,innerHeight*_wceBovS),
     Math.max(_bloomStrength,_wceBloomFloor),0.4,_bloomThreshold);
   _wceBovMatch(bloomPass,0.4);
-  if(_wceBovS!==1){
+  if(_wceBovS!==1 || _wceBovMatchSize){
     const _bpSet=bloomPass.setSize.bind(bloomPass);
-    bloomPass.setSize=function(w,h){ _bpSet(Math.max(2,Math.round(w*_wceBovS)),Math.max(2,Math.round(h*_wceBovS))); };
+    bloomPass.setSize=function(w,h){ _bpSet(Math.max(2,Math.round(w*_wceBovS)),Math.max(2,Math.round(h*_wceBovS))); _wceBovMatch(bloomPass,0.4); };
   }
   comp.addPass(bloomPass);
 }
@@ -3744,6 +3754,7 @@ if(_wceSelOn){
       this._w=Math.max(2,Math.floor(w*0.5*_wceBovS)); this._h=Math.max(2,Math.floor(h*0.5*_wceBovS));
       if(this._rt) this._rt.setSize(this._w,this._h);
       this._bloom.setSize(this._w,this._h);
+      _wceBovMatch(this._bloom,0.5);
     }
     dispose(){
       if(this._rt){ this._rt.dispose(); this._rt=null; }
@@ -3833,7 +3844,7 @@ if(_wceSelOn){
         renderer.setClearColor(oldClear,oldAlpha);
         renderer.setRenderTarget(oldRT);
       }
-      this._bloom.threshold=0.0; this._bloom.strength=1.0; this._bloom.radius=(_wceBovS<1 ? 0 : 0.5);
+      this._bloom.threshold=0.0; this._bloom.strength=1.0; this._bloom.radius=((_wceBovS<1 || _wceBovMatchSize) ? 0 : 0.5);
       this._bloom.render(renderer,null,this._rt,deltaTime,false);
       const h=this._bloom.renderTargetsHorizontal;
       const glowTex=(h && h[0]) ? h[0].texture : this._rt.texture;
