@@ -3,7 +3,7 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT_LWB\Highest\26566b275491.gltf
-Generated: 2026-11-15 19:45:50
+Generated: 2026-11-15 20:00:17
 Total size (this .gltf + its .bin + every texture file): 45.04 MB
 
 ======================================================================
