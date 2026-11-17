@@ -3,8 +3,8 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT_LWB\Highest\26566b275491.gltf
-Generated: 2026-11-15 20:00:17
-Total size (this .gltf + its .bin + every texture file): 45.04 MB
+Generated: 2026-11-17 11:32:23
+Total size (this .gltf + its .bin + every texture file): 44.92 MB
 
 ======================================================================
 EXPORT CONFIGURATION
@@ -35,7 +35,7 @@ None: every animated object sits under its own ANIM_ empty.
 SIZE BREAKDOWN (approximate — see notes)
 ======================================================================
 Geometry (vertex/index buffers): 0 B
-Textures (loose files, External Textures mode):    16.50 MB
+Textures (loose files, External Textures mode):    16.39 MB
 Unaccounted (other bufferViews): 27.99 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
 Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
 
@@ -50,7 +50,7 @@ Draco compression: ACTIVE
 TEXTURES
 ======================================================================
 KTX2 (GPU-compressed) active: YES
-Texture count: 87
+Texture count: 86
 Name                                     Format       Colorspace        Size  Mips    Disk size    Est. VRAM
 Carpaint_Clearcoat                       image/jpeg   unknown      1024x1024  auto     219.1 KB      5.33 MB
 Carpaint_Normal                          image/jpeg   linear       1024x1024  auto     213.3 KB      5.33 MB
@@ -75,12 +75,11 @@ Image_4                                  image/ktx2   unknown        512x512    
 Interior_Body_001_ao                     image/ktx2   unknown      2048x2048    12     361.8 KB      5.33 MB
 leather_red_02_rough_1k                  image/jpeg   linear       1024x1024  auto     175.7 KB      5.33 MB
 leather_red_02_nor_gl_1k                 image/jpeg   linear       1024x1024  auto     184.6 KB      5.33 MB
-Fabric04_1K_Normal                       image/ktx2   unknown      1024x1024    11     143.5 KB      1.33 MB
 LWB_ROOF_01_00_ao                        image/ktx2   unknown      2048x2048    12      63.0 KB      5.33 MB
-Fabric04_1K_Roughness                    image/ktx2   unknown      1024x1024    11      22.3 KB      1.33 MB
+ROOF_FABRIC_TILE_ONE                     image/ktx2   unknown        512x512    10      43.8 KB     341.3 KB
 Object127817_ao                          image/ktx2   unknown      2048x2048    12     211.3 KB      5.33 MB
 Image_44                                 image/ktx2   unknown      2048x2048    12     260.4 KB      5.33 MB
-FRONT_STICKER_SPEC                       image/ktx2   unknown        256x256     9       2.1 KB      85.3 KB
+FRONT_STICKER_SPEC                       image/ktx2   unknown        256x256     9       2.5 KB      85.3 KB
 Object127853_ao                          image/ktx2   unknown      2048x2048    12     139.4 KB      5.33 MB
 Image_61                                 image/ktx2   unknown        512x512    10       8.5 KB     341.3 KB
 Rack_Black_ao                            image/ktx2   unknown      2048x2048    12     124.1 KB      5.33 MB
@@ -140,7 +139,7 @@ SEAT_SYSTEM_TWIN_PASSENGER_RECLINE_SEAT_ image/ktx2   unknown      2048x2048    
 Seat_Accesories_2_001_ao                 image/ktx2   unknown      2048x2048    12     442.8 KB      5.33 MB
 Image_43                                 image/ktx2   unknown      1024x1024    11      63.7 KB      1.33 MB
 
-Estimated total VRAM for textures: 390.26 MB  (from real pixel sizes where the file could be read)
+Estimated total VRAM for textures: 387.92 MB  (from real pixel sizes where the file could be read)
 
 ======================================================================
 MATERIALS / DRAW CALLS

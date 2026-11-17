@@ -3286,6 +3286,7 @@ const FLOOR_Z = CFG.camera.floor_z ?? 0.0;
 let _renderUntil=performance.now()+1500;
 let _animActiveUntil=0;
 function requestRender(ms){ _renderUntil=Math.max(_renderUntil, performance.now()+(ms||300)); }
+window._wceRequestRender=requestRender;
 ctrl.addEventListener('change',()=>requestRender(400));
 ['pointerdown','pointerup','wheel','keydown','click','input','touchstart','touchend']
   .forEach(ev=>window.addEventListener(ev,()=>requestRender(400),{passive:true}));
@@ -9471,6 +9472,146 @@ function _wceSyncLightMatLinks(container, matName){
     light.visible = true;
   });
 }
+</script>
+<script>
+/* Config-driven HDRI rotation + position shift (reads CFG.viewer_hdri). No UI.
+   - mat_bc fa/fe/fp (the roughness-Fresnel) is already handled by the app itself.
+   - viewer_hdri.world.shift      -> sphere-projected reflections for every other standard material
+   - viewer_hdri.materials[NAME]  -> own HDRI rotation + shift; linked:true = uses the world HDRI texture and
+                                     intensity (re-synced whenever the app switches HDRI), with its own rotation/shift
+   World HDRI rotation is left to the app (hdris[].rotation_z / grade.env_rotation). */
+(function () {
+  'use strict';
+  var D = Math.PI / 180;
+  var DEF = '#define textureCubeUV textureCubeUV_orig\n';
+  var WRAP = '\n#ifdef ENVMAP_TYPE_CUBE_UV\n' +
+    'uniform vec3 uEnvShift;\nuniform float uEnvRadius;\nuniform float uEnvShiftOn;\n' +
+    'vec4 textureCubeUV( sampler2D envMap, vec3 sampleDir, float roughness ) {\n' +
+    '  if ( uEnvShiftOn > 0.5 && roughness < 0.9999 ) {\n' +
+    '    vec3 d = normalize( sampleDir * envMapRotation );\n' +
+    '    vec3 wp = cameraPosition + ( vec4( -vViewPosition, 0.0 ) * viewMatrix ).xyz;\n' +
+    '    vec3 o = wp - uEnvShift;\n' +
+    '    float b = dot( o, d );\n' +
+    '    float c = dot( o, o ) - uEnvRadius * uEnvRadius;\n' +
+    '    float t = -b + sqrt( max( b * b - c, 0.0 ) );\n' +
+    '    sampleDir = envMapRotation * normalize( o + d * t );\n' +
+    '  }\n' +
+    '  return textureCubeUV_orig( envMap, sampleDir, roughness );\n' +
+    '}\n#endif\n';
+
+  function num(v, d) { return (typeof v === 'number' && isFinite(v)) ? v : d; }
+  function mkU() { return { uEnvShift: { value: { x: 0, y: 0, z: 0 } }, uEnvRadius: { value: 1 }, uEnvShiftOn: { value: 1 } }; }
+
+  function bbox(meshes) {
+    var mn = [Infinity, Infinity, Infinity], mx = [-Infinity, -Infinity, -Infinity];
+    meshes.forEach(function (o) {
+      if (!o.geometry) return;
+      if (!o.geometry.boundingBox) o.geometry.computeBoundingBox();
+      o.updateWorldMatrix(true, false);
+      var e = o.matrixWorld.elements, b = o.geometry.boundingBox;
+      for (var i = 0; i < 8; i++) {
+        var x = i & 1 ? b.max.x : b.min.x, y = i & 2 ? b.max.y : b.min.y, z = i & 4 ? b.max.z : b.min.z;
+        var w = [e[0] * x + e[4] * y + e[8] * z + e[12], e[1] * x + e[5] * y + e[9] * z + e[13], e[2] * x + e[6] * y + e[10] * z + e[14]];
+        for (var k = 0; k < 3; k++) { mn[k] = Math.min(mn[k], w[k]); mx[k] = Math.max(mx[k], w[k]); }
+      }
+    });
+    var ok = mn.every(isFinite) && mx.every(isFinite);
+    return { c: ok ? mn.map(function (v, i) { return (v + mx[i]) / 2; }) : [0, 0, 0],
+             dim: ok ? (Math.max(mx[0] - mn[0], mx[1] - mn[1], mx[2] - mn[2]) || 1) : 1 };
+  }
+
+  var tries = 0;
+  var timer = setInterval(function () {
+    var cfg = window.CFG && window.CFG.viewer_hdri, s = window.scene;
+    if (!cfg) { if (++tries > 240) clearInterval(timer); return; }       // no section in config -> do nothing
+    if (!s || !s.traverse || !s.environment || !s.environmentRotation) { if (++tries > 480) clearInterval(timer); return; }
+    var NAMES = Object.keys(cfg.materials || {}), found = false;
+    s.traverse(function (o) { [].concat(o.material || []).forEach(function (m) { if (NAMES.indexOf(m.name) >= 0) found = true; }); });
+    if (!found && NAMES.length) { if (++tries > 480) clearInterval(timer); return; }
+    clearInterval(timer);
+    try { start(s, cfg); } catch (e) { console.error('[viewer_hdri]', e); }
+  }, 250);
+
+  function start(s, cfg) {
+    var NAMES = Object.keys(cfg.materials || {});
+    var wcfg = (cfg.world && cfg.world.shift) || null;
+    var UG = mkU(), uByName = {}, patched = new WeakSet(), warned = false;
+
+    function patch(mat, U) {
+      if (patched.has(mat) || !mat.isMeshStandardMaterial) return;
+      patched.add(mat);
+      mat.userData._envShiftU = U;
+      var prev = mat.onBeforeCompile, prevKey = mat.customProgramCacheKey;
+      mat.onBeforeCompile = function (shader, renderer) {
+        if (prev) prev.call(this, shader, renderer);
+        Object.assign(shader.uniforms, this.userData._envShiftU);
+        var f = shader.fragmentShader;
+        var CUBE = '#include <cube_uv_reflection_fragment>', COMMON = '#include <envmap_common_pars_fragment>';
+        var iCube = f.indexOf(CUBE), iCommon = f.indexOf(COMMON);
+        if (iCube < 0 || iCommon < 0) { if (!warned) { warned = true; console.warn('[viewer_hdri] shader chunks not found; shift disabled for some materials'); } return; }
+        if (iCommon < iCube) f = f.replace(CUBE, DEF + CUBE + '\n#undef textureCubeUV\n' + WRAP);
+        else f = f.replace(CUBE, DEF + CUBE + '\n#undef textureCubeUV\n').replace(COMMON, COMMON + '\n' + WRAP);
+        shader.fragmentShader = f;
+      };
+      mat.customProgramCacheKey = function () { return (prevKey ? prevKey.call(this) : '') + '|envshift'; };
+      mat.needsUpdate = true;
+    }
+
+    /* per-material entries */
+    var entries = [];
+    NAMES.forEach(function (name) {
+      var mv = cfg.materials[name], meshes = [], mats = new Set();
+      s.traverse(function (o) { [].concat(o.material || []).forEach(function (m) { if (m.name === name) { mats.add(m); if (meshes.indexOf(o) < 0) meshes.push(o); } }); });
+      if (!mats.size) return;
+      var bb = bbox(meshes), sh = mv.shift || {}, rot = mv.rotation_deg || {};
+      var U = mkU(); uByName[name] = U;
+      var r = (sh.radius == null) ? bb.dim * 10 : sh.radius;
+      U.uEnvShift.value = { x: bb.c[0] + num(sh.x, 0), y: bb.c[1] + num(sh.y, 0), z: bb.c[2] + num(sh.z, 0) };
+      U.uEnvRadius.value = r;
+      U.uEnvShiftOn.value = (sh.enabled === false || !mv.shift) ? 0 : 1;
+      entries.push({ mats: mats, linked: mv.linked !== false, rot: [num(rot.x, 0) * D, num(rot.y, 0) * D, num(rot.z, 0) * D], U: U });
+      mats.forEach(function (m) { patch(m, U); });
+    });
+
+    /* world shift: every other standard material, centre/radius from the scene's meshes */
+    var ownMats = new Set(); entries.forEach(function (e) { e.mats.forEach(function (m) { ownMats.add(m); }); });
+    var worldOn = !!(wcfg && wcfg.enabled !== false);
+    if (worldOn) {
+      var wm = [];
+      s.traverse(function (o) { if (o.isMesh && o.geometry && o.visible !== false) wm.push(o); });
+      var bw = bbox(wm);
+      UG.uEnvShift.value = { x: bw.c[0] + num(wcfg.x, 0), y: bw.c[1] + num(wcfg.y, 0), z: bw.c[2] + num(wcfg.z, 0) };
+      UG.uEnvRadius.value = (wcfg.radius == null) ? bw.dim * 10 : wcfg.radius;
+      UG.uEnvShiftOn.value = 1;
+    } else UG.uEnvShiftOn.value = 0;
+
+    function sweep() {                            /* new/swapped materials (paint variants) also get the world shift */
+      if (!worldOn) return;
+      s.traverse(function (o) { [].concat(o.material || []).forEach(function (m) { if (!ownMats.has(m)) patch(m, UG); }); });
+    }
+
+    /* keep linked materials following the world environment (HDRI switch, strength change) */
+    function sync() {
+      var changed = false;
+      entries.forEach(function (e) {
+        e.mats.forEach(function (m) {
+          if (e.linked) {
+            if (m.envMap !== s.environment) { m.envMap = s.environment; m.needsUpdate = true; changed = true; }
+            var ii = (s.environmentIntensity !== undefined) ? s.environmentIntensity : 1;
+            if (m.envMapIntensity !== ii) { m.envMapIntensity = ii; changed = true; }
+            if (m.envMapRotation) m.envMapRotation.set(e.rot[0], e.rot[1], e.rot[2]);
+          } else if (m.envMap) { m.envMap = null; m.needsUpdate = true; changed = true; }
+        });
+      });
+      if (changed && window._wceRequestRender) window._wceRequestRender(600);
+    }
+    sweep(); sync();
+    setInterval(sync, 250);
+    setInterval(sweep, 2000);
+    if (window._wceRequestRender) window._wceRequestRender(1000);
+    console.log('[viewer_hdri] applied from config for', NAMES.join(', '), worldOn ? '(+ world shift)' : '');
+  }
+})();
 </script>
 <script>(function(){
   var host=location.hostname;
