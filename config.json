@@ -611,7 +611,7 @@
       "phone": {
         "enabled": true,
         "res": "half",
-        "type": "emissive",
+        "type": "material",
         "match_size": true,
         "ref_width": 1920
       }
