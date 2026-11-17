@@ -604,17 +604,12 @@
       "desktop": {
         "enabled": true,
         "res": "full",
-        "type": "material",
-        "match_size": false,
-        "ref_width": 1920
+        "type": "material"
       },
       "phone": {
         "enabled": true,
         "res": "half",
-        "type": "material",
-        "match_size": true,
-        "ref_width": 1920,
-        "strength_scale": 0.5
+        "type": "emissive"
       }
     },
     "noise": {
