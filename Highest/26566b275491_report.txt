@@ -3,8 +3,8 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT_LWB\Highest\26566b275491.gltf
-Generated: 2026-11-18 02:36:20
-Total size (this .gltf + its .bin + every texture file): 41.37 MB
+Generated: 2026-11-19 01:32:25
+Total size (this .gltf + its .bin + every texture file): 43.75 MB
 
 ======================================================================
 EXPORT CONFIGURATION
@@ -35,27 +35,29 @@ None: every animated object sits under its own ANIM_ empty.
 SIZE BREAKDOWN (approximate — see notes)
 ======================================================================
 Geometry (vertex/index buffers): 0 B
-Textures (loose files, External Textures mode):    19.01 MB
-Unaccounted (other bufferViews): 21.81 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
+Textures (loose files, External Textures mode):    21.21 MB
+Unaccounted (other bufferViews): 21.98 MB  — sparse accessor data, custom extensions, etc.; not a bug, just outside this report's simple split
 Note: split is by bufferView/file reference (accessor->geometry, image->texture) — an approximation, not an exact byte-by-byte accounting.
 
 ======================================================================
 GEOMETRY
 ======================================================================
-Meshes: 417   Primitives: 505
-Triangles: 4,443,050   Vertices: 4,122,733
+Meshes: 416   Primitives: 505
+Triangles: 4,441,765   Vertices: 4,128,990
 Draco compression: ACTIVE
 
 ======================================================================
 TEXTURES
 ======================================================================
 KTX2 (GPU-compressed) active: YES
-Texture count: 85
+Texture count: 91
 Name                                     Format       Colorspace        Size  Mips    Disk size    Est. VRAM
 Carpaint_Clearcoat                       image/jpeg   unknown      1024x1024  auto     219.1 KB      5.33 MB
 Carpaint_Normal                          image/ktx2   unknown      1024x1024    11      1.09 MB      1.33 MB
 Tex_GROUNDSHADOW_1                       image/png    sRGB          1024x501  auto      37.2 KB      2.61 MB
 Tex_GROUNDSHADOW_2                       image/png    sRGB          1024x501  auto      41.9 KB      2.61 MB
+Group_002_ao                             image/ktx2   unknown      1024x1024    11      89.3 KB      1.33 MB
+Group_003_ao                             image/ktx2   unknown        512x512    10      36.3 KB     341.3 KB
 Group_ao                                 image/ktx2   unknown      1024x1024    11     107.9 KB      1.33 MB
 Image_21                                 image/ktx2   unknown        512x512    10       5.9 KB     341.3 KB
 Image_18                                 image/ktx2   unknown      1024x1024    11      22.9 KB      1.33 MB
@@ -64,6 +66,7 @@ CARPET_ao                                image/ktx2   unknown      1024x1024    
 Image_55                                 image/ktx2   unknown        512x512    10       9.7 KB     341.3 KB
 Image_56                                 image/ktx2   unknown      1024x1024    11      63.5 KB      1.33 MB
 FIRE_EXTINGUISHER_ao                     image/ktx2   unknown      1024x1024    11      72.1 KB      1.33 MB
+FOOTSTEP_ao                              image/ktx2   unknown      1024x1024    11      85.3 KB      1.33 MB
 Front_Alloy_004_ao                       image/ktx2   unknown      1024x1024    11      61.2 KB      1.33 MB
 Image_38                                 image/ktx2   unknown        512x512    10      47.4 KB     341.3 KB
 Image_39                                 image/ktx2   unknown      1024x1024    11      96.9 KB      1.33 MB
@@ -71,17 +74,18 @@ Front_Tyre005_006_ao                     image/ktx2   unknown      1024x1024    
 Image_40                                 image/ktx2   unknown      1024x1024    11      16.8 KB      1.33 MB
 Image                                    image/ktx2   unknown            4x4     3        451 B         21 B
 Image_4                                  image/ktx2   unknown        512x512    10      48.4 KB     341.3 KB
-Interior_Body_001_ao                     image/ktx2   unknown      2048x2048    12     361.8 KB      5.33 MB
+Interior_Body_001_ao                     image/ktx2   unknown      2048x2048    12     357.6 KB      5.33 MB
 leather_red_02_rough_1k                  image/ktx2   unknown      1024x1024    11    1013.0 KB      1.33 MB
 leather_red_02_nor_gl_1k                 image/ktx2   unknown      1024x1024    11      1.10 MB      1.33 MB
-LWB_ROOF_01_00_ao                        image/ktx2   unknown      2048x2048    12      63.0 KB      5.33 MB
+LWB_ROOF_01_00_ao                        image/ktx2   unknown      2048x2048    12      62.8 KB      5.33 MB
 ROOF_FABRIC_TILE_ONE                     image/ktx2   unknown        512x512    10      43.8 KB     341.3 KB
 Group_001_ao                             image/ktx2   unknown      1024x1024    11      80.0 KB      1.33 MB
-Object127817_ao                          image/ktx2   unknown      2048x2048    12     211.3 KB      5.33 MB
+Object127817_ao                          image/ktx2   unknown      2048x2048    12     211.4 KB      5.33 MB
 Image_44                                 image/ktx2   unknown      2048x2048    12     260.4 KB      5.33 MB
 FRONT_STICKER_SPEC                       image/ktx2   unknown        256x256     9       2.5 KB      85.3 KB
 Image_61                                 image/ktx2   unknown        512x512    10       8.5 KB     341.3 KB
-Rack_Black_ao                            image/ktx2   unknown      1024x1024    11      54.6 KB      1.33 MB
+Rack_Black_ao                            image/ktx2   unknown      1024x1024    11      54.3 KB      1.33 MB
+Rack_Black017_ao                         image/ktx2   unknown        512x512    10      36.9 KB     341.3 KB
 Rack_White_ao                            image/ktx2   unknown      1024x1024    11      68.3 KB      1.33 MB
 Image_41                                 image/ktx2   unknown        256x256     9      10.0 KB      85.3 KB
 Image_47                                 image/ktx2   unknown        512x512    10      26.8 KB     341.3 KB
@@ -89,9 +93,11 @@ Image_48                                 image/ktx2   unknown        512x512    
 Image_49                                 image/ktx2   unknown        512x512    10      32.7 KB     341.3 KB
 Image_37                                 image/ktx2   unknown      1024x1024    11      36.4 KB      1.33 MB
 UV_Windshield [Converted]                image/png    sRGB          1713x844  auto     183.1 KB      7.35 MB
-Walnut Wood Panel UV Texture Layout      image/jpeg   sRGB         1254x1254  auto      89.1 KB      8.00 MB
+Wood_Carpet_ao                           image/ktx2   unknown      2048x2048    12     124.2 KB      5.33 MB
+plank4k-02                               image/jpeg   sRGB         2867x2867  auto      1.86 MB     41.81 MB
 CAB_DOOR_RH_ao                           image/ktx2   unknown      1024x1024    11      50.1 KB      1.33 MB
 Opacity                                  image/png    sRGB         1024x1024  auto      98.8 KB      5.33 MB
+Object089_ao                             image/ktx2   unknown      1024x1024    11      66.6 KB      1.33 MB
 Image_20                                 image/ktx2   unknown      1024x1024    11     128.0 KB      1.33 MB
 Image_57                                 image/ktx2   unknown      2048x2048    12     271.0 KB      5.33 MB
 Image_58                                 image/ktx2   unknown      2048x2048    12     107.1 KB      5.33 MB
@@ -101,9 +107,8 @@ Object127862_ao                          image/ktx2   unknown      2048x2048    
 Open_body_132_ao                         image/ktx2   unknown      1024x1024    11      24.4 KB      1.33 MB
 GSMBiDim_001_ao                          image/ktx2   unknown      1024x1024    11      43.2 KB      1.33 MB
 Image_46                                 image/jpeg   sRGB          1672x941  auto     120.6 KB      8.00 MB
-polySurface4_001_ao                      image/ktx2   unknown      2048x2048    12     272.2 KB      5.33 MB
 Normal_GrainedPlastic                    image/ktx2   unknown        740x740    10      90.4 KB     713.0 KB
-Steering_001_ao                          image/ktx2   unknown      1024x1024    11      74.6 KB      1.33 MB
+Steering_001_ao                          image/ktx2   unknown      1024x1024    11      75.1 KB      1.33 MB
 Steering_002_ao                          image/ktx2   unknown      1024x1024    11      98.5 KB      1.33 MB
 Image_2.001                              image/ktx2   unknown      2048x2048    12      4.26 MB      5.33 MB
 Steering_003_ao                          image/ktx2   unknown      1024x1024    11      74.3 KB      1.33 MB
@@ -136,9 +141,10 @@ Open_body_144_ao                         image/ktx2   unknown      1024x1024    
 SEATSYSTEMAO_ao                          image/ktx2   unknown      1024x1024    11      98.2 KB      1.33 MB
 SEAT_SYSTEM_TWIN_PASSENGER_RECLINE_SEAT_ image/ktx2   unknown      1024x1024    11     113.4 KB      1.33 MB
 Seat_Accesories_2_001_ao                 image/ktx2   unknown      1024x1024    11     136.3 KB      1.33 MB
+polySurface4_001_ao                      image/ktx2   unknown      2048x2048    12     272.6 KB      5.33 MB
 Image_43                                 image/ktx2   unknown      1024x1024    11      63.7 KB      1.33 MB
 
-Estimated total VRAM for textures: 287.17 MB  (from real pixel sizes where the file could be read)
+Estimated total VRAM for textures: 330.97 MB  (from real pixel sizes where the file could be read)
 
 Texture resize pass for this file:
   Tier resize:            off
@@ -150,7 +156,7 @@ Texture resize pass for this file:
 ======================================================================
 MATERIALS / DRAW CALLS
 ======================================================================
-Materials: 205
+Materials: 219
 Primitives (mesh x material combinations): 505
 Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
 
