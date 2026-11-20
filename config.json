@@ -391,8 +391,14 @@
     "Orange_Blinkers": {
       "b": 1.0,
       "c": 1.0,
-      "ba": 8.0,
-      "bm": 0
+      "ba": 2.0,
+      "bm": 1
+    },
+    "Orange_Blinkers.001": {
+      "b": 1.0,
+      "c": 1.0,
+      "ba": 2.0,
+      "bm": 1
     }
   },
   "light_mat_links": [],
@@ -586,14 +592,14 @@
       "desktop": {
         "enabled": true,
         "res": "full",
-        "type": "material",
-        "match_size": false,
+        "type": "selective",
+        "match_size": true,
         "ref_width": 1920
       },
       "phone": {
         "enabled": true,
         "res": "half",
-        "type": "emissive",
+        "type": "material",
         "match_size": true,
         "ref_width": 1920
       }
