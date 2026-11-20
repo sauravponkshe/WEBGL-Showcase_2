@@ -3,7 +3,7 @@
 PONKFIGURATOR PRO — Export Report — Highest
 ======================================================================
 File: E:\URBANIA\EXPORT_LWB\Highest\26566b275491.gltf
-Generated: 2026-11-20 20:19:34
+Generated: 2026-11-20 21:51:03
 Total size (this .gltf + its .bin + every texture file): 43.38 MB
 
 ======================================================================
@@ -42,8 +42,8 @@ Note: split is by bufferView/file reference (accessor->geometry, image->texture)
 ======================================================================
 GEOMETRY
 ======================================================================
-Meshes: 424   Primitives: 515
-Triangles: 4,448,166   Vertices: 4,139,180
+Meshes: 423   Primitives: 514
+Triangles: 4,448,186   Vertices: 4,139,196
 Draco compression: ACTIVE
 
 ======================================================================
@@ -153,8 +153,8 @@ Texture resize pass for this file:
 ======================================================================
 MATERIALS / DRAW CALLS
 ======================================================================
-Materials: 228
-Primitives (mesh x material combinations): 515
+Materials: 227
+Primitives (mesh x material combinations): 514
 Draw calls track distinct MATERIALS actually drawn, not primitive count directly — primitives sharing one material can still batch; this is an upper-bound proxy, not a live measurement.
 
 ======================================================================
